@@ -1,0 +1,20 @@
+.qa-post {
+  float: left;
+  padding: 15px;
+  .btn {
+    background: white;
+    &:hover {
+      background: dark-light-diff($primary, $secondary, 65%, -75%);
+      color: $secondary;
+    }
+  }
+  .count {
+    text-align: center;
+  }
+}
+
+.qa-post + article {
+  position: relative;
+  float: left;
+  width: calc(100% - 65px);
+}

@@ -1,0 +1,5 @@
+plugins:
+  qa_tags:
+    client: true
+    type: list
+    default: 'question'
