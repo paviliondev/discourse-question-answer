@@ -1,3 +1,5 @@
 en:
   site_settings:
     qa_tags: "Tags to enable QA on topic"
+  vote:
+    already_voted: "You can only vote once per question."

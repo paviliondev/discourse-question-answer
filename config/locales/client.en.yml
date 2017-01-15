@@ -2,3 +2,5 @@ en:
   js:
     category:
       enable_qa: "Enable QA style for topics in this category."
+    vote:
+      already_voted: "You can only vote once per question."

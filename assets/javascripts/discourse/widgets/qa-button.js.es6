@@ -9,6 +9,6 @@ export default createWidget('qa-button', {
   },
 
   click() {
-    this.sendWidgetAction('vote', this.attrs.direction)
+    this.sendWidgetAction('vote')
   }
 })

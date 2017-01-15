@@ -8,37 +8,6 @@ register_asset 'stylesheets/qa-styles.scss', :desktop
 after_initialize do
   Category.register_custom_field_type('qa_enabled', :boolean)
 
-  module ::DiscourseQa
-    class Engine < ::Rails::Engine
-      engine_name "discourse_qa"
-      isolate_namespace DiscourseQa
-    end
-  end
-
-  require_dependency "application_controller"
-  class DiscourseQa::QaController < ::ApplicationController
-    def vote
-      post = Post.find(params[:id].to_i)
-      post.custom_fields["qa_count"] = post.custom_fields["qa_count"].to_i + params[:change].to_i
-      post.save!
-      msg = {
-        updated_at: Time.now,
-        post_id: post.id,
-        type: "revised"
-      }
-      MessageBus.publish("/topic/#{post.topic.id}", msg, group_ids: post.topic.secure_group_ids)
-      render json: success_json
-    end
-  end
-
-  DiscourseQa::Engine.routes.draw do
-    post "/vote" => "qa#vote"
-  end
-
-  Discourse::Application.routes.append do
-    mount ::DiscourseQa::Engine, at: "qa"
-  end
-
   module QAHelper
     class << self
       def qa_enabled(topic)
@@ -47,21 +16,66 @@ after_initialize do
         is_qa_category = topic.category && topic.category.custom_fields["qa_enabled"]
         has_qa_tag || is_qa_category
       end
+
+      ## This should be replaced with a :voted? property in TopicUser - but how to do this in a plugin?
+      def user_has_voted(topic, user)
+        PostAction.exists?(post_id: topic.posts.map(&:id),
+                           user_id: user.id,
+                           post_action_type_id: PostActionType.types[:vote])
+      end
+    end
+  end
+
+  require 'post_serializer'
+  class ::PostSerializer
+    attributes :vote_count, :sort_order
+  end
+
+  require 'post_actions_controller'
+  class ::PostActionsController
+    before_filter :check_if_voted, only: :create
+
+    def check_if_voted
+      if QAHelper.qa_enabled(@post.topic)
+        if QAHelper.user_has_voted(@post.topic, current_user)
+          raise Discourse::InvalidAccess.new, I18n.t('vote.alread_voted')
+        end
+      end
+    end
+  end
+
+  require 'post_action'
+  class ::PostAction
+    def is_vote?
+      post_action_type_id == PostActionType.types[:vote]
+    end
+
+    def notify_subscribers
+      if (is_like? || is_flag? || is_vote?) && post
+        post.publish_change_to_clients! :acted
+      end
     end
   end
 
   DiscourseEvent.on(:post_created) do |post, opts, user|
-    if QAHelper.qa_enabled(post.topic)
-      post.custom_fields['qa_count'] = 0
+    if !post.is_first_post? && QAHelper.qa_enabled(post.topic)
+      post.sort_order = Topic.max_sort_order
       post.save!
     end
   end
 
-  TopicView.add_post_custom_fields_whitelister do |user|
-    ["qa_count"]
+  require 'topic_view_serializer'
+  class ::TopicViewSerializer
+    attributes :voted, :qa_enabled
+
+    def qa_enabled
+      QAHelper.qa_enabled(object.topic)
+    end
+
+    def voted
+      QAHelper.user_has_voted(object.topic, scope.current_user)
+    end
   end
 
-  add_to_serializer(:topic_view, :qa_enabled) {QAHelper.qa_enabled(object.topic)}
-  add_to_serializer(:basic_category, :qa_enabled) {object.custom_fields["qa_enabled"]}
-  add_to_serializer(:post, :qa_count) {post_custom_fields["qa_count"]}
+  add_to_serializer(:basic_category, :qa_enabled) { object.custom_fields["qa_enabled"] }
 end

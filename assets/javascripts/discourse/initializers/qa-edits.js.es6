@@ -7,37 +7,22 @@ export default {
   name: 'qa-edits',
   initialize(){
     withPluginApi('0.1', api => {
-      api.includePostAttributes('qa_count')
       api.decorateWidget('post:before', function(helper) {
         const model = helper.getModel();
-        if (model && model.get('topic.qa_enabled')) {
+        if (model && model.get('post_number') !== 1 && model.get('topic.qa_enabled')) {
           return helper.attach('qa-post', {
-            count: model.get('qa_count'),
+            count: model.get('vote_count'),
             post: model
           })
         }
       })
-    })
-
-    TopicController.reopen({
-      @observes('model.postStream.loaded')
-      subscribeToQAUpdates() {
-        let model = this.get('model'),
-            postStream = model.get('postStream'),
-            refresh = (args) => this.appEvents.trigger('post-stream:refresh', args);
-
-        if (model.qa_enabled && postStream.get('loaded')) {
-          this.messageBus.subscribe("/topic/" + model.id, function(data) {
-            if (data.type === 'revised') {
-              if (data.post_id !== undefined) {
-                postStream.triggerChangedPost(data.post_id, data.updated_at).then(() =>
-                  refresh({ id: data.post_id })
-                );
-              }
-            }
-          })
+      api.attachWidgetAction('post', 'undoPostAction', function(typeId) {
+        const post = this.model;
+        if (typeId === 5) {
+          post.set('topic.voted', false)
         }
-      }
+        return post.get('actions_summary').findBy('id', typeId).undo(post);
+      })
     })
   }
 }
