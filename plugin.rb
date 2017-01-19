@@ -19,6 +19,8 @@ after_initialize do
 
       ## This should be replaced with a :voted? property in TopicUser - but how to do this in a plugin?
       def user_has_voted(topic, user)
+        return nil if !user
+        
         PostAction.exists?(post_id: topic.posts.map(&:id),
                            user_id: user.id,
                            post_action_type_id: PostActionType.types[:vote])
@@ -36,7 +38,7 @@ after_initialize do
     before_filter :check_if_voted, only: :create
 
     def check_if_voted
-      if QAHelper.qa_enabled(@post.topic)
+      if current_user && QAHelper.qa_enabled(@post.topic)
         if QAHelper.user_has_voted(@post.topic, current_user)
           raise Discourse::InvalidAccess.new, I18n.t('vote.alread_voted')
         end
@@ -73,7 +75,7 @@ after_initialize do
     end
 
     def voted
-      QAHelper.user_has_voted(object.topic, scope.current_user)
+      scope.current_user && QAHelper.user_has_voted(object.topic, scope.current_user)
     end
   end
 
