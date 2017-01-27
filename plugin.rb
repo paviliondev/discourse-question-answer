@@ -20,7 +20,7 @@ after_initialize do
       ## This should be replaced with a :voted? property in TopicUser - but how to do this in a plugin?
       def user_has_voted(topic, user)
         return nil if !user
-        
+
         PostAction.exists?(post_id: topic.posts.map(&:id),
                            user_id: user.id,
                            post_action_type_id: PostActionType.types[:vote])
@@ -60,7 +60,7 @@ after_initialize do
   end
 
   DiscourseEvent.on(:post_created) do |post, opts, user|
-    if !post.is_first_post? && QAHelper.qa_enabled(post.topic)
+    if !post.is_first_post? && QAHelper.qa_enabled(post.topic) && post.post_type == 1
       post.sort_order = Topic.max_sort_order
       post.save!
     end
