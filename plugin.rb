@@ -80,4 +80,140 @@ after_initialize do
   end
 
   add_to_serializer(:basic_category, :qa_enabled) { object.custom_fields["qa_enabled"] }
+
+  #create qa specific badges
+  upvotes_id = BadgeGrouping.find_or_create_by(name: "Upvotes", position: 1).id
+  badge_type_gold_id = BadgeType.find_by(name: "Gold").id
+  badge_type_silver_id = BadgeType.find_by(name: "Silver").id
+  badge_type_bronze_id = BadgeType.find_by(name: "Bronze").id
+
+  professor = {
+    name: "Professor",
+    description: "Received more than 100 total upvotes",
+    badge_type_id: badge_type_gold_id,
+    allow_title: true,
+    multiple_grant: false,
+    icon: "fa-graduation-cap",
+    listable: true,
+    target_posts: false,
+    query:
+    "SELECT count(*), r.username Liked, r.id user_id, current_timestamp granted_at\nFROM post_actions pa\nINNER JOIN posts p on p.id=pa.post_id /* Get post details */\nINNER JOIN users r on r.id=p.user_id /* The user who made the post that was liked */\nWHERE pa.post_action_type_id=5 /* upvote type */\nGROUP BY Liked, r.id\nHAVING count(*) >= 100 /* Change to suit */\nORDER BY count(*) DESC",
+    enabled: true,
+    auto_revoke: false,
+    badge_grouping_id: upvotes_id,
+    trigger: 0,
+    show_posts: false,
+    system: false,
+    image: "fa-graduation-cap",
+    long_description: ""
+  }
+
+  teacher = {
+    name: "Teacher",
+    description: "Received more than 20 total upvotes",
+    badge_type_id: badge_type_silver_id,
+    allow_title: true,
+    multiple_grant: false,
+    icon: "fa-graduation-cap",
+    listable: true,
+    target_posts: false,
+    query:
+    "SELECT count(*), r.username Liked, r.id user_id, current_timestamp granted_at\nFROM post_actions pa\nINNER JOIN posts p on p.id=pa.post_id /* Get post details */\nINNER JOIN users r on r.id=p.user_id /* The user who made the post that was liked */\nWHERE pa.post_action_type_id=5 /* upvote type */\nGROUP BY Liked, r.id\nHAVING count(*) >= 20 /* Change to suit */\nORDER BY count(*) DESC",
+    enabled: true,
+    auto_revoke: false,
+    badge_grouping_id: upvotes_id,
+    trigger: 0,
+    show_posts: false,
+    system: false,
+    image: "fa-graduation-cap",
+    long_description: ""
+  }
+
+  tutor = {
+    name: "Tutor",
+    description: "Received more than 10 total upvotes",
+    badge_type_id: badge_type_bronze_id,
+    allow_title: true,
+    multiple_grant: false,
+    icon: "fa-graduation-cap",
+    listable: true,
+    target_posts: false,
+    query:
+    "SELECT count(*), r.username Liked, r.id user_id, current_timestamp granted_at\nFROM post_actions pa\nINNER JOIN posts p on p.id=pa.post_id /* Get post details */\nINNER JOIN users r on r.id=p.user_id /* The user who made the post that was liked */\nWHERE pa.post_action_type_id=5 /* upvote type */\nGROUP BY Liked, r.id\nHAVING count(*) >= 10 /* Change to suit */\nORDER BY count(*) DESC",
+    enabled: true,
+    auto_revoke: false,
+    badge_grouping_id: upvotes_id,
+    trigger: 0,
+    show_posts: false,
+    system: false,
+    image: "fa-graduation-cap",
+    long_description: ""
+  }
+
+  goal = {
+    name: "Goooal!!!",
+    description: "Received one upvote for an answer",
+    badge_type_id: badge_type_bronze_id,
+    allow_title: false,
+    multiple_grant: true,
+    icon: "fa-futbol-o",
+    listable: true,
+    target_posts: false,
+    query: "SELECT p.user_id, p.id post_id, p.updated_at granted_at\nFROM badge_posts p\nWHERE p.vote_count >= 1 AND\n(:backfill OR p.id IN (:post_ids) )",
+    enabled: true,
+    auto_revoke: false,
+    badge_grouping_id: upvotes_id,
+    trigger: 1,
+    show_posts: true,
+    system: false,
+    image: "fa-futbol-o",
+    long_description: nil
+  }
+
+  double_play = {
+    name: "Double Play",
+    description: "Received two upvotes for an answer",
+    badge_type_id: badge_type_silver_id,
+    allow_title: false,
+    multiple_grant: true,
+    icon: "fa-futbol-o",
+    listable: true,
+    target_posts: false,
+    query: "SELECT p.user_id, p.id post_id, p.updated_at granted_at\nFROM badge_posts p\nWHERE p.vote_count >= 2 AND\n(:backfill OR p.id IN (:post_ids) )",
+    enabled: true,
+    auto_revoke: false,
+    badge_grouping_id: upvotes_id,
+    trigger: 1,
+    show_posts: true,
+    system: false,
+    image: "fa-futbol-o",
+    long_description: nil
+  }
+
+  hat_trick = {
+    name: "Hat-trick",
+    description: "Received three upvotes for an answer",
+    badge_type_id: badge_type_gold_id,
+    allow_title: false,
+    multiple_grant: true,
+    icon: "fa-futbol-o",
+    listable: true,
+    target_posts: false,
+    query: "SELECT p.user_id, p.id post_id, p.updated_at granted_at\nFROM badge_posts p\nWHERE p.vote_count >= 3 AND\n(:backfill OR p.id IN (:post_ids) )",
+    enabled: true,
+    auto_revoke: false,
+    badge_grouping_id: upvotes_id,
+    trigger: 1,
+    show_posts: true,
+    system: false,
+    image: "fa-futbol-o",
+    long_description: nil
+  }
+
+  Badge.find_or_create_by(professor)
+  Badge.find_or_create_by(teacher)
+  Badge.find_or_create_by(tutor)
+  Badge.find_or_create_by(goal)
+  Badge.find_or_create_by(double_play)
+  Badge.find_or_create_by(hat_trick)
 end
