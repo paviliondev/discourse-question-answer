@@ -14,7 +14,8 @@ after_initialize do
         tags = topic.tags.map(&:name)
         has_qa_tag = !(tags & SiteSetting.qa_tags.split('|')).empty?
         is_qa_category = topic.category && topic.category.custom_fields["qa_enabled"]
-        has_qa_tag || is_qa_category
+        is_qa_subtype = topic.subtype == 'question'
+        has_qa_tag || is_qa_category || is_qa_subtype
       end
 
       ## This should be replaced with a :voted? property in TopicUser - but how to do this in a plugin?
