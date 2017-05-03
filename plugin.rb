@@ -31,7 +31,7 @@ after_initialize do
 
   require 'post_serializer'
   class ::PostSerializer
-    attributes :vote_count, :sort_order
+    attributes :vote_count
   end
 
   require 'post_actions_controller'
@@ -60,11 +60,33 @@ after_initialize do
     end
   end
 
-  DiscourseEvent.on(:post_created) do |post, opts, user|
-    if !post.is_first_post? && QAHelper.qa_enabled(post.topic) && post.post_type == 1
-      post.sort_order = Topic.max_sort_order
-      post.save!
+  ## necessary until I figure out how to properly use sort order with vote count
+  module QAExtension
+    def qa_enabled
+      @topic.category.custom_fields['qa_enabled']
     end
+
+    def order_by
+      if qa_enabled
+        "case when post_number = 1 then 0 else 1 end, vote_count DESC"
+      else
+        'sort_order'
+      end
+    end
+
+    def filter_posts_by_ids(post_ids)
+      @posts = Post.where(id: post_ids, topic_id: @topic.id)
+                   .includes(:user, :reply_to_user, :incoming_email)
+                   .order(order_by)
+      @posts = filter_post_types(@posts)
+      @posts = @posts.with_deleted if @guardian.can_see_deleted_posts?
+      @posts
+    end
+  end
+
+  require 'topic_view'
+  class ::TopicView
+    prepend QAExtension
   end
 
   require 'topic_view_serializer'
