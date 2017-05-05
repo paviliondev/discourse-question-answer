@@ -63,7 +63,7 @@ after_initialize do
   ## necessary until I figure out how to properly use sort order with vote count
   module QAExtension
     def qa_enabled
-      @topic.category.custom_fields['qa_enabled']
+      @topic.category && @topic.category.custom_fields['qa_enabled']
     end
 
     def order_by
