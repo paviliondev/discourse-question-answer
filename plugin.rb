@@ -39,10 +39,10 @@ after_initialize do
     before_filter :check_if_voted, only: :create
 
     def check_if_voted
-      if current_user && QAHelper.qa_enabled(@post.topic)
-        if QAHelper.user_has_voted(@post.topic, current_user)
-          raise Discourse::InvalidAccess.new, I18n.t('vote.alread_voted')
-        end
+      if current_user && params[:post_action_type_id].to_i === PostActionType.types[:vote] &&
+        QAHelper.qa_enabled(@post.topic) && QAHelper.user_has_voted(@post.topic, current_user)
+         puts "PASSED"
+         raise Discourse::InvalidAccess.new, I18n.t('vote.alread_voted')
       end
     end
   end
