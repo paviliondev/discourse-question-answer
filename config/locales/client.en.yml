@@ -6,7 +6,7 @@ en:
           title: "QnA Topic"
           details: "Users can vote for the response that best answers the initial post.
                     <ul><li>Each user is allowed one vote.</li>
-                    <li>Posts are ordered by vote count.</li></ul>"
+                    <li>Responses are ordered by vote count.</li></ul>"
     category:
       enable_qa: "Enable QnA style for topics in this category."
     vote:
