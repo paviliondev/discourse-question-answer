@@ -1,4 +1,6 @@
 import { withPluginApi } from 'discourse/lib/plugin-api';
+import { default as computed } from 'ember-addons/ember-computed-decorators';
+import Topic from 'discourse/models/topic';
 
 export default {
   name: 'qa-edits',
@@ -21,6 +23,23 @@ export default {
         }
         return post.get('actions_summary').findBy('id', typeId).undo(post);
       })
+    })
+
+    Topic.reopen({
+      @computed('tags', 'category', 'subtype')
+      qaEnabled(tags, category, subtype) {
+        const qaTags = this.siteSettings.qa_tags.split('|');
+        let hasTag = tags.filter(function(t){ return qaTags.indexOf(t) !== -1; }).length > 0;
+        let isCategory = category && category.qa_enabled;
+        let isSubtype = subtype === 'question';
+
+        return hasTag || isCategory || isSubtype;
+      },
+
+      @computed('qaEnabled')
+      showQaTip(qaEnabled) {
+        return qaEnabled && this.siteSettings.qa_show_topic_tip;
+      }
     })
   }
 }
