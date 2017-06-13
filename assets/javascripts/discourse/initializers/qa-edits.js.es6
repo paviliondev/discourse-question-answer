@@ -1,7 +1,4 @@
 import { withPluginApi } from 'discourse/lib/plugin-api';
-import { default as computed, on, observes } from 'ember-addons/ember-computed-decorators';
-import TopicController from 'discourse/controllers/topic';
-import Composer from 'discourse/models/composer';
 
 export default {
   name: 'qa-edits',
@@ -16,6 +13,7 @@ export default {
           })
         }
       })
+
       api.attachWidgetAction('post', 'undoPostAction', function(typeId) {
         const post = this.model;
         if (typeId === 5) {

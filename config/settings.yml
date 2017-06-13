@@ -3,3 +3,6 @@ plugins:
     client: true
     type: list
     default: 'question'
+  qa_show_topic_tip:
+    client: true
+    default: true

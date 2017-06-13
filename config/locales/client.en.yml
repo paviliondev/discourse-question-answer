@@ -1,6 +1,13 @@
 en:
   js:
+    topic:
+      tip:
+        qa:
+          title: "QnA Topic"
+          details: "Users can vote for the response that best answers the initial post.
+                    <ul><li>Each user is allowed one vote.</li>
+                    <li>Posts are ordered by vote count.</li></ul>"
     category:
-      enable_qa: "Enable QA style for topics in this category."
+      enable_qa: "Enable QnA style for topics in this category."
     vote:
       already_voted: "You can only vote once per question."

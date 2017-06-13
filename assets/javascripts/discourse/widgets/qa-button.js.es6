@@ -1,5 +1,4 @@
 import { createWidget } from 'discourse/widgets/widget';
-import { h } from 'virtual-dom';
 
 export default createWidget('qa-button', {
   tagName: 'button.btn.qa-button',

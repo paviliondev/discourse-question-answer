@@ -1,3 +1,22 @@
+.qa-tip {
+  padding: 10px 0;
+
+  .btn {
+    float: left;
+  }
+
+  .fa {
+    margin-right: 2px;
+  }
+
+  .tip-details {
+    background-color: dark-light-diff($primary, $secondary, 95%, -85%);
+    padding: 10px 15px;
+    float: left;
+    clear: both;
+  }
+}
+
 .qa-post {
   float: left;
   padding-right: 20px;

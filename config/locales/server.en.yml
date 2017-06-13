@@ -1,5 +1,6 @@
 en:
   site_settings:
-    qa_tags: "Tags to enable QA on topic"
+    qa_tags: "Tags to enable QnA on topic"
+    qa_show_topic_tip: "Show a tip about the mechanics of QnA topics under the titles of QnA topics"
   vote:
     already_voted: "You can only vote once per question."

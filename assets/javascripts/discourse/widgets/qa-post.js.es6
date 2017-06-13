@@ -1,5 +1,4 @@
 import { createWidget } from 'discourse/widgets/widget';
-import { ajax } from 'discourse/lib/ajax';
 import { h } from 'virtual-dom';
 
 export default createWidget('qa-post', {
