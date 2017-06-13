@@ -8,7 +8,7 @@ export default {
     withPluginApi('0.1', api => {
       api.decorateWidget('post:before', function(helper) {
         const model = helper.getModel();
-        if (model && model.get('post_number') !== 1 && model.get('topic.qa_enabled')) {
+        if (model && model.get('post_number') !== 1 && model.get('topic.qaEnabled')) {
           return helper.attach('qa-post', {
             count: model.get('vote_count'),
             post: model
