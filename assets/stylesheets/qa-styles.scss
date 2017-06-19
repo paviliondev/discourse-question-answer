@@ -1,5 +1,6 @@
 .qa-tip {
   padding: 10px 0;
+  position: relative;
 
   .btn {
     float: left;
@@ -7,21 +8,6 @@
 
   .fa {
     margin-right: 2px;
-  }
-
-  .tip-details {
-    background-color: dark-light-diff($primary, $secondary, 95%, -85%);
-    padding: 10px 15px;
-    float: left;
-    clear: both;
-
-    ul {
-      margin-bottom: 0;
-    }
-
-    li {
-      margin: 2px 0;
-    }
   }
 }
 
@@ -44,4 +30,23 @@
   position: relative;
   float: left;
   width: calc(100% - 65px);
+}
+
+// identical to classes in other plugins
+
+.tip-details {
+  background-color: dark-light-diff($primary, $secondary, 95%, -85%);
+  padding: 10px 15px;
+  position: absolute;
+  top: 32px;
+  z-index: 10;
+  width: 300px;
+
+  ul {
+    margin-bottom: 0;
+  }
+
+  li {
+    margin: 2px 0;
+  }
 }
