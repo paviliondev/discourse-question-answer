@@ -1,5 +1,8 @@
+.qa-tip-container {
+  position: relative;
+}
+
 .qa-tip {
-  padding: 10px 0;
   position: relative;
 
   .btn {
@@ -14,13 +17,16 @@
 .qa-post {
   float: left;
   padding-right: 20px;
+
   .btn {
     background: white;
+
     &:hover {
       background: dark-light-diff($primary, $secondary, 65%, -75%);
       color: $secondary;
     }
   }
+
   .count {
     text-align: center;
   }
@@ -38,7 +44,7 @@
   background-color: dark-light-diff($primary, $secondary, 95%, -85%);
   padding: 10px 15px;
   position: absolute;
-  top: 32px;
+  top: 22px;
   z-index: 10;
   width: 300px;
 
