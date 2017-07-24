@@ -29,7 +29,6 @@ after_initialize do
     end
   end
 
-  require 'post_serializer'
   class ::PostSerializer
     attributes :vote_count
   end
@@ -46,7 +45,6 @@ after_initialize do
     end
   end
 
-  require 'post_action'
   class ::PostAction
     def is_vote?
       post_action_type_id == PostActionType.types[:vote]
