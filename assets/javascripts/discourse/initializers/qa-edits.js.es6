@@ -29,7 +29,8 @@ export default {
       @computed('tags', 'category', 'subtype')
       qaEnabled(tags, category, subtype) {
         const qaTags = this.siteSettings.qa_tags.split('|');
-        let hasTag = qaTags.filter(function(t){ return qaTags.indexOf(t) !== -1; }).length > 0;
+        let topicTags = tags || [];
+        let hasTag = topicTags.filter(function(t){ return qaTags.indexOf(t) !== -1; }).length > 0;
         let isCategory = category && category.qa_enabled;
         let isSubtype = subtype === 'question';
 
