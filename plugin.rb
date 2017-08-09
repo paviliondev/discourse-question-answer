@@ -7,6 +7,7 @@ register_asset 'stylesheets/qa-styles.scss', :desktop
 
 after_initialize do
   Category.register_custom_field_type('qa_enabled', :boolean)
+  add_to_serializer(:basic_category, :qa_enabled) { object.custom_fields["qa_enabled"] }
 
   module QAHelper
     class << self
@@ -29,7 +30,7 @@ after_initialize do
     end
   end
 
-  class ::PostSerializer
+  ::PostSerializer.class_eval do
     attributes :vote_count
   end
 
@@ -98,6 +99,4 @@ after_initialize do
       scope.current_user && QAHelper.user_has_voted(object.topic, scope.current_user)
     end
   end
-
-  add_to_serializer(:basic_category, :qa_enabled) { object.custom_fields["qa_enabled"] }
 end
