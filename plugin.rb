@@ -1,4 +1,4 @@
-# name: discourse-qa
+# name: discourse-question-answer
 # about: QnA Style Topics
 # version: 0.1
 # authors: Angus McLeod
