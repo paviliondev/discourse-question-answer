@@ -1,6 +1,6 @@
 it:
   site_settings:
-    qa_tags: "Tag per attivare Q&A sugli argomenti"
+    qa_tags: "Etichette per attivare Q&A sugli argomenti"
     qa_show_topic_tip: "Mostra un suggerimento sulla meccanica degli argomenti Q&A sotto i titoli degli argomenti Q&A"
   vote:
     already_voted: "Puoi votare una sola volta per domanda."
