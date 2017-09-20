@@ -12,18 +12,18 @@ export default {
           return helper.attach('qa-post', {
             count: model.get('vote_count'),
             post: model
-          })
+          });
         }
-      })
+      });
 
       api.attachWidgetAction('post', 'undoPostAction', function(typeId) {
         const post = this.model;
         if (typeId === 5) {
-          post.set('topic.voted', false)
+          post.set('topic.voted', false);
         }
         return post.get('actions_summary').findBy('id', typeId).undo(post);
-      })
-    })
+      });
+    });
 
     Topic.reopen({
       @computed('tags', 'category', 'subtype')
@@ -41,6 +41,6 @@ export default {
       showQaTip(qaEnabled) {
         return qaEnabled && this.siteSettings.qa_show_topic_tip;
       }
-    })
+    });
   }
-}
+};

@@ -4,4 +4,4 @@ export default {
       this.toggleProperty('showDetails');
     }
   }
-}
+};

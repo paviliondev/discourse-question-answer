@@ -41,7 +41,7 @@ after_initialize do
     def check_if_voted
       if current_user && params[:post_action_type_id].to_i === PostActionType.types[:vote] &&
         QAHelper.qa_enabled(@post.topic) && QAHelper.user_has_voted(@post.topic, current_user)
-         raise Discourse::InvalidAccess.new, I18n.t('vote.alread_voted')
+        raise Discourse::InvalidAccess.new, I18n.t('vote.alread_voted')
       end
     end
   end
@@ -74,8 +74,8 @@ after_initialize do
 
     def filter_posts_by_ids(post_ids)
       @posts = Post.where(id: post_ids, topic_id: @topic.id)
-                   .includes(:user, :reply_to_user, :incoming_email)
-                   .order(order_by)
+        .includes(:user, :reply_to_user, :incoming_email)
+        .order(order_by)
       @posts = filter_post_types(@posts)
       @posts = @posts.with_deleted if @guardian.can_see_deleted_posts?
       @posts

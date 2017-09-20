@@ -13,7 +13,7 @@ export default createWidget('qa-post', {
     const contents = [
       this.attach('qa-button', { direction: 'up' }),
       h('div.count', `${attrs.count}`)
-    ]
+    ];
     return contents;
   },
 
@@ -25,9 +25,9 @@ export default createWidget('qa-post', {
     if (!this.currentUser) {
       return this.sendShowLogin();
     }
-    post.set('topic.voted', true)
+    post.set('topic.voted', true);
     const voteAction = post.get('actions_summary').findBy('id', 5);
-    voteAction.act(post)
+    voteAction.act(post);
   }
 
-})
+});
