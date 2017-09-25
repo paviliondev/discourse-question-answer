@@ -19,7 +19,7 @@ after_initialize do
         has_qa_tag || is_qa_category || is_qa_subtype
       end
 
-      ## This should be replaced with a :voted? property in TopicUser - but how to do this in a plugin?
+      ## This should be replaced with a :voted? property in TopicUser - but how to do this properly in a plugin?
       def user_has_voted(topic, user)
         return nil if !user
 
@@ -36,7 +36,7 @@ after_initialize do
 
   require 'post_actions_controller'
   class ::PostActionsController
-    before_filter :check_if_voted, only: :create
+    before_action :check_if_voted, only: :create
 
     def check_if_voted
       if current_user && params[:post_action_type_id].to_i === PostActionType.types[:vote] &&
@@ -58,10 +58,9 @@ after_initialize do
     end
   end
 
-  ## necessary until I figure out how to properly use sort order with vote count
-  module QAExtension
+  TopicView.class_eval do
     def qa_enabled
-      @topic.category && @topic.category.custom_fields['qa_enabled']
+      QAHelper.qa_enabled(@topic)
     end
 
     def order_by
@@ -80,11 +79,6 @@ after_initialize do
       @posts = @posts.with_deleted if @guardian.can_see_deleted_posts?
       @posts
     end
-  end
-
-  require 'topic_view'
-  class ::TopicView
-    prepend QAExtension
   end
 
   require 'topic_view_serializer'
