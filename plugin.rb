@@ -3,7 +3,7 @@
 # version: 0.1
 # authors: Angus McLeod
 
-register_asset 'stylesheets/qa-styles.scss', :desktop
+register_asset 'stylesheets/qa-styles.scss'
 
 after_initialize do
   Category.register_custom_field_type('qa_enabled', :boolean)
