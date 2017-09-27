@@ -38,6 +38,28 @@
   width: calc(100% - 65px);
 }
 
+.topic-post.answer .topic-body {
+  width: 640px;
+}
+
+.topic-post.comment {
+  padding-left: 105px;
+
+  .topic-body {
+    width: 600px;
+    padding: 10px 10px 10px 0;
+
+    .regular {
+      margin-top: 0;
+    }
+
+    .post-menu-area {
+      margin-top: 5px;
+      margin-bottom: 0;
+    }
+  }
+}
+
 // identical to classes in other plugins
 
 .tip-details {

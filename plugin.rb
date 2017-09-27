@@ -27,6 +27,32 @@ after_initialize do
                            user_id: user.id,
                            post_action_type_id: PostActionType.types[:vote])
       end
+
+      def update_order(topic_id)
+
+        posts = Post.where(topic_id: topic_id)
+
+        # All answers ordered by vote count then by post number
+        answers = posts.where(reply_to_post_number: [nil, ''])
+          .where.not(post_number: 1)
+          .order("vote_count DESC, post_number ASC")
+
+        # Counting mechanism assumes there won't be more than 5000 posts in total in the topic
+        count = 5000
+        answers.each do |a|
+          votes = a.vote_count
+          a.update(sort_order: votes + count)
+          count -= 1
+
+          # Replying to posts that are themselves replies to posts is disabled, so there are no comments on comments
+          comments = posts.where(reply_to_post_number: a.post_number)
+            .order("post_number ASC")
+          comments.each do |c|
+            c.update(sort_order: votes + count)
+            count -= 1
+          end
+        end
+      end
     end
   end
 
@@ -46,7 +72,17 @@ after_initialize do
     end
   end
 
+  class ::Post
+    after_create :update_qa_order
+
+    def update_qa_order
+      QAHelper.update_order(topic_id)
+    end
+  end
+
   class ::PostAction
+    after_commit :update_qa_order, if: :is_vote?
+
     def is_vote?
       post_action_type_id == PostActionType.types[:vote]
     end
@@ -56,6 +92,11 @@ after_initialize do
         post.publish_change_to_clients! :acted
       end
     end
+
+    def update_qa_order
+      topic_id = Post.where(id: post_id).pluck(:topic_id).first
+      QAHelper.update_order(topic_id)
+    end
   end
 
   TopicView.class_eval do
@@ -63,21 +104,22 @@ after_initialize do
       QAHelper.qa_enabled(@topic)
     end
 
-    def order_by
-      if qa_enabled
-        "case when post_number = 1 then 0 else 1 end, vote_count DESC"
-      else
-        'sort_order'
-      end
-    end
-
     def filter_posts_by_ids(post_ids)
-      @posts = Post.where(id: post_ids, topic_id: @topic.id)
-        .includes(:user, :reply_to_user, :incoming_email)
-        .order(order_by)
-      @posts = filter_post_types(@posts)
-      @posts = @posts.with_deleted if @guardian.can_see_deleted_posts?
-      @posts
+      if qa_enabled
+
+        # All Posts
+        posts = Post.where(id: post_ids, topic_id: @topic.id)
+          .includes(:user, :reply_to_user, :incoming_email)
+
+        # First post should always be first. Sort_order is set after_commit in post action and after_create in post
+        @posts = posts.order("case when post_number = 1 then 0 else 1 end, sort_order DESC")
+
+        @posts = filter_post_types(@posts)
+        @posts = @posts.with_deleted if @guardian.can_see_deleted_posts?
+        @posts
+      else
+        super
+      end
     end
   end
 
