@@ -37,19 +37,18 @@ after_initialize do
           .where.not(post_number: 1)
           .order("vote_count DESC, post_number ASC")
 
-        # Counting mechanism assumes there won't be more than 5000 posts in total in the topic
-        count = 5000
+        count = 1
         answers.each do |a|
-          votes = a.vote_count
-          a.update(sort_order: votes + count)
-          count -= 1
-
-          # Replying to posts that are themselves replies to posts is disabled, so there are no comments on comments
+          a.update(sort_order: count)
+          
           comments = posts.where(reply_to_post_number: a.post_number)
-            .order("post_number ASC")
-          comments.each do |c|
-            c.update(sort_order: votes + count)
-            count -= 1
+          if comments.any?
+            comments.each do |c|
+              count += 1
+              c.update(sort_order: count)
+            end
+          else
+            count += 1
           end
         end
       end
@@ -112,7 +111,7 @@ after_initialize do
           .includes(:user, :reply_to_user, :incoming_email)
 
         # First post should always be first. Sort_order is set after_commit in post action and after_create in post
-        @posts = posts.order("case when post_number = 1 then 0 else 1 end, sort_order DESC")
+        @posts = posts.order("case when post_number = 1 then 0 else 1 end, sort_order ASC")
 
         @posts = filter_post_types(@posts)
         @posts = @posts.with_deleted if @guardian.can_see_deleted_posts?
