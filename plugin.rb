@@ -3,7 +3,9 @@
 # version: 0.1
 # authors: Angus McLeod
 
-register_asset 'stylesheets/qa-styles.scss'
+register_asset 'stylesheets/common/question-answer.scss'
+register_asset 'stylesheets/desktop/question-answer.scss', :desktop
+register_asset 'stylesheets/mobile/question-answer.scss', :mobile
 
 after_initialize do
   Category.register_custom_field_type('qa_enabled', :boolean)
@@ -29,10 +31,8 @@ after_initialize do
       end
 
       def update_order(topic_id)
-
         posts = Post.where(topic_id: topic_id)
 
-        # All answers ordered by vote count then by post number
         answers = posts.where(reply_to_post_number: [nil, ''])
           .where.not(post_number: 1)
           .order("vote_count DESC, post_number ASC")
@@ -40,8 +40,8 @@ after_initialize do
         count = 1
         answers.each do |a|
           a.update(sort_order: count)
-          
           comments = posts.where(reply_to_post_number: a.post_number)
+            .order("post_number ASC")
           if comments.any?
             comments.each do |c|
               count += 1
@@ -98,21 +98,16 @@ after_initialize do
     end
   end
 
-  TopicView.class_eval do
+  ::TopicView.class_eval do
     def qa_enabled
       QAHelper.qa_enabled(@topic)
     end
 
     def filter_posts_by_ids(post_ids)
       if qa_enabled
-
-        # All Posts
         posts = Post.where(id: post_ids, topic_id: @topic.id)
           .includes(:user, :reply_to_user, :incoming_email)
-
-        # First post should always be first. Sort_order is set after_commit in post action and after_create in post
         @posts = posts.order("case when post_number = 1 then 0 else 1 end, sort_order ASC")
-
         @posts = filter_post_types(@posts)
         @posts = @posts.with_deleted if @guardian.can_see_deleted_posts?
         @posts

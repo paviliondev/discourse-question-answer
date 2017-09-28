@@ -9,7 +9,7 @@ export default createWidget('qa-post', {
     appRoute.send('showLogin');
   },
 
-  html(attrs, state) {
+  html(attrs) {
     const contents = [
       this.attach('qa-button', { direction: 'up' }),
       h('div.count', `${attrs.count}`)

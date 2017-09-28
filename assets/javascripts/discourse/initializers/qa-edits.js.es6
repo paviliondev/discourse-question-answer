@@ -1,5 +1,5 @@
 import { withPluginApi } from 'discourse/lib/plugin-api';
-import { default as computed, observes } from 'ember-addons/ember-computed-decorators';
+import { default as computed } from 'ember-addons/ember-computed-decorators';
 
 export default {
   name: 'qa-edits',
@@ -21,11 +21,7 @@ export default {
 
       api.addPostClassesCallback((attrs) => {
         if (attrs.topic.qa_enabled && !attrs.firstPost) {
-          if (attrs.reply_to_post_number) {
-            return ["comment"];
-          } else {
-            return ["answer"];
-          };
+          return attrs.reply_to_post_number ? ["comment"] : ["answer"];
         };
       });
 
@@ -45,6 +41,23 @@ export default {
       });
 
       api.modifyClass('model:post-stream', {
+        prependPost(post) {
+          const stored = this.storePost(post);
+          if (stored) {
+            const posts = this.get('posts');
+            let insertPost = () => posts.unshiftObject(stored);
+
+            const qaEnabled = this.get('topic.qa_enabled');
+            if (qaEnabled && post.post_number === 2 && posts[0].post_number === 1) {
+              insertPost = () => posts.insertAt(1, stored);
+            };
+
+            insertPost();
+          }
+
+          return post;
+        },
+
         appendPost(post) {
           const stored = this.storePost(post);
           if (stored) {
@@ -52,19 +65,19 @@ export default {
 
             if (!posts.includes(stored)) {
               const replyingTo = post.get('reply_to_post_number');
+              const qaEnabled = this.get('topic.qa_enabled');
               let insertPost = () => posts.pushObject(stored);
 
-              if ((this.get('topic.qa_enabled') && replyingTo)) {
-
-                let set = false;
+              if (qaEnabled && replyingTo) {
+                let passed = false;
                 posts.some((p, i) => {
-                  if (set && !p.reply_to_post_number) {
+                  if (passed && !p.reply_to_post_number) {
                     insertPost = () => posts.insertAt(i, stored);
                     return true;
                   };
 
                   if (p.post_number === replyingTo && i < posts.length - 1) {
-                    set = true;
+                    passed = true;
                   };
                 });
               };
