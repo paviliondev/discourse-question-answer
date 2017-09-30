@@ -1,11 +1,14 @@
 # name: discourse-question-answer
-# about: QnA Style Topics
-# version: 0.1
+# about: Question / Answer Style Topics
+# version: 0.2
 # authors: Angus McLeod
+# url: https://github.com/angusmcleod/discourse-question-answer
 
 register_asset 'stylesheets/common/question-answer.scss'
 register_asset 'stylesheets/desktop/question-answer.scss', :desktop
 register_asset 'stylesheets/mobile/question-answer.scss', :mobile
+
+enabled_site_setting :qa_enabled
 
 after_initialize do
   Category.register_custom_field_type('qa_enabled', :boolean)
@@ -14,6 +17,7 @@ after_initialize do
   module QAHelper
     class << self
       def qa_enabled(topic)
+        return false if !SiteSetting.qa_enabled
         tags = topic.tags.map(&:name)
         has_qa_tag = !(tags & SiteSetting.qa_tags.split('|')).empty?
         is_qa_category = topic.category && topic.category.custom_fields["qa_enabled"]
@@ -23,7 +27,7 @@ after_initialize do
 
       ## This should be replaced with a :voted? property in TopicUser - but how to do this properly in a plugin?
       def user_has_voted(topic, user)
-        return nil if !user
+        return nil if !user || !SiteSetting.qa_enabled
 
         PostAction.exists?(post_id: topic.posts.map(&:id),
                            user_id: user.id,
@@ -31,6 +35,8 @@ after_initialize do
       end
 
       def update_order(topic_id)
+        return if !SiteSetting.qa_enabled
+
         posts = Post.where(topic_id: topic_id)
 
         answers = posts.where(reply_to_post_number: [nil, ''])
@@ -72,7 +78,11 @@ after_initialize do
   end
 
   class ::Post
-    after_create :update_qa_order
+    after_create :update_qa_order, if: :qa_enabled
+
+    def qa_enabled
+      QAHelper.qa_enabled(topic)
+    end
 
     def update_qa_order
       QAHelper.update_order(topic_id)
@@ -98,7 +108,7 @@ after_initialize do
     end
   end
 
-  ::TopicView.class_eval do
+  module TopicViewQAExtension
     def qa_enabled
       QAHelper.qa_enabled(@topic)
     end
@@ -115,6 +125,10 @@ after_initialize do
         super
       end
     end
+  end
+
+  class ::TopicView
+    prepend TopicViewQAExtension
   end
 
   require 'topic_view_serializer'

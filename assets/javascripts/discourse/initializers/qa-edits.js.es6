@@ -4,6 +4,9 @@ import { default as computed } from 'ember-addons/ember-computed-decorators';
 export default {
   name: 'qa-edits',
   initialize(){
+
+    if (!Discourse.SiteSettings.qa_enabled) return;
+
     withPluginApi('0.8.10', api => {
       api.decorateWidget('post:before', function(helper) {
         const model = helper.getModel();

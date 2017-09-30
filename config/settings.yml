@@ -6,3 +6,6 @@ plugins:
   qa_show_topic_tip:
     client: true
     default: true
+  qa_enabled:
+    client: true
+    default: false
