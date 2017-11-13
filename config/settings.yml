@@ -8,4 +8,4 @@ plugins:
     default: true
   qa_enabled:
     client: true
-    default: false
+    default: true
