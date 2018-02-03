@@ -3,5 +3,6 @@ en:
     qa_tags: "Tags to enable QnA on topic"
     qa_show_topic_tip: "Show a tip about the mechanics of QnA topics under the titles of QnA topics"
     qa_enabled: "Enable QA Plugin"
+    qa_disable_like_on_answers: "Disables like button on answers in QnA topics"
   vote:
     already_voted: "You can only vote once per question."

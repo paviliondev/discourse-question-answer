@@ -7,7 +7,24 @@ export default {
 
     if (!Discourse.SiteSettings.qa_enabled) return;
 
-    withPluginApi('0.8.10', api => {
+    withPluginApi('0.8.12', api => {
+
+      api.reopenWidget('post-menu', {
+        menuItems() {
+          const attrs = this.attrs;
+          let result = this.siteSettings.post_menu.split('|');
+
+          if (attrs.topic.qa_enabled &&
+              !attrs.firstPost &&
+              !attrs.reply_to_post_number &&
+              Discourse.SiteSettings.qa_disable_like_on_answers) {
+            result = result.filter((b) => b !== 'like');
+          }
+
+          return result;
+        },
+      });
+
       api.decorateWidget('post:before', function(helper) {
         const model = helper.getModel();
         if (model && model.get('post_number') !== 1

@@ -9,3 +9,6 @@ plugins:
   qa_enabled:
     client: true
     default: true
+  qa_disable_like_on_answers:
+    client: true
+    default: false
