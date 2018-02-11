@@ -1,0 +1,13 @@
+en:
+  js:
+    topic:
+      tip:
+        qa:
+          title: "问答话题"
+          details: "用户可以给最佳回答投票。
+                    <ul><li>每位只有一票。</li>
+                    <li>回答以得票数排序。</li></ul>"
+    category:
+      enable_qa: "此类别中的帖子允许问答。"
+    vote:
+      already_voted: "每个问题您只能投票一次。"
