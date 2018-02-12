@@ -1,0 +1,13 @@
+it:
+  js:
+    topic:
+      tip:
+        qa:
+          title: "Argomento Q&A"
+          details: "Gli utenti possono votare il messaggio che meglio risponde al messaggio iniziale.
+                    <ul><li>Ad ogni utente è consentito un voto.</li>
+                    <li>Le risposte vengono ordinate per numero di voti.</li></ul>"
+    category:
+      enable_qa: "Abilita lo stile Q&A per gli argomenti di questa categoria."
+    vote:
+      already_voted: "Puoi votare una sola volta per domanda."
