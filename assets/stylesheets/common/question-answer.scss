@@ -31,6 +31,14 @@
   }
 }
 
+.time-gap+.topic-post.answer .topic-body, .time-gap+.topic-post.comment .topic-body {
+  border-top: 1px solid $primary-low;
+}
+
+.topic-post.answer+.time-gap, .topic-post.comment+.time-gap {
+  display: none;
+}
+
 // identical to classes in other plugins
 
 .tip-details {
