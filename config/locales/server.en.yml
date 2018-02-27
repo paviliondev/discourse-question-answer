@@ -4,5 +4,6 @@ en:
     qa_show_topic_tip: "Show a tip about the mechanics of QnA topics under the titles of QnA topics"
     qa_enabled: "Enable QA Plugin"
     qa_disable_like_on_answers: "Disables like button on answers in QnA topics"
+    qa_undo_vote_action_window: "Number of minutes users are allowed to undo votes in QnA topics (enter 0 for no limit)"
   vote:
     already_voted: "You can only vote once per question."

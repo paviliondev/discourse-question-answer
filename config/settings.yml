@@ -12,3 +12,5 @@ plugins:
   qa_disable_like_on_answers:
     client: true
     default: false
+  qa_undo_vote_action_window:
+    default: 10
