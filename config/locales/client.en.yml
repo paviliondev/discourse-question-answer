@@ -8,6 +8,6 @@ en:
                     <ul><li>Each user is allowed one vote.</li>
                     <li>Responses are ordered by vote count.</li></ul>"
     category:
-      enable_qa: "Enable QnA style for topics in this category."
+      enable_qa: "Make all topics in this category QnA."
     vote:
       already_voted: "You can only vote once per question."
