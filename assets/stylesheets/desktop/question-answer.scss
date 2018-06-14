@@ -21,6 +21,19 @@
 
     .regular {
       margin-top: 0;
+
+      p {
+        margin: 0;
+      }
+
+      nav.post-controls button {
+        font-size: 0.9em;
+        padding: 6px 8px;
+      }
+    }
+
+    .post-actions {
+      margin: 0;
     }
 
     .post-menu-area {
