@@ -3,7 +3,7 @@ en:
     topic:
       tip:
         qa:
-          title: "QnA Topic"
+          title: "Question"
           details: "Users can vote for the response that best answers the initial post.
                     <ul><li>Each user is allowed one vote.</li>
                     <li>Responses are ordered by vote count.</li></ul>"
