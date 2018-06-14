@@ -281,7 +281,7 @@ export default {
             ]
           ));
 
-          let lastAnswerUrl = '/t/' + attrs.topic.slug + attrs.topic.last_answer_post_number;
+          let lastAnswerUrl = '/t/' + attrs.topic.slug + '/' + attrs.topic.id + '/' + attrs.topic.last_answer_post_number;
 
           contents.push(h('li',
             h('a', { attributes: { href: lastAnswerUrl } }, [

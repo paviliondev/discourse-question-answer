@@ -7,11 +7,11 @@ module QATopicExtension
   end
 
   def answers
-    @answers ||= posts.where(reply_to_post_number: [nil, '']).order("created_at DESC")
+    @answers ||= posts.where(reply_to_post_number: [nil, '']).order("created_at ASC")
   end
 
   def comments
-    @comments ||= posts.where.not(reply_to_post_number: [nil, '']).order("created_at DESC")
+    @comments ||= posts.where.not(reply_to_post_number: [nil, '']).order("created_at ASC")
   end
 
   def answer_count
@@ -40,6 +40,7 @@ module QATopicExtension
 
   def last_answer_post_number
     if answers.any?
+      puts "HERE ARE THE ANSWERS: #{answers.inspect}"
       answers.last[:post_number]
     else
       nil
