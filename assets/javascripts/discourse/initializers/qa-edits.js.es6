@@ -1,5 +1,6 @@
 import { withPluginApi } from 'discourse/lib/plugin-api';
-import { default as computed } from 'ember-addons/ember-computed-decorators';
+import { default as computed, on } from 'ember-addons/ember-computed-decorators';
+import { REPLY } from "discourse/models/composer";
 
 export default {
   name: 'qa-edits',
@@ -14,11 +15,14 @@ export default {
           const attrs = this.attrs;
           let result = this.siteSettings.post_menu.split('|');
 
-          if (attrs.topic.qa_enabled &&
-              !attrs.firstPost &&
-              !attrs.reply_to_post_number &&
-              Discourse.SiteSettings.qa_disable_like_on_answers) {
-            result = result.filter((b) => b !== 'like');
+          if (attrs.topic.qa_enabled && !attrs.firstPost) {
+            if (this.siteSettings.qa_disable_like_on_answers && !attrs.reply_to_post_number) {
+              result = result.filter((b) => b !== 'like');
+            }
+
+            if (!attrs.reply_to_post_number) {
+              result = result.filter((b) => b !== 'reply');
+            }
           }
 
           return result;
@@ -43,6 +47,77 @@ export default {
         if (attrs.topic.qa_enabled && !attrs.firstPost) {
           return attrs.reply_to_post_number ? ["comment"] : ["answer"];
         };
+      });
+
+      api.addPostMenuButton('comment', (attrs) => {
+        if (attrs.canCreatePost &&
+            attrs.topic.qa_enabled &&
+            !attrs.firstPost &&
+            !attrs.reply_to_post_number) {
+
+          let args = {
+            action: 'replyToPost',
+            title: 'topic.comment.help',
+            icon: 'comment',
+            className: 'comment create fade-out'
+          };
+
+          if (!attrs.mobileView) {
+            args.label = 'topic.comment.title';
+          }
+
+          return args;
+        };
+      });
+
+      api.modifyClass('component:composer-actions', {
+        @on('init')
+        setupPost() {
+          const composerPost = this.get('composerModel.post');
+          if (composerPost) {
+            this.set('pluginPostSnapshot', composerPost);
+          }
+        },
+
+        @computed('pluginPostSnapshot')
+        commenting(post) {
+          return post && post.topic.qa_enabled && !post.get('firstPost') && !post.reply_to_post_number;
+        },
+
+        computeHeaderContent() {
+          let content = this._super();
+
+          if (this.get('commenting') &&
+              this.get("action") === REPLY &&
+              this.get('options.userAvatar')) {
+            content.icon = 'comment';
+          }
+
+          return content;
+        },
+
+        @computed("options", "canWhisper", "action", 'commenting')
+        content(options, canWhisper, action, commenting) {
+          let items = this._super(...arguments);
+
+          if (commenting) {
+            items.forEach((item) => {
+              if (item.id === 'reply_to_topic') {
+                item.name = I18n.t('composer.composer_actions.reply_to_question.label');
+                item.description = I18n.t('composer.composer_actions.reply_to_question.desc');
+              }
+              if (item.id === 'reply_to_post') {
+                item.icon = 'comment';
+                item.name = I18n.t('composer.composer_actions.comment_on_answer.label', {
+                  postUsername: this.get('pluginPostSnapshot.username')
+                });
+                item.description = I18n.t('composer.composer_actions.comment_on_answer.desc');
+              }
+            })
+          }
+
+          return items;
+        }
       });
 
       api.attachWidgetAction('post', 'undoPostAction', function(typeId) {

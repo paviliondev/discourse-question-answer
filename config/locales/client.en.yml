@@ -1,6 +1,18 @@
 en:
   js:
+    composer:
+      composer_actions:
+        reply_to_question:
+          label: Reply to question
+          desc: Reply to the question, not any specific answer
+        comment_on_answer:
+          label: Comment on answer of %{postUsername}
+          desc: Comment on an answer
     topic:
+      comment:
+        title: 'Comment'
+        help: 'begin composing a comment on this reply'
+
       tip:
         qa:
           title: "Question"
