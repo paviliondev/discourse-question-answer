@@ -23,3 +23,8 @@ en:
       enable_qa: "Make all topics in this category QnA."
     vote:
       already_voted: "You can only vote once per question."
+
+    last_answer_lowercase: last answer
+    answers_lowercase:
+      one: answer
+      other: answers

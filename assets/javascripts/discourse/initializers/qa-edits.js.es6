@@ -1,5 +1,8 @@
 import { withPluginApi } from 'discourse/lib/plugin-api';
 import { default as computed, on } from 'ember-addons/ember-computed-decorators';
+import { h } from 'virtual-dom';
+import { avatarImg, avatarFor } from 'discourse/widgets/post';
+import { dateNode, numberNode } from 'discourse/helpers/node';
 import { REPLY } from "discourse/models/composer";
 
 export default {
@@ -242,6 +245,102 @@ export default {
           return this.attach('post-article', attrs);
         },
       });
+
+      function renderParticipants(userFilters, participants) {
+        if (!participants) { return; }
+
+        userFilters = userFilters || [];
+        return participants.map(p => {
+          return this.attach('topic-participant', p, { state: { toggled: userFilters.includes(p.username) } });
+        });
+      }
+
+      api.reopenWidget('topic-map-summary', {
+        html(attrs, state) {
+          if (attrs.topic.qa_enabled) {
+            return this.qaMap(attrs, state);
+          } else {
+            return this._super(attrs, state);
+          }
+        },
+
+        qaMap(attrs, state) {
+          const contents = [];
+
+          contents.push(h('li',
+            [
+              h('h4', I18n.t('created_lowercase')),
+              h('div.topic-map-post.created-at', [
+                avatarFor('tiny', {
+                  username: attrs.createdByUsername,
+                  template: attrs.createdByAvatarTemplate,
+                  name: attrs.createdByName
+                }),
+                dateNode(attrs.topicCreatedAt)
+              ])
+            ]
+          ));
+
+          let lastAnswerUrl = '/t/' + attrs.topic.slug + attrs.topic.last_answer_post_number;
+
+          contents.push(h('li',
+            h('a', { attributes: { href: lastAnswerUrl } }, [
+              h('h4', I18n.t('last_answer_lowercase')),
+              h('div.topic-map-post.last-answer', [
+                avatarFor('tiny', {
+                  username: attrs.topic.last_answerer.username,
+                  template: attrs.topic.last_answerer.avatar_template,
+                  name: attrs.topic.last_answerer.name
+                }),
+                dateNode(attrs.topic.last_answered_at)
+              ])
+            ])
+          ));
+
+          contents.push(h('li', [
+            numberNode(attrs.topic.answer_count),
+            h('h4', I18n.t('answers_lowercase', { count: attrs.topic.answer_count }))
+          ]));
+
+          contents.push(h('li.secondary', [
+            numberNode(attrs.topicViews, { className: attrs.topicViewsHeat }),
+            h('h4', I18n.t('views_lowercase', { count: attrs.topicViews }))
+          ]));
+
+          contents.push(h('li.secondary', [
+            numberNode(attrs.participantCount),
+            h('h4', I18n.t('users_lowercase', { count: attrs.participantCount }))
+          ]));
+
+          if (attrs.topicLikeCount) {
+            contents.push(h('li.secondary', [
+              numberNode(attrs.topicLikeCount),
+              h('h4', I18n.t('likes_lowercase', { count: attrs.topicLikeCount }))
+            ]));
+          }
+
+          if (attrs.topicLinkLength > 0) {
+            contents.push(h('li.secondary', [
+              numberNode(attrs.topicLinkLength),
+              h('h4', I18n.t('links_lowercase', { count: attrs.topicLinkLength }))
+            ]));
+          }
+
+          if (state.collapsed && attrs.topicPostsCount > 2 && attrs.participants.length > 0) {
+            const participants = renderParticipants.call(this, attrs.userFilters, attrs.participants.slice(0, 3));
+            contents.push(h('li.avatars', participants));
+          }
+
+          const nav = h('nav.buttons', this.attach('button', {
+            title: 'topic.toggle_information',
+            icon: state.collapsed ? 'chevron-down' : 'chevron-up',
+            action: 'toggleMap',
+            className: 'btn',
+          }));
+
+          return [nav, h('ul.clearfix', contents)];
+        }
+      })
     });
   }
 };
