@@ -2,6 +2,8 @@ module QAHelper
   class << self
     def qa_enabled(topic)
       return false if !SiteSetting.qa_enabled
+      return false if topic.is_category_topic?
+      
       tags = topic.tags.map(&:name)
       has_qa_tag = !(tags & SiteSetting.qa_tags.split('|')).empty?
       is_qa_category = topic.category && topic.category.custom_fields["qa_enabled"]
