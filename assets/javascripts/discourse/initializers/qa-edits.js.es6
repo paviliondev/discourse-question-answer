@@ -1,5 +1,5 @@
 import { withPluginApi } from 'discourse/lib/plugin-api';
-import { default as computed, on } from 'ember-addons/ember-computed-decorators';
+import { default as computed, on, observes } from 'ember-addons/ember-computed-decorators';
 import { h } from 'virtual-dom';
 import { avatarImg, avatarFor } from 'discourse/widgets/post';
 import { dateNode, numberNode } from 'discourse/helpers/node';
@@ -18,14 +18,14 @@ export default {
           const attrs = this.attrs;
           let result = this.siteSettings.post_menu.split('|');
 
-          if (attrs.topic.qa_enabled && !attrs.firstPost) {
-            if (this.siteSettings.qa_disable_like_on_answers && !attrs.reply_to_post_number) {
+          if (attrs.topic.qa_enabled) {
+            if (this.siteSettings.qa_disable_like_on_answers &&
+                !attrs.firstPost &&
+                !attrs.reply_to_post_number) {
               result = result.filter((b) => b !== 'like');
             }
 
-            if (!attrs.reply_to_post_number) {
-              result = result.filter((b) => b !== 'reply');
-            }
+            result = result.filter((b) => b !== 'reply');
           }
 
           return result;
@@ -49,6 +49,26 @@ export default {
       api.addPostClassesCallback((attrs) => {
         if (attrs.topic.qa_enabled && !attrs.firstPost) {
           return attrs.reply_to_post_number ? ["comment"] : ["answer"];
+        };
+      });
+
+      api.addPostMenuButton('answer', (attrs) => {
+        if (attrs.canCreatePost &&
+            attrs.topic.qa_enabled &&
+            attrs.firstPost) {
+
+          let args = {
+            action: 'replyToPost',
+            title: 'topic.answer.help',
+            icon: 'reply',
+            className: 'answer create fade-out'
+          };
+
+          if (!attrs.mobileView) {
+            args.label = 'topic.answer.title';
+          }
+
+          return args;
         };
       });
 
@@ -131,12 +151,23 @@ export default {
         return post.get('actions_summary').findBy('id', typeId).undo(post);
       });
 
-      api.modifyClass('model:topic', {
+      api.modifyClass('model:topic', {        
         @computed('qa_enabled')
         showQaTip(qaEnabled) {
           return qaEnabled && this.siteSettings.qa_show_topic_tip;
         }
       });
+
+      api.modifyClass('component:topic-footer-buttons', {
+        @on('didInsertElement')
+        @observes('topic.qa_enabled')
+        hideFooterReply() {
+          const qaEnabled = this.get('topic.qa_enabled');
+          Ember.run.scheduleOnce('afterRender', () => {
+            this.$('.topic-footer-main-buttons > button.create:not(.answer)').toggle(!qaEnabled);
+          });
+        }
+      })
 
       api.modifyClass('model:post-stream', {
         prependPost(post) {

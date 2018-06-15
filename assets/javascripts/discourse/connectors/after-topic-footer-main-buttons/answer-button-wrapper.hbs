@@ -1,0 +1,9 @@
+{{#if topic.qa_enabled}}
+  {{#if topic.details.can_create_post}}
+    {{d-button class="btn-primary create answer"
+               icon="reply"
+               action="answerQuestion"
+               label="topic.answer.title"
+               title="topic.answer.help"}}
+  {{/if}}
+{{/if}}

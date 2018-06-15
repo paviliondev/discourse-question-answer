@@ -3,15 +3,18 @@ en:
     composer:
       composer_actions:
         reply_to_question:
-          label: Reply to question
-          desc: Reply to the question, not any specific answer
+          label: Answer the question
+          desc: Answer the question in the first post
         comment_on_answer:
           label: Comment on answer of %{postUsername}
           desc: Comment on an answer
     topic:
+      answer:
+        title: 'Answer'
+        help: 'begin composing an answer to the question'
       comment:
         title: 'Comment'
-        help: 'begin composing a comment on this reply'
+        help: 'begin composing a comment on this answer'
 
       tip:
         qa:
