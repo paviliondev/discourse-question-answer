@@ -91,7 +91,7 @@ class ::Post
 
   def last_voted(user_id)
     user_votes = vote_history.select do |v|
-      v['user_id'] === user_id && v['action'] === 'create'
+      v['user_id'].to_i === user_id && v['action'] === 'create'
     end
 
     if user_votes.any?
