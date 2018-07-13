@@ -1,72 +1,103 @@
-::PostSerializer.class_eval do
-  attributes :vote_count
-end
+module PostSerializerQAExtension
+  def actions_summary
+    summaries = super.reject { |s| s[:id] === PostActionType.types[:vote]}
 
-require 'post_actions_controller'
-class ::PostActionsController
-  before_action :check_if_voted, only: :create
+    if object.qa_enabled
+      user = scope.current_user
+      summary = {
+        id: PostActionType.types[:vote],
+        count: object.vote_count
+      }
 
-  def check_if_voted
-    if current_user && params[:post_action_type_id].to_i === PostActionType.types[:vote] &&
-      QAHelper.qa_enabled(@post.topic) && QAHelper.user_has_voted(@post.topic, current_user)
-      raise Discourse::InvalidAccess.new, I18n.t('vote.alread_voted')
+      voted = object.voted.include?(user.id)
+
+      if voted
+        summary[:acted] = true
+        summary[:can_undo] = ::QuestionAnswer::Vote.can_undo(object, user)
+      else
+        summary[:can_act] = true
+      end
+
+      summary.delete(:count) if summary[:count] == 0
+
+      if summary[:can_act] || summary[:count]
+        summaries + [summary]
+      else
+        summaries
+      end
+    else
+      summaries
     end
   end
 end
+
+require_dependency 'post_serializer'
+class ::PostSerializer
+  prepend PostSerializerQAExtension
+
+  attributes :vote_count, :voted
+
+  def vote_count
+    object.vote_count
+  end
+
+  def voted
+    object.voted
+  end
+end
+
+## 'vote_count' and 'voted' are used for quick access, whereas 'vote_history' is used for record keeping
+## See QuestionAnswer::Vote for how these fields are saved / updated
+
+Post.register_custom_field_type('vote_count', :integer)
+Post.register_custom_field_type('vote_history', :json)
 
 class ::Post
-  after_create :update_qa_order, if: :qa_enabled
+  after_create :update_vote_order, if: :qa_enabled
+
+  self.ignored_columns = %w(vote_count)
+
+  def vote_count
+    if custom_fields['vote_count'].present?
+      custom_fields['vote_count'].to_i
+    else
+      0
+    end
+  end
+
+  def voted
+    if custom_fields['voted'].present?
+      [*custom_fields['voted']].map(&:to_i)
+    else
+      []
+    end
+  end
+
+  def vote_history
+    if custom_fields['vote_history'].present?
+      [*custom_fields['vote_history']]
+    else
+      []
+    end
+  end
 
   def qa_enabled
-    QAHelper.qa_enabled(topic)
+    ::Topic.qa_enabled(topic)
   end
 
-  def update_qa_order
-    QAHelper.update_order(topic_id)
-  end
-end
-
-class ::PostAction
-  after_commit :update_qa_order, if: :is_vote?
-
-  def is_vote?
-    post_action_type_id == PostActionType.types[:vote]
+  def update_vote_order
+    ::Topic.update_vote_order(topic_id)
   end
 
-  def notify_subscribers
-    if (is_like? || is_flag? || is_vote?) && post
-      post.publish_change_to_clients! :acted
-    end
-  end
-
-  def update_qa_order
-    topic_id = Post.where(id: post_id).pluck(:topic_id).first
-    QAHelper.update_order(topic_id)
-  end
-end
-
-module PostGuardianVoteExtension
-  def can_delete_post_action?(post_action)
-    # only use extension if post_action is a vote
-    return super(post_action) unless post_action.post_action_type_id == PostActionType.types[:vote]
-
-    # You can only undo your own actions
-    return false unless is_my_own?(post_action) && not(post_action.is_private_message?)
-
-    # Apply vote action window if it exists
-    vote_window = SiteSetting.qa_undo_vote_action_window.to_i
-    if vote_window == 0
-      return true
-    elsif vote_window.present?
-      return post_action.created_at > vote_window.minutes.ago
+  def last_voted(user_id)
+    user_votes = vote_history.select do |v|
+      v['user_id'] === user_id && v['action'] === 'create'
     end
 
-    # Use post action setting as default
-    post_action.created_at > SiteSetting.post_undo_action_window_mins.minutes.ago
+    if user_votes.any?
+      user_votes.sort_by { |v| v['created_at'].to_i }.first['created_at'].to_datetime
+    else
+      nil
+    end
   end
-end
-
-require_dependency 'guardian'
-class ::Guardian
-  prepend PostGuardianVoteExtension
 end

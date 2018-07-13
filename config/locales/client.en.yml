@@ -1,5 +1,8 @@
 en:
   js:
+    category:
+      enable_qa: "Make all topics in this category QnA."
+
     composer:
       composer_actions:
         reply_to_question:
@@ -8,6 +11,24 @@ en:
         comment_on_answer:
           label: Comment on answer of %{postUsername}
           desc: Comment on an answer
+
+    post:
+      actions:
+        undo:
+          vote: "Undo vote"
+        people:
+          vote: "voted for this"
+        by_you:
+          vote: "You voted for this post"
+        by_you_and_others:
+          vote:
+            one: "You and 1 other voted for this post"
+            other: "You and {{count}} other people voted for this post"
+        by_others:
+          vote:
+            one: "1 person voted for this post"
+            other: "{{count}} people voted for this post"
+
     topic:
       answer:
         title: 'Answer'
@@ -22,8 +43,7 @@ en:
           details: "Users can vote for the response that best answers the initial post.
                     <ul><li>Each user is allowed one vote.</li>
                     <li>Responses are ordered by vote count.</li></ul>"
-    category:
-      enable_qa: "Make all topics in this category QnA."
+
     vote:
       already_voted: "You can only vote once per question."
 

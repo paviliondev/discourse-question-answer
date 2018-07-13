@@ -4,6 +4,8 @@ import { h } from 'virtual-dom';
 import { avatarImg, avatarFor } from 'discourse/widgets/post';
 import { dateNode, numberNode } from 'discourse/helpers/node';
 import { REPLY } from "discourse/models/composer";
+import { undoVote, whoVoted, voteActionId } from '../lib/qa-utilities';
+import { avatarAtts } from 'discourse/widgets/actions-summary';
 
 export default {
   name: 'qa-edits',
@@ -144,14 +146,45 @@ export default {
       });
 
       api.attachWidgetAction('post', 'undoPostAction', function(typeId) {
-        const post = this.model;
-        if (typeId === 5) {
+
+        if (typeId === voteActionId) {
+          const post = this.model;
+          const user = this.currentUser;
+
           post.set('topic.voted', false);
+
+          let vote = {
+            user_id: user.id,
+            post_id: post.id,
+            direction: 'up'
+          }
+
+          undoVote({ vote });
+        } else {
+          this._super(typeId);
         }
-        return post.get('actions_summary').findBy('id', typeId).undo(post);
       });
 
-      api.modifyClass('model:topic', {        
+      api.reopenWidget('actions-summary-item', {
+        whoActed() {
+          const attrs = this.attrs;
+
+          if (attrs.id === voteActionId) {
+            whoVoted({
+              post_id: attrs.postId
+            }).then(result => {
+              if (result.voters) {
+                this.state.users = result.voters.map(avatarAtts);
+                this.scheduleRerender();
+              }
+            });
+          } else {
+            this._super();
+          }
+        }
+      });
+
+      api.modifyClass('model:topic', {
         @computed('qa_enabled')
         showQaTip(qaEnabled) {
           return qaEnabled && this.siteSettings.qa_show_topic_tip;

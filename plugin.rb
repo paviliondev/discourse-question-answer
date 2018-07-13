@@ -14,7 +14,9 @@ after_initialize do
   Category.register_custom_field_type('qa_enabled', :boolean)
   add_to_serializer(:basic_category, :qa_enabled) { object.custom_fields["qa_enabled"] }
 
-  load File.expand_path('../lib/qa_helper.rb', __FILE__)
+  PostActionType.types[:vote] = 100
+
+  load File.expand_path('../lib/qa.rb', __FILE__)
   load File.expand_path('../lib/qa_post_edits.rb', __FILE__)
   load File.expand_path('../lib/qa_topic_edits.rb', __FILE__)
 end

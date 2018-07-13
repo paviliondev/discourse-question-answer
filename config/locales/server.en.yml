@@ -5,5 +5,16 @@ en:
     qa_enabled: "Enable QA Plugin"
     qa_disable_like_on_answers: "Disables like button on answers in QnA topics"
     qa_undo_vote_action_window: "Number of minutes users are allowed to undo votes in QnA topics (enter 0 for no limit)"
+
+  post_action_types:
+    vote:
+      title: 'Vote'
+      description: 'Vote for this post'
+      short_description: 'Vote for this post'
+      long_form: 'voted for this post'
+
   vote:
-    already_voted: "You can only vote once per question."
+    error:
+      user_has_not_voted: "User has not voted."
+      already_voted: "You can only vote once per question."
+      undo_vote_action_window: "You can only undo votes %{minutes} after voting."
