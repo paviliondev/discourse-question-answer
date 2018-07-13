@@ -42,6 +42,6 @@ class SaveExistingPostVoteCountsToCustomFields < ActiveRecord::Migration[5.2]
   end
 
   def down
-    PostCustomField.where(name: ['vote_history', 'vote_count', 'voted']).delete_all
+    raise ActiveRecord::IrreversibleMigration
   end
 end
