@@ -1,4 +1,5 @@
 import { createWidget } from 'discourse/widgets/widget';
+import { castVote } from '../lib/qa-utilities';
 import { h } from 'virtual-dom';
 
 export default createWidget('qa-post', {
@@ -17,17 +18,27 @@ export default createWidget('qa-post', {
     return contents;
   },
 
-  vote() {
+  vote(direction) {
     const post = this.attrs.post;
+    const user = this.currentUser;
+
     if (post.get('topic.voted')) {
       return bootbox.alert(I18n.t('vote.already_voted'));
     }
-    if (!this.currentUser) {
+
+    if (!user) {
       return this.sendShowLogin();
     }
+
     post.set('topic.voted', true);
-    const voteAction = post.get('actions_summary').findBy('id', 5);
-    voteAction.act(post);
+
+    let vote = {
+      user_id: user.id,
+      post_id: post.id,
+      direction
+    };
+
+    castVote({ vote });
   }
 
 });
