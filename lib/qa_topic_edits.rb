@@ -129,7 +129,6 @@ module TopicViewQAExtension
   end
 end
 
-require_dependency 'lib/topic_view'
 class TopicView
   prepend TopicViewQAExtension
 end
