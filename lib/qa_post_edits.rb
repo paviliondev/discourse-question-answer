@@ -9,13 +9,15 @@ module PostSerializerQAExtension
         count: object.vote_count
       }
 
-      voted = object.voted.include?(user.id)
+      if user
+        voted = object.voted.include?(user.id)
 
-      if voted
-        summary[:acted] = true
-        summary[:can_undo] = ::QuestionAnswer::Vote.can_undo(object, user)
-      else
-        summary[:can_act] = true
+        if voted
+          summary[:acted] = true
+          summary[:can_undo] = ::QuestionAnswer::Vote.can_undo(object, user)
+        else
+          summary[:can_act] = true
+        end
       end
 
       summary.delete(:count) if summary[:count] == 0
