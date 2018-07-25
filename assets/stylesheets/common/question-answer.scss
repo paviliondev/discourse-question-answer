@@ -43,6 +43,18 @@ nav.post-controls button.comment {
   font-size: 1em;
 }
 
+.topic-post.comment {
+  .avatar-flair {
+    width: 12px;
+    height: 12px;
+    right: 16px;
+
+    i {
+      font-size: 8px;
+    }
+  }
+}
+
 // identical to classes in other plugins
 
 .tip-details {
