@@ -23,8 +23,8 @@ after_initialize do
   end
 
   require_dependency 'post_action_type'
-  class PostActionType
-    prepend PostActionTypeExtension
+  class ::PostActionType
+    singleton_class.prepend PostActionTypeExtension
   end
 
   load File.expand_path('../lib/qa.rb', __FILE__)
