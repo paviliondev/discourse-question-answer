@@ -16,6 +16,17 @@ after_initialize do
 
   PostActionType.types[:vote] = 100
 
+  module PostActionTypeExtension
+    def public_types
+      @public_types ||= super.except(:vote)
+    end
+  end
+
+  require_dependency 'post_action_type'
+  class PostActionType
+    prepend PostActionTypeExtension
+  end
+
   load File.expand_path('../lib/qa.rb', __FILE__)
   load File.expand_path('../lib/qa_post_edits.rb', __FILE__)
   load File.expand_path('../lib/qa_topic_edits.rb', __FILE__)
