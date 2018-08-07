@@ -1,7 +1,7 @@
 import { withPluginApi } from 'discourse/lib/plugin-api';
 import { default as computed, on, observes } from 'ember-addons/ember-computed-decorators';
 import { h } from 'virtual-dom';
-import { avatarImg, avatarFor } from 'discourse/widgets/post';
+import { avatarFor } from 'discourse/widgets/post';
 import { dateNode, numberNode } from 'discourse/helpers/node';
 import { REPLY } from "discourse/models/composer";
 import { undoVote, whoVoted, voteActionId } from '../lib/qa-utilities';
@@ -138,7 +138,7 @@ export default {
                 });
                 item.description = I18n.t('composer.composer_actions.comment_on_answer.desc');
               }
-            })
+            });
           }
 
           return items;
@@ -146,7 +146,6 @@ export default {
       });
 
       api.attachWidgetAction('post', 'undoPostAction', function(typeId) {
-
         if (typeId === voteActionId) {
           const post = this.model;
           const user = this.currentUser;
@@ -157,7 +156,7 @@ export default {
             user_id: user.id,
             post_id: post.id,
             direction: 'up'
-          }
+          };
 
           undoVote({ vote });
         } else {
@@ -200,7 +199,7 @@ export default {
             this.$('.topic-footer-main-buttons > button.create:not(.answer)').toggle(!qaEnabled);
           });
         }
-      })
+      });
 
       api.modifyClass('model:post-stream', {
         prependPost(post) {
@@ -404,7 +403,7 @@ export default {
 
           return [nav, h('ul.clearfix', contents)];
         }
-      })
+      });
     });
   }
 };
