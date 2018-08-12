@@ -46,11 +46,93 @@ export default {
         }
       });
 
-      api.includePostAttributes('reply_to_post_number', 'topic');
+      api.decorateWidget('post:after', function(helper) {
+        const model = helper.getModel();
+        if (model.attachCommentToggle && model.hiddenComments > 0) {
+          let type = Number(Discourse.SiteSettings.qa_comments_default) > 0 ? 'more' : 'all';
+          return helper.attach('link', {
+            action: 'showComments',
+            actionParam: model.answerId,
+            rawLabel: I18n.t(`topic.comment.show_comments.${type}`, { count: model.hiddenComments }),
+            className: 'show-comments'
+          });
+        }
+      });
+
+      api.reopenWidget('post-stream', {
+        buildKey: () => 'post-stream',
+
+        defaultState(attrs, state) {
+          let defaultState = this._super(attrs, state);
+          defaultState['showComments'] = [];
+          return defaultState;
+        },
+
+        showComments(answerId) {
+          let showComments = this.state.showComments;
+          if (showComments.indexOf(answerId) === -1) {
+            showComments.push(answerId);
+            this.state.showComments = showComments;
+            this.appEvents.trigger("post-stream:refresh", { force: true });
+          }
+        },
+
+        html(attrs, state) {
+          let answerId = null;
+          let showComments = state.showComments;
+          let defaultComments = Number(Discourse.SiteSettings.qa_comments_default);
+          let commentCount = 0;
+          let lastVisible = null;
+
+          attrs.posts.posts.forEach((p, i) => {
+            if (p.reply_to_post_number) {
+              commentCount++;
+              p['comment'] = true;
+              p['showComment'] = (showComments.indexOf(answerId) > -1) || (commentCount <= defaultComments);
+              p['answerId'] = answerId;
+              p['attachCommentToggle'] = false;
+
+              if (p['showComment']) lastVisible = i;
+
+              if ((!attrs.posts.posts[i+1] ||
+                  !attrs.posts.posts[i+1].reply_to_post_number) &&
+                  !p['showComment']) {
+                attrs.posts.posts[lastVisible]['answerId'] = answerId;
+                attrs.posts.posts[lastVisible]['attachCommentToggle'] = true;
+                attrs.posts.posts[lastVisible]['hiddenComments'] = commentCount - defaultComments;
+              }
+            } else {
+              p['attachCommentToggle'] = false;
+              answerId = p.id;
+              commentCount = 0;
+              lastVisible = i;
+            }
+          });
+
+          return this._super(attrs, state);
+        }
+      });
+
+      api.includePostAttributes(
+        'reply_to_post_number',
+        'topic',
+        'comment',
+        'showComment',
+        'answerId',
+        'lastComment'
+      );
 
       api.addPostClassesCallback((attrs) => {
         if (attrs.topic.qa_enabled && !attrs.firstPost) {
-          return attrs.reply_to_post_number ? ["comment"] : ["answer"];
+          if (attrs.comment) {
+            let classes = ["comment"];
+            if (attrs.showComment) {
+              classes.push('show');
+            }
+            return classes;
+          } else {
+            return ["answer"];
+          }
         };
       });
 
@@ -81,7 +163,7 @@ export default {
             !attrs.reply_to_post_number) {
 
           let args = {
-            action: 'replyToPost',
+            action: 'openCommentCompose',
             title: 'topic.comment.help',
             icon: 'comment',
             className: 'comment create fade-out'
@@ -306,6 +388,11 @@ export default {
           }
 
           return this.attach('post-article', attrs);
+        },
+
+        openCommentCompose() {
+          this.sendWidgetAction('showComments', this.attrs.id);
+          this.sendWidgetAction('replyToPost', this.model);
         },
       });
 

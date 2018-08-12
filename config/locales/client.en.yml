@@ -36,6 +36,9 @@ en:
       comment:
         title: 'Comment'
         help: 'begin composing a comment on this answer'
+        show_comments:
+          all: 'show {{count}} comments'
+          more: 'show {{count}} more comments'
 
       tip:
         qa:

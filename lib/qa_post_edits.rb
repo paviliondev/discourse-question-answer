@@ -1,6 +1,6 @@
 module PostSerializerQAExtension
   def actions_summary
-    summaries = super.reject { |s| s[:id] === PostActionType.types[:vote]}
+    summaries = super.reject { |s| s[:id] === PostActionType.types[:vote] }
 
     if object.qa_enabled
       user = scope.current_user

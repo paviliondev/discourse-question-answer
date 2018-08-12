@@ -5,6 +5,7 @@ en:
     qa_enabled: "Enable QA Plugin"
     qa_disable_like_on_answers: "Disables like button on answers in QnA topics"
     qa_undo_vote_action_window: "Number of minutes users are allowed to undo votes in QnA topics (enter 0 for no limit)"
+    qa_comments_default: "Maximum number of comments to display by default."
 
   post_action_types:
     vote:

@@ -44,6 +44,12 @@ nav.post-controls button.comment {
 }
 
 .topic-post.comment {
+  display: none;
+
+  &.show {
+    display: block;
+  }
+
   .avatar-flair {
     width: 12px;
     height: 12px;
@@ -53,6 +59,15 @@ nav.post-controls button.comment {
       font-size: 8px;
     }
   }
+}
+
+.show-comments {
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.answer .show-comments {
+  padding-left: 105px;
 }
 
 // identical to classes in other plugins

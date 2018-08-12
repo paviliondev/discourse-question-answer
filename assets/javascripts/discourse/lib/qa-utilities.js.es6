@@ -7,22 +7,22 @@ const vote = function(type, data) {
   return ajax('/qa/vote', {
     type,
     data
-  }).catch(popupAjaxError)
-}
+  }).catch(popupAjaxError);
+};
 
 const undoVote = function(data) {
   return vote('DELETE', data);
-}
+};
 
 const castVote = function(data) {
   return vote('POST', data);
-}
+};
 
 const whoVoted = function(data) {
   return ajax('/qa/voters', {
     type: 'GET',
     data
-  }).catch(popupAjaxError)
-}
+  }).catch(popupAjaxError);
+};
 
 export { undoVote, castVote, voteActionId, whoVoted };
