@@ -83,8 +83,10 @@ export default {
           let defaultComments = Number(Discourse.SiteSettings.qa_comments_default);
           let commentCount = 0;
           let lastVisible = null;
+          let posts = attrs.posts || [];
+          let postArray = posts.toArray();
 
-          attrs.posts.posts.forEach((p, i) => {
+          postArray.forEach((p, i) => {
             if (p.reply_to_post_number) {
               commentCount++;
               p['comment'] = true;
@@ -94,12 +96,12 @@ export default {
 
               if (p['showComment']) lastVisible = i;
 
-              if ((!attrs.posts.posts[i+1] ||
-                  !attrs.posts.posts[i+1].reply_to_post_number) &&
+              if ((!postArray[i+1] ||
+                  !postArray[i+1].reply_to_post_number) &&
                   !p['showComment']) {
-                attrs.posts.posts[lastVisible]['answerId'] = answerId;
-                attrs.posts.posts[lastVisible]['attachCommentToggle'] = true;
-                attrs.posts.posts[lastVisible]['hiddenComments'] = commentCount - defaultComments;
+                postArray[lastVisible]['answerId'] = answerId;
+                postArray[lastVisible]['attachCommentToggle'] = true;
+                postArray[lastVisible]['hiddenComments'] = commentCount - defaultComments;
               }
             } else {
               p['attachCommentToggle'] = false;
@@ -108,6 +110,8 @@ export default {
               lastVisible = i;
             }
           });
+
+          attrs.posts = postArray;
 
           return this._super(attrs, state);
         }
