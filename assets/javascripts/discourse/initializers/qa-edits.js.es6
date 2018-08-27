@@ -81,46 +81,49 @@ export default {
         },
 
         html(attrs, state) {
-          let answerId = null;
-          let showComments = state.showComments;
-          let defaultComments = Number(Discourse.SiteSettings.qa_comments_default);
-          let commentCount = 0;
-          let lastVisible = null;
           let posts = attrs.posts || [];
-          let postArray = posts.toArray();
+          let postArray = this.capabilities.isAndroid ? posts : posts.toArray();
 
-          postArray.forEach((p, i) => {
-            if (p.reply_to_post_number) {
-              commentCount++;
-              p['comment'] = true;
-              p['showComment'] = (showComments.indexOf(answerId) > -1) || (commentCount <= defaultComments);
-              p['answerId'] = answerId;
-              p['attachCommentToggle'] = false;
+          if (postArray[0] && postArray[0].topic && postArray[0].topic.qa_enabled) {
+            let answerId = null;
+            let showComments = state.showComments;
+            let defaultComments = Number(Discourse.SiteSettings.qa_comments_default);
+            let commentCount = 0;
+            let lastVisible = null;
 
-              if (p['showComment']) lastVisible = i;
+            postArray.forEach((p, i) => {
+              if (p.reply_to_post_number) {
+                commentCount++;
+                p['comment'] = true;
+                p['showComment'] = (showComments.indexOf(answerId) > -1) || (commentCount <= defaultComments);
+                p['answerId'] = answerId;
+                p['attachCommentToggle'] = false;
 
-              if ((!postArray[i+1] ||
-                  !postArray[i+1].reply_to_post_number) &&
-                  !p['showComment']) {
-                postArray[lastVisible]['answerId'] = answerId;
-                postArray[lastVisible]['attachCommentToggle'] = true;
-                postArray[lastVisible]['hiddenComments'] = commentCount - defaultComments;
+                if (p['showComment']) lastVisible = i;
+
+                if ((!postArray[i+1] ||
+                    !postArray[i+1].reply_to_post_number) &&
+                    !p['showComment']) {
+                  postArray[lastVisible]['answerId'] = answerId;
+                  postArray[lastVisible]['attachCommentToggle'] = true;
+                  postArray[lastVisible]['hiddenComments'] = commentCount - defaultComments;
+                }
+              } else {
+                p['attachCommentToggle'] = false;
+                answerId = p.id;
+                commentCount = 0;
+                lastVisible = i;
               }
-            } else {
-              p['attachCommentToggle'] = false;
-              answerId = p.id;
-              commentCount = 0;
-              lastVisible = i;
-            }
-          });
-
-          if (this.capabilities.isAndroid) {
-            attrs.posts = postArray;
-          } else {
-            attrs.posts = PostsWithPlaceholders.create({
-              posts: postArray,
-              store
             });
+
+            if (this.capabilities.isAndroid) {
+              attrs.posts = postArray;
+            } else {
+              attrs.posts = PostsWithPlaceholders.create({
+                posts: postArray,
+                store
+              });
+            }
           }
 
           return this._super(attrs, state);
