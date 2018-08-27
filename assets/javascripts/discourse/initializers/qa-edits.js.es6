@@ -22,8 +22,7 @@ export default {
         menuItems() {
           const attrs = this.attrs;
           let result = this.siteSettings.post_menu.split('|');
-
-          if (attrs.topic.qa_enabled) {
+          if (attrs.qa_enabled) {
             if (this.siteSettings.qa_disable_like_on_answers &&
                 !attrs.firstPost &&
                 !attrs.reply_to_post_number) {
@@ -32,7 +31,6 @@ export default {
 
             result = result.filter((b) => b !== 'reply');
           }
-
           return result;
         },
       });
@@ -41,7 +39,7 @@ export default {
         const model = helper.getModel();
         if (model && model.get('post_number') !== 1
             && !model.get('reply_to_post_number')
-            && model.get('topic.qa_enabled')) {
+            && model.get('qa_enabled')) {
           return helper.attach('qa-post', {
             count: model.get('vote_count'),
             post: model
@@ -84,7 +82,7 @@ export default {
           let posts = attrs.posts || [];
           let postArray = this.capabilities.isAndroid ? posts : posts.toArray();
 
-          if (postArray[0] && postArray[0].topic && postArray[0].topic.qa_enabled) {
+          if (postArray[0] && postArray[0].qa_enabled) {
             let answerId = null;
             let showComments = state.showComments;
             let defaultComments = Number(Discourse.SiteSettings.qa_comments_default);
@@ -131,16 +129,21 @@ export default {
       });
 
       api.includePostAttributes(
+        'qa_enabled',
         'reply_to_post_number',
-        'topic',
         'comment',
         'showComment',
         'answerId',
-        'lastComment'
+        'lastComment',
+        'last_answerer',
+        'last_answered_at',
+        'answer_count',
+        'last_answer_post_number',
+        'last_answerer'
       );
 
       api.addPostClassesCallback((attrs) => {
-        if (attrs.topic.qa_enabled && !attrs.firstPost) {
+        if (attrs.qa_enabled && !attrs.firstPost) {
           if (attrs.comment) {
             let classes = ["comment"];
             if (attrs.showComment) {
@@ -155,7 +158,7 @@ export default {
 
       api.addPostMenuButton('answer', (attrs) => {
         if (attrs.canCreatePost &&
-            attrs.topic.qa_enabled &&
+            attrs.qa_enabled &&
             attrs.firstPost) {
 
           let args = {
@@ -175,7 +178,7 @@ export default {
 
       api.addPostMenuButton('comment', (attrs) => {
         if (attrs.canCreatePost &&
-            attrs.topic.qa_enabled &&
+            attrs.qa_enabled &&
             !attrs.firstPost &&
             !attrs.reply_to_post_number) {
 
@@ -393,7 +396,7 @@ export default {
         html(attrs) {
           if (attrs.cloaked) { return ''; }
 
-          if (attrs.topic.qa_enabled && !attrs.firstPost) {
+          if (attrs.qa_enabled && !attrs.firstPost) {
             attrs.replyToUsername = null;
             if (attrs.reply_to_post_number) {
               attrs.canCreatePost = false;
@@ -424,7 +427,7 @@ export default {
 
       api.reopenWidget('topic-map-summary', {
         html(attrs, state) {
-          if (attrs.topic.qa_enabled) {
+          if (attrs.qa_enabled) {
             return this.qaMap(attrs, state);
           } else {
             return this._super(attrs, state);
@@ -448,25 +451,25 @@ export default {
             ]
           ));
 
-          let lastAnswerUrl = '/t/' + attrs.topic.slug + '/' + attrs.topic.id + '/' + attrs.topic.last_answer_post_number;
+          let lastAnswerUrl = attrs.topicUrl + '/' + attrs.last_answer_post_number;
 
           contents.push(h('li',
             h('a', { attributes: { href: lastAnswerUrl } }, [
               h('h4', I18n.t('last_answer_lowercase')),
               h('div.topic-map-post.last-answer', [
                 avatarFor('tiny', {
-                  username: attrs.topic.last_answerer.username,
-                  template: attrs.topic.last_answerer.avatar_template,
-                  name: attrs.topic.last_answerer.name
+                  username: attrs.last_answerer.username,
+                  template: attrs.last_answerer.avatar_template,
+                  name: attrs.last_answerer.name
                 }),
-                dateNode(attrs.topic.last_answered_at)
+                dateNode(attrs.last_answered_at)
               ])
             ])
           ));
 
           contents.push(h('li', [
-            numberNode(attrs.topic.answer_count),
-            h('h4', I18n.t('answers_lowercase', { count: attrs.topic.answer_count }))
+            numberNode(attrs.answer_count),
+            h('h4', I18n.t('answers_lowercase', { count: attrs.answer_count }))
           ]));
 
           contents.push(h('li.secondary', [

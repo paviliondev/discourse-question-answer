@@ -37,7 +37,14 @@ require_dependency 'post_serializer'
 class ::PostSerializer
   prepend PostSerializerQAExtension
 
-  attributes :vote_count, :voted
+  attributes :vote_count,
+             :voted,
+             :qa_enabled,
+             :last_answerer,
+             :last_answered_at,
+             :answer_count,
+             :last_answer_post_number,
+             :last_answerer
 
   def vote_count
     object.vote_count
@@ -45,6 +52,50 @@ class ::PostSerializer
 
   def voted
     object.voted
+  end
+
+  def qa_enabled
+    object.qa_enabled
+  end
+
+  def last_answerer
+    object.topic.last_answerer
+  end
+
+  def include_last_answerer?
+    object.qa_enabled
+  end
+
+  def last_answered_at
+    object.topic.last_answered_at
+  end
+
+  def include_last_answered_at?
+    object.qa_enabled
+  end
+
+  def answer_count
+    object.topic.answer_count
+  end
+
+  def include_answer_count?
+    object.qa_enabled
+  end
+
+  def last_answer_post_number
+    object.topic.last_answer_post_number
+  end
+
+  def include_last_answer_post_number?
+    object.qa_enabled
+  end
+
+  def last_answerer
+    object.topic.last_answerer
+  end
+
+  def include_last_answerer?
+    object.qa_enabled
   end
 end
 
