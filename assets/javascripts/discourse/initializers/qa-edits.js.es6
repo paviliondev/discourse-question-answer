@@ -6,12 +6,15 @@ import { dateNode, numberNode } from 'discourse/helpers/node';
 import { REPLY } from "discourse/models/composer";
 import { undoVote, whoVoted, voteActionId } from '../lib/qa-utilities';
 import { avatarAtts } from 'discourse/widgets/actions-summary';
+import PostsWithPlaceholders from 'discourse/lib/posts-with-placeholders';
 
 export default {
   name: 'qa-edits',
-  initialize(){
+  initialize(container){
 
     if (!Discourse.SiteSettings.qa_enabled) return;
+
+    const store = container.lookup('store:main');
 
     withPluginApi('0.8.12', api => {
 
@@ -111,7 +114,14 @@ export default {
             }
           });
 
-          attrs.posts = postArray;
+          if (this.capabilities.isAndroid) {
+            attrs.posts = postArray;
+          } else {
+            attrs.posts = PostsWithPlaceholders.create({
+              posts: postArray,
+              store
+            });
+          }
 
           return this._super(attrs, state);
         }

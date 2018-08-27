@@ -7,4 +7,4 @@ export default {
       controller.send('replyToPost');
     }
   }
-}
+};
