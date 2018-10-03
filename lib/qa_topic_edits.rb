@@ -84,6 +84,8 @@ class ::Topic
 
     posts = Post.where(topic_id: topic_id)
 
+    posts.where(post_number: 1).update(sort_order: 1)
+
     answers = posts.where(reply_to_post_number: [nil, ''])
       .where.not(post_number: 1)
       .order("(
@@ -93,7 +95,7 @@ class ::Topic
         ), 0)
       ) DESC, post_number ASC")
 
-    count = 1
+    count = 2
     answers.each do |a|
       a.update(sort_order: count)
       comments = posts.where(reply_to_post_number: a.post_number)
