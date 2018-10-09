@@ -9,7 +9,7 @@ es:
           label: Responder a la pregunta
           desc: Responder a la pregunta en el primer mensaje
         comment_on_answer:
-          label: Comentar la respuesta de %{postUsername}
+          label: "Comentar la respuesta de %{postUsername}"
           desc: Comentar una respuesta
 
     post:
@@ -24,10 +24,12 @@ es:
           vote:
             one: "Tú y otra persona habéis votado este mensaje"
             other: "Tú y otras {{count}} personas habéis votado este mensaje"
+
         by_others:
           vote:
             one: "1 persona ha votado este mensaje"
             other: "{{count}} personas han votado este mensaje"
+
 
     topic:
       answer:
@@ -43,9 +45,7 @@ es:
       tip:
         qa:
           title: "Pregunta"
-          details: "Los usuarios pueden votar la respuesta que mejor responda a la pregunta del mensaje inicial.
-                    <ul><li>Cada usuario solo tiene permitido un voto.</li>
-                    <li>Las respuestas están ordenadas según el número de votos recibidos.</li></ul>"
+          details: "Los usuarios pueden votar la respuesta que mejor responda a la pregunta del mensaje inicial. <ul><li>Cada usuario solo tiene permitido un voto.</li> <li>Las respuestas están ordenadas según el número de votos recibidos.</li></ul>"
 
     vote:
       already_voted: "Solo puedes votar una vez por pregunta."
@@ -54,3 +54,4 @@ es:
     answers_lowercase:
       one: respuesta
       other: respuestas
+

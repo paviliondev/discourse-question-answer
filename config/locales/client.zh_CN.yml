@@ -1,13 +1,54 @@
 zh_CN:
   js:
+    category:
+      enable_qa: "此类别中的帖子允许问答。"
+
+    composer:
+      composer_actions:
+        reply_to_question:
+          label: ""
+          desc: ""
+        comment_on_answer:
+          label: ""
+          desc: ""
+
+    post:
+      actions:
+        undo:
+          vote: ""
+        people:
+          vote: ""
+        by_you:
+          vote: ""
+        by_you_and_others:
+          vote:
+            other: ""
+
+        by_others:
+          vote:
+            other: ""
+
+
     topic:
+      answer:
+        title: ''
+        help: ''
+      comment:
+        title: ''
+        help: ''
+        show_comments:
+          all: ''
+          more: ''
+
       tip:
         qa:
           title: "问答话题"
-          details: "用户可以给最佳回答投票。
-                    <ul><li>每位只有一票。</li>
-                    <li>回答以得票数排序。</li></ul>"
-    category:
-      enable_qa: "此类别中的帖子允许问答。"
+          details: "用户可以给最佳回答投票。 <ul><li>每位只有一票。</li> <li>回答以得票数排序。</li></ul>"
+
     vote:
       already_voted: "每个问题您只能投票一次。"
+
+    last_answer_lowercase: ""
+    answers_lowercase:
+      other: ''
+
