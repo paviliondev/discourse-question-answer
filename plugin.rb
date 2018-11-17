@@ -1,6 +1,6 @@
 # name: discourse-question-answer
 # about: Question / Answer Style Topics
-# version: 0.2
+# version: 0.3
 # authors: Angus McLeod
 # url: https://github.com/angusmcleod/discourse-question-answer
 
@@ -30,4 +30,5 @@ after_initialize do
   load File.expand_path('../lib/qa.rb', __FILE__)
   load File.expand_path('../lib/qa_post_edits.rb', __FILE__)
   load File.expand_path('../lib/qa_topic_edits.rb', __FILE__)
+  load File.expand_path('../lib/qa_diary_edits.rb', __FILE__)
 end

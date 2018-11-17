@@ -17,3 +17,6 @@ plugins:
   qa_comments_default:
     default: 3
     client: true
+  qa_diary_format:
+    default: false
+    client: true

@@ -11,10 +11,11 @@ import PostsWithPlaceholders from 'discourse/lib/posts-with-placeholders';
 export default {
   name: 'qa-edits',
   initialize(container){
-
-    if (!Discourse.SiteSettings.qa_enabled) return;
-
     const store = container.lookup('store:main');
+    const currentUser = container.lookup('current-user:main');
+    const siteSettings = container.lookup("site-settings:main");
+
+    if (!siteSettings.qa_enabled) return;
 
     withPluginApi('0.8.12', api => {
 
@@ -50,7 +51,7 @@ export default {
       api.decorateWidget('post:after', function(helper) {
         const model = helper.getModel();
         if (model.attachCommentToggle && model.hiddenComments > 0) {
-          let type = Number(Discourse.SiteSettings.qa_comments_default) > 0 ? 'more' : 'all';
+          let type = Number(siteSettings.qa_comments_default) > 0 ? 'more' : 'all';
           return helper.attach('link', {
             action: 'showComments',
             actionParam: model.answerId,
@@ -85,7 +86,7 @@ export default {
           if (postArray[0] && postArray[0].qa_enabled) {
             let answerId = null;
             let showComments = state.showComments;
-            let defaultComments = Number(Discourse.SiteSettings.qa_comments_default);
+            let defaultComments = Number(siteSettings.qa_comments_default);
             let commentCount = 0;
             let lastVisible = null;
 
@@ -107,7 +108,8 @@ export default {
                   postArray[lastVisible]['hiddenComments'] = commentCount - defaultComments;
                 }
               } else {
-                p['attachCommentToggle'] = false;
+                p['attachCommentToggle'] = !siteSettings.qa_diary_format;
+                p['topicUserId'] = p.topic.user_id
                 answerId = p.id;
                 commentCount = 0;
                 lastVisible = i;
@@ -139,7 +141,8 @@ export default {
         'last_answered_at',
         'answer_count',
         'last_answer_post_number',
-        'last_answerer'
+        'last_answerer',
+        'topicUserId'
       );
 
       api.addPostClassesCallback((attrs) => {
@@ -157,9 +160,12 @@ export default {
       });
 
       api.addPostMenuButton('answer', (attrs) => {
+        const diary = siteSettings.qa_diary_format;
+
         if (attrs.canCreatePost &&
             attrs.qa_enabled &&
-            attrs.firstPost) {
+            attrs.firstPost &&
+            (!diary || attrs.topicUserId === currentUser.id)) {
 
           let args = {
             action: 'replyToPost',
