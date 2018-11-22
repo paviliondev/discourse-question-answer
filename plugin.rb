@@ -12,7 +12,21 @@ enabled_site_setting :qa_enabled
 
 after_initialize do
   Category.register_custom_field_type('qa_enabled', :boolean)
-  add_to_serializer(:basic_category, :qa_enabled) { object.custom_fields["qa_enabled"] }
+  Category.register_custom_field_type('qa_one_to_many', :boolean)
+
+  require_dependency 'category'
+  class ::Category
+    def qa_enabled
+      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_enabled'])
+    end
+
+    def qa_one_to_many
+      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_one_to_many'])
+    end
+  end
+
+  add_to_serializer(:basic_category, :qa_enabled) { object.qa_enabled }
+  add_to_serializer(:basic_category, :qa_one_to_many) { object.qa_one_to_many }
 
   PostActionType.types[:vote] = 100
 
@@ -30,5 +44,5 @@ after_initialize do
   load File.expand_path('../lib/qa.rb', __FILE__)
   load File.expand_path('../lib/qa_post_edits.rb', __FILE__)
   load File.expand_path('../lib/qa_topic_edits.rb', __FILE__)
-  load File.expand_path('../lib/qa_diary_edits.rb', __FILE__)
+  load File.expand_path('../lib/qa_one_to_many_edits.rb', __FILE__)
 end

@@ -1,9 +1,10 @@
-module DiaryGuardianExtension
+module OneToManyGuardianExtension
   def can_create_post_on_topic?(topic)
     post = self.try(:post_opts) || {}
-    if topic.category &&
-      topic.category.custom_fields["qa_enabled"] &&
-      SiteSetting.qa_diary_format &&
+    category = topic.category
+    if category &&
+      category.qa_enabled &&
+      category.qa_one_to_many &&
       post.present? &&
       !post[:reply_to_post_number]
       return @user.id == topic.user_id
@@ -14,10 +15,10 @@ end
 
 class ::Guardian
   attr_accessor :post_opts
-  prepend DiaryGuardianExtension
+  prepend OneToManyGuardianExtension
 end
 
-module DiaryPostCreatorExtension
+module OneToManyPostCreatorExtension
   def valid?
     guardian.post_opts = @opts
     super
@@ -25,5 +26,5 @@ module DiaryPostCreatorExtension
 end
 
 class ::PostCreator
-  prepend DiaryPostCreatorExtension
+  prepend OneToManyPostCreatorExtension
 end

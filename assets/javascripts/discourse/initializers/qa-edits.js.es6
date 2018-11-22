@@ -91,6 +91,8 @@ export default {
             let lastVisible = null;
 
             postArray.forEach((p, i) => {
+              p['oneToMany'] = p.topic.category.qa_one_to_many;
+
               if (p.reply_to_post_number) {
                 commentCount++;
                 p['comment'] = true;
@@ -108,7 +110,7 @@ export default {
                   postArray[lastVisible]['hiddenComments'] = commentCount - defaultComments;
                 }
               } else {
-                p['attachCommentToggle'] = !siteSettings.qa_diary_format;
+                p['attachCommentToggle'] = !p['oneToMany'];
                 p['topicUserId'] = p.topic.user_id
                 answerId = p.id;
                 commentCount = 0;
@@ -142,7 +144,8 @@ export default {
         'answer_count',
         'last_answer_post_number',
         'last_answerer',
-        'topicUserId'
+        'topicUserId',
+        'oneToMany'
       );
 
       api.addPostClassesCallback((attrs) => {
@@ -160,22 +163,22 @@ export default {
       });
 
       api.addPostMenuButton('answer', (attrs) => {
-        const diary = siteSettings.qa_diary_format;
-
         if (attrs.canCreatePost &&
             attrs.qa_enabled &&
             attrs.firstPost &&
-            (!diary || attrs.topicUserId === currentUser.id)) {
+            (!attrs.oneToMany || attrs.topicUserId === currentUser.id)) {
+
+          let postType = attrs.oneToMany ? 'one_to_many_post' : 'answer';
 
           let args = {
             action: 'replyToPost',
-            title: 'topic.answer.help',
+            title: `topic.${postType}.help`,
             icon: 'reply',
             className: 'answer create fade-out'
           };
 
           if (!attrs.mobileView) {
-            args.label = 'topic.answer.title';
+            args.label = `topic.${postType}.title`;
           }
 
           return args;
@@ -236,6 +239,7 @@ export default {
           if (commenting) {
             items.forEach((item) => {
               if (item.id === 'reply_to_topic') {
+                console.log(options);
                 item.name = I18n.t('composer.composer_actions.reply_to_question.label');
                 item.description = I18n.t('composer.composer_actions.reply_to_question.desc');
               }
@@ -458,10 +462,11 @@ export default {
           ));
 
           let lastAnswerUrl = attrs.topicUrl + '/' + attrs.last_answer_post_number;
+          let postType = attrs.oneToMany ? 'one_to_many' : 'answer';
 
           contents.push(h('li',
             h('a', { attributes: { href: lastAnswerUrl } }, [
-              h('h4', I18n.t('last_answer_lowercase')),
+              h('h4', I18n.t(`last_${postType}_lowercase`)),
               h('div.topic-map-post.last-answer', [
                 avatarFor('tiny', {
                   username: attrs.last_answerer.username,
@@ -475,7 +480,7 @@ export default {
 
           contents.push(h('li', [
             numberNode(attrs.answer_count),
-            h('h4', I18n.t('answers_lowercase', { count: attrs.answer_count }))
+            h('h4', I18n.t(`${postType}_lowercase`, { count: attrs.answer_count }))
           ]));
 
           contents.push(h('li.secondary', [

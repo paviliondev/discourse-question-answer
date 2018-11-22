@@ -4,10 +4,25 @@ export default {
   setupComponent(attrs, component) {
     const currentUser = component.get('currentUser');
     const topic = attrs.topic;
-    const diary = Discourse.SiteSettings.qa_diary_format;
+    const oneToMany = topic.category.qa_one_to_many;
     const qaEnabled = topic.qa_enabled;
     const canCreatePost = topic.get('details.can_create_post');
-    component.set('showCreateAnswer', qaEnabled && canCreatePost && (!diary || topic.user_id == currentUser.id))
+
+    let showCreateAnswer = qaEnabled && canCreatePost && (!oneToMany || topic.user_id == currentUser.id);
+    let label;
+    let title;
+
+    if (showCreateAnswer) {
+      let topicType = oneToMany ? 'one_to_many' : 'answer';
+      label = `topic.${topicType}.title`;
+      title = `topic.${topicType}.help`;
+    }
+
+    component.setProperties({
+      showCreateAnswer,
+      label,
+      title
+    });
   },
 
   actions: {

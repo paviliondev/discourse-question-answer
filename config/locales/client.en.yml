@@ -2,6 +2,7 @@ en:
   js:
     category:
       enable_qa: "Make all topics in this category QnA."
+      qa_one_to_many: "QnA one-to-many format."
 
     composer:
       composer_actions:
@@ -11,6 +12,12 @@ en:
         comment_on_answer:
           label: Comment on answer of %{postUsername}
           desc: Comment on an answer
+        one_to_many_entry:
+          label: Make a new entry
+          desc: Make a new entry
+        comment_on_entry:
+          label: Comment on entry of ${postUsername}
+          desc: Comment on an entry
 
     post:
       actions:
@@ -30,6 +37,9 @@ en:
             other: "{{count}} people voted for this post"
 
     topic:
+      one_to_many:
+        title: "New Entry"
+        help: "begin composing a new entry"
       answer:
         title: 'Answer'
         help: 'begin composing an answer to the question'
@@ -46,11 +56,18 @@ en:
           details: "Users can vote for the response that best answers the initial post.
                     <ul><li>Each user is allowed one vote.</li>
                     <li>Responses are ordered by vote count.</li></ul>"
+        qa_one_to_many:
+          title: "One to many"
+          details: "Only the topic author can post entries. All users can post comments."
 
     vote:
       already_voted: "You can only vote once per question."
 
     last_answer_lowercase: last answer
+    last_one_to_many_lowercase: last entry
     answers_lowercase:
       one: answer
       other: answers
+    one_to_many_lowercase:
+      one: entry
+      other: entries
