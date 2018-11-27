@@ -49,6 +49,6 @@ zh_CN:
       already_voted: "每个问题您只能投票一次。"
 
     last_answer_lowercase: ""
-    answers_lowercase:
+    answer_lowercase:
       other: ''
 
