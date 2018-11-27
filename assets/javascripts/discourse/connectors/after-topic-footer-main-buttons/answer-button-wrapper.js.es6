@@ -4,7 +4,7 @@ export default {
   setupComponent(attrs, component) {
     const currentUser = component.get('currentUser');
     const topic = attrs.topic;
-    const oneToMany = topic.category.qa_one_to_many;
+    const oneToMany = topic.category && topic.category.qa_one_to_many;
     const qaEnabled = topic.qa_enabled;
     const canCreatePost = topic.get('details.can_create_post');
 
