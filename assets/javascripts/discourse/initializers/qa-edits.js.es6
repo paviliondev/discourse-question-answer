@@ -168,7 +168,7 @@ export default {
             attrs.firstPost &&
             (!attrs.oneToMany || attrs.topicUserId === currentUser.id)) {
 
-          let postType = attrs.oneToMany ? 'one_to_many_post' : 'answer';
+          let postType = attrs.oneToMany ? 'one_to_many' : 'answer';
 
           let args = {
             action: 'replyToPost',
