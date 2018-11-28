@@ -239,7 +239,6 @@ export default {
           if (commenting) {
             items.forEach((item) => {
               if (item.id === 'reply_to_topic') {
-                console.log(options);
                 item.name = I18n.t('composer.composer_actions.reply_to_question.label');
                 item.description = I18n.t('composer.composer_actions.reply_to_question.desc');
               }
