@@ -25,6 +25,19 @@ after_initialize do
     end
   end
 
+  require_dependency 'category_custom_field'
+  class ::CategoryCustomField
+    after_commit :update_post_order, if: :qa_enabled_changed
+
+    def qa_enabled_changed
+      name == 'qa_enabled'
+    end
+
+    def update_post_order
+      Jobs.enqueue(:update_post_order, category_id: category_id)
+    end
+  end
+
   add_to_serializer(:basic_category, :qa_enabled) { object.qa_enabled }
   add_to_serializer(:basic_category, :qa_one_to_many) { object.qa_one_to_many }
 
@@ -45,4 +58,5 @@ after_initialize do
   load File.expand_path('../lib/qa_post_edits.rb', __FILE__)
   load File.expand_path('../lib/qa_topic_edits.rb', __FILE__)
   load File.expand_path('../lib/qa_one_to_many_edits.rb', __FILE__)
+  load File.expand_path('../jobs/update_post_order.rb', __FILE__)
 end
