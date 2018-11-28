@@ -51,7 +51,7 @@ es:
       already_voted: "Solo puedes votar una vez por pregunta."
 
     last_answer_lowercase: última respuesta
-    answers_lowercase:
+    answer_lowercase:
       one: respuesta
       other: respuestas
 

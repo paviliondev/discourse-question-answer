@@ -51,7 +51,7 @@ fi:
       already_voted: "Voit äänestää vain yhtä vastausta tähän kysymykseen"
 
     last_answer_lowercase: viimeisin vastaus
-    answers_lowercase:
+    answer_lowercase:
       one: vastaus
       other: vastaukset
 
