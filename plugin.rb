@@ -10,6 +10,11 @@ register_asset 'stylesheets/mobile/question-answer.scss', :mobile
 
 enabled_site_setting :qa_enabled
 
+if respond_to?(:register_svg_icon)
+  register_svg_icon "angle-up"
+  register_svg_icon "info"
+end
+
 after_initialize do
   Category.register_custom_field_type('qa_enabled', :boolean)
   Category.register_custom_field_type('qa_one_to_many', :boolean)
