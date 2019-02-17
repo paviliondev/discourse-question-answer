@@ -1,0 +1,21 @@
+fr:
+  site_settings:
+    qa_tags: "Tags pour activer QnA sur le sujet"
+    qa_show_topic_tip: "Afficher une astuce sur la mécanique des sujets QnA sous les titres de sujets QnA"
+    qa_enabled: "Activer le plugin QA"
+    qa_disable_like_on_answers: "Désactiver le bouton de type de réponse sur les sujets de questions et réponses"
+    qa_undo_vote_action_window: "Nombre de minutes où les utilisateurs sont autorisés à annuler les votes dans les sujets QnA (entrez 0 pour aucune limite)"
+    qa_comments_default: "Nombre maximum de commentaires à afficher par défaut."
+
+  post_action_types:
+    vote:
+      title: 'Vote'
+      description: 'Votez pour ce post'
+      short_description: 'Votez pour ce post'
+      long_form: 'voté pour ce post'
+
+  vote:
+    error:
+      user_has_not_voted: "L'utilisateur n'a pas voté."
+      already_voted: "Vous ne pouvez voter qu'une fois par question."
+      undo_vote_action_window: "Vous ne pouvez annuler des votes %{minutes}qu'après avoir voté."
