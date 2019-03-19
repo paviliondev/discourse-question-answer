@@ -18,6 +18,16 @@ end
 after_initialize do
   Category.register_custom_field_type('qa_enabled', :boolean)
   Category.register_custom_field_type('qa_one_to_many', :boolean)
+  add_to_serializer(:basic_category, :qa_enabled) { object.qa_enabled }
+  add_to_serializer(:basic_category, :qa_one_to_many) { object.qa_one_to_many }
+
+  [
+    'qa_enabled',
+    'qa_one_to_many'
+  ].each do |key|
+    Site.preloaded_category_custom_fields << key if Site.respond_to? :preloaded_category_custom_fields
+    add_to_serializer(:basic_category, key.to_sym) { object.send(key) }
+  end
 
   require_dependency 'category'
   class ::Category
@@ -42,9 +52,6 @@ after_initialize do
       Jobs.enqueue(:update_post_order, category_id: category_id)
     end
   end
-
-  add_to_serializer(:basic_category, :qa_enabled) { object.qa_enabled }
-  add_to_serializer(:basic_category, :qa_one_to_many) { object.qa_one_to_many }
 
   PostActionType.types[:vote] = 100
 
