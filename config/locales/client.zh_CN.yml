@@ -26,16 +26,16 @@ zh_CN:
         people:
           vote: "投票"
         by_you:
-          vote: "你为这个帖子投票了"
+          vote: "你为这个答案投票了"
         by_you_and_others:
           vote:
-            one: "你和另外一个人投票给了这个帖子"
-            other: "你和 {{count}} 个人投票给了这个帖子"
+            one: "你和另外一个人投票给了这个答案"
+            other: "你和 {{count}} 个人投票给了这个答案"
 
         by_others:
           vote:
-            one: "1 个人投票给了这个帖子"
-            other: "{{count}} 个人投票给了这个帖子"
+            one: "1 个人投票给了这个答案"
+            other: "{{count}} 个人投票给了这个答案"
 
     topic:
       one_to_many:
