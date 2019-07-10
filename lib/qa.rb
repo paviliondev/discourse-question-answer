@@ -106,18 +106,18 @@ class QuestionAnswer::VotesController < ::ApplicationController
   end
 
   def ensure_can_act
-    if Topic.voted(@post.topic, @user)
-      if self.action_name === QuestionAnswer::Vote::CREATE
-        raise Discourse::InvalidAccess.new, I18n.t('vote.error.alread_voted')
-      end
 
-      if self.action_name === QuestionAnswer::Vote::DESTROY && !QuestionAnswer::Vote.can_undo(@post, @user)
-        raise Discourse::InvalidAccess.new, I18n.t('vote.error.undo_vote_action_window',
-          minutes: SiteSetting.qa_undo_vote_action_window
-        )
-      end
-    elsif self.action_name === QuestionAnswer::Vote::DESTROY
-      raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_has_not_voted')
+    if Topic.can_vote(@post.topic, @user)
+        if Topic.vote_count(@post.topic, @user) >= vote_limit 
+            if self.action_name === QuestionAnswer::Vote::CREATE
+                raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_over_limit')
+            end
+        end
+
+        if Topic.vote_count(@post.topic, @user) == 0
+            if self.action_name === QuestionAnswer::Vote::DESTROY
+            raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_has_not_voted')
+        end
     end
   end
 end

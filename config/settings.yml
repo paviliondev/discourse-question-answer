@@ -17,3 +17,7 @@ plugins:
   qa_comments_default:
     default: 3
     client: true
+  qa_tl1_vote_limit: 1
+  qa_tl2_vote_limit: 3
+  qa_tl3_vote_limit: 10
+  qa_tl4_vote_limit: 100

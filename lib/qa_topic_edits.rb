@@ -61,10 +61,32 @@ class ::Topic
 
   def self.voted(topic, user)
     return nil if !user || !SiteSetting.qa_enabled
+    return nil if !self.can_vote(topic, user)
+  end
 
-    PostCustomField.exists?(post_id: topic.posts.map(&:id),
-                            name: 'voted',
-                            value: user.id)
+  def self.can_vote(topic, user)
+    return nil if !user || !SiteSetting.qa_enabled
+    vote_count = self.vote_count(topic, user)
+
+    case user.trust_level
+    when 2
+        vote_limit = SiteSetting.qa_tl2_vote_limit
+    when 3
+        vote_limit = SiteSetting.qa_tl3_vote_limit
+    when 4
+        vote_limit = SiteSetting.qa_tl4_vote_limit
+    else
+        vote_limit = SiteSetting.qa_tl1_vote_limit
+    end
+    return vote_limit < vote_count
+  end
+
+  def self.vote_count(topic, user)
+    return nil if !user || !SiteSetting.qa_enabled
+    return PostCustomField.where(post_id: topic.posts.map(&:id),
+                                 name: 'voted',
+                                 value: user.id).count
+
   end
 
   def self.qa_enabled(topic)
@@ -140,6 +162,8 @@ require_dependency 'basic_user_serializer'
 class ::TopicViewSerializer
   attributes :qa_enabled,
              :voted,
+             :vote_count,
+             :can_vote,
              :last_answered_at,
              :last_commented_on,
              :answer_count,
@@ -153,6 +177,14 @@ class ::TopicViewSerializer
 
   def voted
     scope.current_user && ::Topic.voted(object.topic, scope.current_user)
+  end
+
+  def vote_count
+    scope.current_user && ::Topic.vote_count(object.topic, scope.current_user)
+  end
+
+  def can_vote
+    scope.current_user && ::Topic.can_vote(object.topic, scope.current_user)
   end
 
   def last_answered_at

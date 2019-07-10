@@ -7,6 +7,12 @@ en:
     qa_undo_vote_action_window: "Number of minutes users are allowed to undo votes in QnA topics (enter 0 for no limit)"
     qa_comments_default: "Maximum number of comments to display by default."
 
+    qa_tl1_vote_limit: "The vote limit for the question and answer plugin for trust level 1 users"
+    qa_tl2_vote_limit: "The vote limit for the question and answer plugin for trust level 2 users"
+    qa_tl3_vote_limit: "The vote limit for the question and answer plugin for trust level 3 users"
+    qa_tl4_vote_limit: "The vote limit for the question and answer plugin for trust level 4 users"
+
+
   post_action_types:
     vote:
       title: 'Vote'
@@ -17,5 +23,6 @@ en:
   vote:
     error:
       user_has_not_voted: "User has not voted."
+      user_over_limit: "You cannot exceed the number of votes for your trust level."
       already_voted: "You can only vote once per question."
       undo_vote_action_window: "You can only undo votes %{minutes} after voting."
