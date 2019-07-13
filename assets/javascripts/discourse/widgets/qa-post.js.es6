@@ -22,7 +22,7 @@ export default createWidget('qa-post', {
     const post = this.attrs.post;
     const user = this.currentUser;
 
-    if (post.get('topic.voted')) {
+    if (!post.get('topic.can_vote')) {
       return bootbox.alert(I18n.t('vote.user_over_limit'));
     }
 

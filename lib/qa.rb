@@ -29,9 +29,13 @@ class QuestionAnswer::VotesController < ::ApplicationController
   before_action :find_vote_post
   before_action :find_vote_user, only: [:create, :destroy]
   before_action :ensure_qa_enabled, only: [:create, :destroy]
-  before_action :ensure_can_act, only: [:create, :destroy]
 
   def create
+
+    if !Topic.can_vote(@post.topic, @user)
+        raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_over_limit')
+    end
+
     if QuestionAnswer::Vote.vote(@post, @user, vote_args)
       render json: success_json.merge(
         vote_count: @post.vote_count
@@ -42,6 +46,11 @@ class QuestionAnswer::VotesController < ::ApplicationController
   end
 
   def destroy
+
+    if Topic.vote_count(@post.topic, @user) == 0
+       raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_has_not_voted')
+    end
+
     if QuestionAnswer::Vote.vote(@post, @user, vote_args)
       render json: success_json.merge(
         vote_count: @post.vote_count
@@ -103,22 +112,6 @@ class QuestionAnswer::VotesController < ::ApplicationController
 
   def ensure_qa_enabled
     Topic.qa_enabled(@post.topic)
-  end
-
-  def ensure_can_act
-
-    if Topic.can_vote(@post.topic, @user)
-        if Topic.vote_count(@post.topic, @user) >= vote_limit 
-            if self.action_name === QuestionAnswer::Vote::CREATE
-                raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_over_limit')
-            end
-        end
-
-        if Topic.vote_count(@post.topic, @user) == 0
-            if self.action_name === QuestionAnswer::Vote::DESTROY
-            raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_has_not_voted')
-        end
-    end
   end
 end
 

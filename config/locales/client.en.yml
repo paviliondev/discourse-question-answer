@@ -62,6 +62,7 @@ en:
 
     vote:
       already_voted: "You can only vote once per question."
+      user_over_limit: "You cannot exceed the number of votes for your trust level."
 
     last_answer_lowercase: last answer
     last_one_to_many_lowercase: last entry
