@@ -31,14 +31,14 @@ class QuestionAnswer::VotesController < ::ApplicationController
   before_action :ensure_qa_enabled, only: [:create, :destroy]
 
   def create
-
     if !Topic.can_vote(@post.topic, @user)
-        raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_over_limit')
+      raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_over_limit')
     end
 
     if QuestionAnswer::Vote.vote(@post, @user, vote_args)
       render json: success_json.merge(
-        vote_count: @post.vote_count
+        vote_count: Topic.vote_count(@post.topic, @user),
+        can_vote: Topic.can_vote(@post.topic, @user)
       )
     else
       render json: failed_json, status: 422
@@ -46,14 +46,14 @@ class QuestionAnswer::VotesController < ::ApplicationController
   end
 
   def destroy
-
     if Topic.vote_count(@post.topic, @user) == 0
-       raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_has_not_voted')
+      raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_has_not_voted')
     end
 
     if QuestionAnswer::Vote.vote(@post, @user, vote_args)
       render json: success_json.merge(
-        vote_count: @post.vote_count
+        vote_count: Topic.vote_count(@post.topic, @user),
+        can_vote: Topic.can_vote(@post.topic, @user)
       )
     else
       render json: failed_json, status: 422
