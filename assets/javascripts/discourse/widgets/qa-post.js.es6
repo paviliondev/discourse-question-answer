@@ -38,14 +38,15 @@ export default createWidget('qa-post', {
       direction
     };
 
-    castVote({ vote })
-      .then(result => {
-          if (result.can_vote) {
-            post.set('topic.can_vote', result.can_vote);
-          }
-          if (result.vote_count) {
-            post.set('topic.vote_count', result.vote_count);
-          }
+    castVote({ 
+      vote 
+    }).then(result => {
+      if (result.can_vote) {
+        post.set('topic.can_vote', result.can_vote);
+      }
+      if (result.vote_count) {
+        post.set('topic.vote_count', result.vote_count);
+      }
     });
   }
 });
