@@ -46,10 +46,6 @@ export default createWidget('qa-post', {
           if (result.vote_count) {
             post.set('topic.vote_count', result.vote_count);
           }
-      });
-
-    if (!post.get('topic.can_vote')) {
-      return bootbox.alert(I18n.t('vote.user_over_limit'));
-    }
+    });
   }
 });
