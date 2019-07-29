@@ -17,3 +17,18 @@ plugins:
   qa_comments_default:
     default: 3
     client: true
+  qa_tl1_vote_limit:
+    default: 1
+    client: true
+  qa_tl2_vote_limit:
+    default: 2
+    client: true
+  qa_tl3_vote_limit:
+    default: 3
+    client: true
+  qa_tl4_vote_limit:
+    default: 4
+    client: true
+  qa_allow_multiple_votes_per_post:
+    default: false
+    client: true

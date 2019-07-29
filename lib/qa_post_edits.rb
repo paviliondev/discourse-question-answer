@@ -153,4 +153,9 @@ class ::Post
       nil
     end
   end
+  
+  def can_vote(user_id)
+    SiteSetting.qa_allow_multiple_votes_per_post ||
+    !voted.include?(user_id)
+  end
 end

@@ -59,12 +59,18 @@ require_dependency 'topic'
 class ::Topic
   prepend TopicQAExtension
 
-  def self.voted(topic, user)
+  def self.can_vote(topic, user)
     return nil if !user || !SiteSetting.qa_enabled
+    vote_count = self.votes(topic, user).length
+    vote_limit = SiteSetting.send("qa_tl#{user.trust_level}_vote_limit")
+    vote_limit >= vote_count
+  end
 
-    PostCustomField.exists?(post_id: topic.posts.map(&:id),
-                            name: 'voted',
-                            value: user.id)
+  def self.votes(topic, user)
+    return nil if !user || !SiteSetting.qa_enabled
+    PostCustomField.where(post_id: topic.posts.map(&:id),
+                          name: 'voted',
+                          value: user.id).pluck(:post_id)
   end
 
   def self.qa_enabled(topic)
@@ -139,7 +145,8 @@ require_dependency 'topic_view_serializer'
 require_dependency 'basic_user_serializer'
 class ::TopicViewSerializer
   attributes :qa_enabled,
-             :voted,
+             :votes,
+             :can_vote,
              :last_answered_at,
              :last_commented_on,
              :answer_count,
@@ -151,8 +158,12 @@ class ::TopicViewSerializer
     object.qa_enabled
   end
 
-  def voted
-    scope.current_user && ::Topic.voted(object.topic, scope.current_user)
+  def votes
+    Topic.votes(object.topic, scope.current_user)
+  end
+
+  def can_vote
+    Topic.can_vote(object.topic, scope.current_user)
   end
 
   def last_answered_at

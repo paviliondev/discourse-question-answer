@@ -29,12 +29,20 @@ class QuestionAnswer::VotesController < ::ApplicationController
   before_action :find_vote_post
   before_action :find_vote_user, only: [:create, :destroy]
   before_action :ensure_qa_enabled, only: [:create, :destroy]
-  before_action :ensure_can_act, only: [:create, :destroy]
 
   def create
+    if !Topic.can_vote(@post.topic, @user)
+      raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_over_limit')
+    end
+    
+    if !@post.can_vote(@user.id)
+      raise Discourse::InvalidAccess.new, I18n.t('vote.error.one_vote_per_post')
+    end
+
     if QuestionAnswer::Vote.vote(@post, @user, vote_args)
       render json: success_json.merge(
-        vote_count: @post.vote_count
+        votes: Topic.votes(@post.topic, @user),
+        can_vote: Topic.can_vote(@post.topic, @user)
       )
     else
       render json: failed_json, status: 422
@@ -42,9 +50,14 @@ class QuestionAnswer::VotesController < ::ApplicationController
   end
 
   def destroy
+    if Topic.votes(@post.topic, @user).length == 0
+      raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_has_not_voted')
+    end
+
     if QuestionAnswer::Vote.vote(@post, @user, vote_args)
       render json: success_json.merge(
-        vote_count: @post.vote_count
+        votes: Topic.votes(@post.topic, @user),
+        can_vote: Topic.can_vote(@post.topic, @user)
       )
     else
       render json: failed_json, status: 422
@@ -103,22 +116,6 @@ class QuestionAnswer::VotesController < ::ApplicationController
 
   def ensure_qa_enabled
     Topic.qa_enabled(@post.topic)
-  end
-
-  def ensure_can_act
-    if Topic.voted(@post.topic, @user)
-      if self.action_name === QuestionAnswer::Vote::CREATE
-        raise Discourse::InvalidAccess.new, I18n.t('vote.error.alread_voted')
-      end
-
-      if self.action_name === QuestionAnswer::Vote::DESTROY && !QuestionAnswer::Vote.can_undo(@post, @user)
-        raise Discourse::InvalidAccess.new, I18n.t('vote.error.undo_vote_action_window',
-          minutes: SiteSetting.qa_undo_vote_action_window
-        )
-      end
-    elsif self.action_name === QuestionAnswer::Vote::DESTROY
-      raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_has_not_voted')
-    end
   end
 end
 
