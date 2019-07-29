@@ -20,6 +20,14 @@ export default {
     withPluginApi('0.8.12', api => {
 
       api.reopenWidget('post-menu', {
+        defaultState(attrs) {
+          let defaultState = this._super();
+          if (attrs.qa_enabled) {
+            defaultState = $.assign({}, defaultState, { voters: [] });
+          }
+          return defaultState;
+        },
+
         menuItems() {
           const attrs = this.attrs;
           let result = this.siteSettings.post_menu.split('|');
@@ -34,6 +42,51 @@ export default {
           }
           return result;
         },
+
+        html(attrs, state) {
+          let contents = this._super(attrs, state);
+          if (attrs.qa_enabled && state.voters.length) {
+            contents.push(
+              this.attach("small-user-list", {
+                users: state.voters,
+                listClassName: "voters",
+                description: "post.actions.people.vote"
+              })
+            );
+          }
+          return contents;
+        },
+
+        getWhoVoted() {
+          const { attrs, state } = this;
+
+          whoVoted({
+            post_id: attrs.postId
+          }).then(result => {
+            if (result.voters) {
+              state.voters = result.voters.map(avatarAtts);
+            }
+          });
+
+          return this.store
+            .find("post-action-user", {
+              id: attrs.id,
+              post_action_type_id: voteActionId
+            })
+            .then(users => {
+              state.votes = users.map(avatarAtts);
+              state.total = users.totalRows;
+            });
+        },
+
+        toggleWhoVoted() {
+          const state = this.state;
+          if (state.voters.length) {
+            state.voters = [];
+          } else {
+            return this.getWhoVoted();
+          }
+        }
       });
 
       api.decorateWidget('post:before', function(helper) {
@@ -272,25 +325,6 @@ export default {
           undoVote({ vote });
         } else {
           this._super(typeId);
-        }
-      });
-
-      api.reopenWidget('actions-summary-item', {
-        whoActed() {
-          const attrs = this.attrs;
-
-          if (attrs.id === voteActionId) {
-            whoVoted({
-              post_id: attrs.postId
-            }).then(result => {
-              if (result.voters) {
-                this.state.users = result.voters.map(avatarAtts);
-                this.scheduleRerender();
-              }
-            });
-          } else {
-            this._super();
-          }
         }
       });
 
