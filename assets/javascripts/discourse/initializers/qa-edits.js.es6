@@ -67,16 +67,6 @@ export default {
               state.voters = result.voters.map(avatarAtts);
             }
           });
-
-          return this.store
-            .find("post-action-user", {
-              id: attrs.id,
-              post_action_type_id: voteActionId
-            })
-            .then(users => {
-              state.votes = users.map(avatarAtts);
-              state.total = users.totalRows;
-            });
         },
 
         toggleWhoVoted() {
