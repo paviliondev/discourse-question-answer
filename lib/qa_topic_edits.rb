@@ -68,7 +68,7 @@ class ::Topic
     return nil if !user || !SiteSetting.qa_enabled
     vote_count = self.vote_count(topic, user)
     vote_limit = SiteSetting.send("qa_tl#{user.trust_level}_vote_limit")
-    vote_limit < vote_count
+    vote_limit >= vote_count
   end
 
   def self.vote_count(topic, user)
