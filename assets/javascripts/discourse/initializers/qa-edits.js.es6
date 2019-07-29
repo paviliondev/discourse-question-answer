@@ -23,7 +23,7 @@ export default {
         defaultState(attrs) {
           let defaultState = this._super();
           if (attrs.qa_enabled) {
-            defaultState = $.assign({}, defaultState, { voters: [] });
+            defaultState = $.extend({}, defaultState, { voters: [] });
           }
           return defaultState;
         },
