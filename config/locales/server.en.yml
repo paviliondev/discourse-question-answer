@@ -11,7 +11,8 @@ en:
     qa_tl2_vote_limit: "The vote limit for the question and answer plugin for trust level 2 users"
     qa_tl3_vote_limit: "The vote limit for the question and answer plugin for trust level 3 users"
     qa_tl4_vote_limit: "The vote limit for the question and answer plugin for trust level 4 users"
-
+    
+    qa_allow_multiple_votes_per_post: "Allow users to vote multiple times for the same post."
 
   post_action_types:
     vote:
@@ -26,3 +27,4 @@ en:
       user_over_limit: "You cannot exceed the number of votes for your trust level."
       already_voted: "You can only vote once per question."
       undo_vote_action_window: "You can only undo votes %{minutes} after voting."
+      one_vote_per_post: "You can only vote once for each post."

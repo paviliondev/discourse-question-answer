@@ -19,15 +19,22 @@ export default createWidget('qa-post', {
   },
 
   vote(direction) {
-    const post = this.attrs.post;
     const user = this.currentUser;
+
+    if (!user) {
+      return this.sendShowLogin();
+    }
+
+    const post = this.attrs.post;
+    const siteSettings = this.siteSettings;
 
     if (!post.get('topic.can_vote')) {
       return bootbox.alert(I18n.t('vote.user_over_limit'));
     }
 
-    if (!user) {
-      return this.sendShowLogin();
+    if (!siteSettings.qa_allow_multiple_votes_per_post &&
+        post.get('topic.votes').indexOf(post.id) > -1) {
+      return bootbox.alert(I18n.t('vote.one_vote_per_post'));
     }
 
     post.set('topic.voted', true);
@@ -44,8 +51,8 @@ export default createWidget('qa-post', {
       if (result.can_vote) {
         post.set('topic.can_vote', result.can_vote);
       }
-      if (result.vote_count) {
-        post.set('topic.vote_count', result.vote_count);
+      if (result.votes) {
+        post.set('topic.votes', result.votes);
       }
     });
   }

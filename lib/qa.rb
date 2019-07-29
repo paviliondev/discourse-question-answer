@@ -34,10 +34,14 @@ class QuestionAnswer::VotesController < ::ApplicationController
     if !Topic.can_vote(@post.topic, @user)
       raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_over_limit')
     end
+    
+    if !@post.can_vote(@user.id)
+      raise Discourse::InvalidAccess.new, I18n.t('vote.error.one_vote_per_post')
+    end
 
     if QuestionAnswer::Vote.vote(@post, @user, vote_args)
       render json: success_json.merge(
-        vote_count: Topic.vote_count(@post.topic, @user),
+        votes: Topic.votes(@post.topic, @user),
         can_vote: Topic.can_vote(@post.topic, @user)
       )
     else
@@ -46,13 +50,13 @@ class QuestionAnswer::VotesController < ::ApplicationController
   end
 
   def destroy
-    if Topic.vote_count(@post.topic, @user) == 0
+    if Topic.votes(@post.topic, @user).length == 0
       raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_has_not_voted')
     end
 
     if QuestionAnswer::Vote.vote(@post, @user, vote_args)
       render json: success_json.merge(
-        vote_count: Topic.vote_count(@post.topic, @user),
+        votes: Topic.votes(@post.topic, @user),
         can_vote: Topic.can_vote(@post.topic, @user)
       )
     else
