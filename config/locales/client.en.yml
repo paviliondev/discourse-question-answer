@@ -25,6 +25,9 @@ en:
           vote: "Undo vote"
         people:
           vote: "voted for this"
+          vote_capped:
+            one: "and {{count}} other voted for this"
+            other: "and {{count}} others voted for this"
         by_you:
           vote: "You voted for this post"
         by_you_and_others:
