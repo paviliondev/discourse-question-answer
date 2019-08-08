@@ -63,7 +63,9 @@ class ::Topic
     return false if !user || !SiteSetting.qa_enabled
     topic_vote_count = self.qa_votes(topic, user).length
     return false if topic_vote_count > 0 && !SiteSetting.qa_trust_level_vote_limits
-    topic_vote_limit = SiteSetting.send("qa_tl#{user.trust_level}_vote_limit")
+    trust_level = user.trust_level
+    return false if trust_level == 0
+    topic_vote_limit = SiteSetting.send("qa_tl#{trust_level}_vote_limit")
     topic_vote_limit.to_i >= topic_vote_count
   end
 
