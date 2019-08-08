@@ -1,7 +1,7 @@
 import { cookAsync } from "discourse/lib/text";
 
 export default Ember.Component.extend({
-  classNames: 'topic-tip',
+  classNames: 'qa-topic-tip',
 
   didInsertElement() {
     Ember.$(document).on('click', Ember.run.bind(this, this.documentClick));
