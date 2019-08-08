@@ -5,15 +5,10 @@ export default Ember.Component.extend({
 
   didInsertElement() {
     Ember.$(document).on('click', Ember.run.bind(this, this.documentClick));
-    
-    console.log(this.get('details'), this.get('detailsOpts'));
 
     let rawDetails = I18n.t(this.get('details'), this.get('detailsOpts'));
 
-    console.log(rawDetails);
-
     cookAsync(rawDetails).then(cooked => {
-      console.log(cooked)
       this.set('cookedDetails', cooked);
     });
   },
