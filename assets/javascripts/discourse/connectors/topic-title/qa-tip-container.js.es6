@@ -1,7 +1,9 @@
 export default {
   setupComponent(attrs, component) {
     const oneToMany = attrs.model.category && attrs.model.category.qa_one_to_many;
-    const siteSettings = Discourse.SiteSettings;
+    const siteSettings = attrs.model.siteSettings;
+    
+    console.log(siteSettings);
 
     let topicType = oneToMany ? 'qa_one_to_many' : 'qa';
     let label = `topic.tip.${topicType}.title`;
