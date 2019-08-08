@@ -1,8 +1,21 @@
+import { cookAsync } from "discourse/lib/text";
+
 export default Ember.Component.extend({
   classNames: 'topic-tip',
 
   didInsertElement() {
     Ember.$(document).on('click', Ember.run.bind(this, this.documentClick));
+    
+    console.log(this.get('details'), this.get('detailsOpts'));
+
+    let rawDetails = I18n.t(this.get('details'), this.get('detailsOpts'));
+
+    console.log(rawDetails);
+
+    cookAsync(rawDetails).then(cooked => {
+      console.log(cooked)
+      this.set('cookedDetails', cooked);
+    });
   },
 
   willDestroyElement() {
@@ -23,4 +36,4 @@ export default Ember.Component.extend({
       this.toggleProperty('showDetails');
     }
   }
-})
+});
