@@ -26,18 +26,6 @@ export default createWidget('qa-post', {
     }
 
     const post = this.attrs.post;
-    const siteSettings = this.siteSettings;
-
-    if (!post.get('topic.can_vote')) {
-      return bootbox.alert(I18n.t('vote.user_over_limit'));
-    }
-
-    if (!siteSettings.qa_allow_multiple_votes_per_post &&
-        post.get('topic.votes').indexOf(post.id) > -1) {
-      return bootbox.alert(I18n.t('vote.one_vote_per_post'));
-    }
-
-    post.set('topic.voted', true);
 
     let vote = {
       user_id: user.id,
@@ -45,14 +33,16 @@ export default createWidget('qa-post', {
       direction
     };
 
-    castVote({ 
-      vote 
-    }).then(result => {
-      if (result.can_vote) {
-        post.set('topic.can_vote', result.can_vote);
-      }
-      if (result.votes) {
-        post.set('topic.votes', result.votes);
+    castVote({ vote }).then(result => {
+      if (result.success) {
+        post.set('topic.qa_voted', true);
+
+        if (result.qa_can_vote) {
+          post.set('topic.qa_can_vote', result.qa_can_vote);
+        }
+        if (result.qa_votes) {
+          post.set('topic.qa_votes', result.qa_votes);
+        }
       }
     });
   }

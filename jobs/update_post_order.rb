@@ -7,7 +7,7 @@ module Jobs
       Topic.where(category_id: args[:category_id]).each do |topic|
         puts "HERE IS THE TOPIC: #{topic.title}"
         if qa_enabled
-          Topic.update_vote_order(topic.id)
+          Topic.qa_update_vote_order(topic.id)
         else
           topic.posts.each do |post|
             puts "UPDATING COLUMN: #{post.post_number}"

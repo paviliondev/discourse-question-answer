@@ -31,18 +31,22 @@ class QuestionAnswer::VotesController < ::ApplicationController
   before_action :ensure_qa_enabled, only: [:create, :destroy]
 
   def create
-    if !Topic.can_vote(@post.topic, @user)
-      raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_over_limit')
+    if !Topic.qa_can_vote(@post.topic, @user)
+      raise Discourse::InvalidAccess.new(nil, nil,
+        custom_message: 'vote.error.user_over_limit'
+      ) 
     end
     
-    if !@post.can_vote(@user.id)
-      raise Discourse::InvalidAccess.new, I18n.t('vote.error.one_vote_per_post')
+    if !@post.qa_can_vote(@user.id)
+      raise Discourse::InvalidAccess.new(nil, nil,
+        custom_message: 'vote.error.one_vote_per_post'
+      )
     end
 
     if QuestionAnswer::Vote.vote(@post, @user, vote_args)
       render json: success_json.merge(
-        votes: Topic.votes(@post.topic, @user),
-        can_vote: Topic.can_vote(@post.topic, @user)
+        qa_votes: Topic.qa_votes(@post.topic, @user),
+        qa_can_vote: Topic.qa_can_vote(@post.topic, @user)
       )
     else
       render json: failed_json, status: 422
@@ -50,14 +54,14 @@ class QuestionAnswer::VotesController < ::ApplicationController
   end
 
   def destroy
-    if Topic.votes(@post.topic, @user).length == 0
+    if Topic.qa_votes(@post.topic, @user).length == 0
       raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_has_not_voted')
     end
 
     if QuestionAnswer::Vote.vote(@post, @user, vote_args)
       render json: success_json.merge(
-        votes: Topic.votes(@post.topic, @user),
-        can_vote: Topic.can_vote(@post.topic, @user)
+        qa_votes: Topic.qa_votes(@post.topic, @user),
+        qa_can_vote: Topic.qa_can_vote(@post.topic, @user)
       )
     else
       render json: failed_json, status: 422
@@ -67,8 +71,8 @@ class QuestionAnswer::VotesController < ::ApplicationController
   def voters
     voters = []
 
-    if @post.voted.any?
-      @post.voted.each do |user_id|
+    if @post.qa_voted.any?
+      @post.qa_voted.each do |user_id|
         if user = User.find_by(id: user_id)
           voters.push(Voter.new(user))
         end
@@ -132,9 +136,9 @@ class QuestionAnswer::Vote
       modifier = args[:action] === CREATE ? 1 : -1
     end
 
-    post.custom_fields['vote_count'] = post.vote_count + modifier
+    post.custom_fields['vote_count'] = post.qa_vote_count + modifier
 
-    voted = post.voted
+    voted = post.qa_voted
 
     if args[:direction] === UP
       if args[:action] === CREATE
@@ -146,7 +150,7 @@ class QuestionAnswer::Vote
 
     post.custom_fields['voted'] = voted
 
-    votes = post.vote_history
+    votes = post.qa_vote_history
 
     votes.push(
       direction: args[:direction],
@@ -158,7 +162,7 @@ class QuestionAnswer::Vote
     post.custom_fields['vote_history'] = votes.to_json
 
     if post.save_custom_fields(true)
-      Topic.update_vote_order(post.topic)
+      Topic.qa_update_vote_order(post.topic)
       post.publish_change_to_clients! :acted
 
       true
@@ -169,6 +173,6 @@ class QuestionAnswer::Vote
 
   def self.can_undo(post, user)
     window = SiteSetting.qa_undo_vote_action_window.to_i
-    window === 0 || post.last_voted(user.id).to_i > window.minutes.ago.to_i
+    window === 0 || post.qa_last_voted(user.id).to_i > window.minutes.ago.to_i
   end
 end

@@ -17,6 +17,9 @@ plugins:
   qa_comments_default:
     default: 3
     client: true
+  qa_trust_level_vote_limits:
+    default: false
+    client: true
   qa_tl1_vote_limit:
     default: 1
     client: true
@@ -29,6 +32,6 @@ plugins:
   qa_tl4_vote_limit:
     default: 4
     client: true
-  qa_allow_multiple_votes_per_post:
+  qa_tl_allow_multiple_votes_per_post:
     default: false
     client: true
