@@ -13,11 +13,16 @@
 }
 
 .topic-post.comment {
-  padding-left: 105px;
+  padding-left: 110px;
+  max-width: 630px;
+  
+  .topic-avatar {
+    width: 30px;
+  }
 
   .topic-body {
-    width: 597px;
-    padding: 10px 10px 10px 0;
+    width: calc(100% - 30px);
+    padding: 10px 0 10px 0;
 
     .regular {
       margin-top: 0;
