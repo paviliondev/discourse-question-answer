@@ -19,18 +19,13 @@ export default createWidget('qa-post', {
   },
 
   vote(direction) {
-    const post = this.attrs.post;
     const user = this.currentUser;
-
-    if (post.get('topic.voted')) {
-      return bootbox.alert(I18n.t('vote.already_voted'));
-    }
 
     if (!user) {
       return this.sendShowLogin();
     }
 
-    post.set('topic.voted', true);
+    const post = this.attrs.post;
 
     let vote = {
       user_id: user.id,
@@ -38,7 +33,17 @@ export default createWidget('qa-post', {
       direction
     };
 
-    castVote({ vote });
-  }
+    castVote({ vote }).then(result => {
+      if (result.success) {
+        post.set('topic.qa_voted', true);
 
+        if (result.qa_can_vote) {
+          post.set('topic.qa_can_vote', result.qa_can_vote);
+        }
+        if (result.qa_votes) {
+          post.set('topic.qa_votes', result.qa_votes);
+        }
+      }
+    });
+  }
 });

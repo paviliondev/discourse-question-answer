@@ -6,11 +6,11 @@ module PostSerializerQAExtension
       user = scope.current_user
       summary = {
         id: PostActionType.types[:vote],
-        count: object.vote_count
+        count: object.qa_vote_count
       }
 
       if user
-        voted = object.voted.include?(user.id)
+        voted = object.qa_voted.include?(user.id)
 
         if voted
           summary[:acted] = true
@@ -37,8 +37,8 @@ require_dependency 'post_serializer'
 class ::PostSerializer
   prepend PostSerializerQAExtension
 
-  attributes :vote_count,
-             :voted,
+  attributes :qa_vote_count,
+             :qa_voted,
              :qa_enabled,
              :last_answerer,
              :last_answered_at,
@@ -46,12 +46,12 @@ class ::PostSerializer
              :last_answer_post_number,
              :last_answerer
 
-  def vote_count
-    object.vote_count
+  def qa_vote_count
+    object.qa_vote_count
   end
 
-  def voted
-    object.voted
+  def qa_voted
+    object.qa_voted
   end
 
   def qa_enabled
@@ -99,18 +99,18 @@ class ::PostSerializer
   end
 end
 
-## 'vote_count' and 'voted' are used for quick access, whereas 'vote_history' is used for record keeping
+## 'qa_vote_count' and 'qa_voted' are used for quick access, whereas 'qa_vote_history' is used for record keeping
 ## See QuestionAnswer::Vote for how these fields are saved / updated
 
 Post.register_custom_field_type('vote_count', :integer)
 Post.register_custom_field_type('vote_history', :json)
 
 class ::Post
-  after_create :update_vote_order, if: :qa_enabled
+  after_create :qa_update_vote_order, if: :qa_enabled
 
   self.ignored_columns = %w(vote_count)
 
-  def vote_count
+  def qa_vote_count
     if custom_fields['vote_count'].present?
       custom_fields['vote_count'].to_i
     else
@@ -118,7 +118,7 @@ class ::Post
     end
   end
 
-  def voted
+  def qa_voted
     if custom_fields['voted'].present?
       [*custom_fields['voted']].map(&:to_i)
     else
@@ -126,7 +126,7 @@ class ::Post
     end
   end
 
-  def vote_history
+  def qa_vote_history
     if custom_fields['vote_history'].present?
       [*custom_fields['vote_history']]
     else
@@ -138,12 +138,12 @@ class ::Post
     ::Topic.qa_enabled(topic)
   end
 
-  def update_vote_order
-    ::Topic.update_vote_order(topic_id)
+  def qa_update_vote_order
+    ::Topic.qa_update_vote_order(topic_id)
   end
 
-  def last_voted(user_id)
-    user_votes = vote_history.select do |v|
+  def qa_last_voted(user_id)
+    user_votes = qa_vote_history.select do |v|
       v['user_id'].to_i === user_id && v['action'] === 'create'
     end
 
@@ -152,5 +152,10 @@ class ::Post
     else
       nil
     end
+  end
+  
+  def qa_can_vote(user_id)
+    SiteSetting.qa_tl_allow_multiple_votes_per_post ||
+    !qa_voted.include?(user_id)
   end
 end

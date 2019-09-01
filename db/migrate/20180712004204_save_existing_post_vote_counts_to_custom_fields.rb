@@ -4,7 +4,7 @@ class SaveExistingPostVoteCountsToCustomFields < ActiveRecord::Migration[5.1]
 
     PostAction.where(post_action_type_id: 5).each do |action|
       if post = Post.find_by(id: action[:post_id])
-        votes = post.vote_history
+        votes = post.qa_vote_history
 
         votes.push(
           "direction": QuestionAnswer::Vote::UP,
@@ -32,7 +32,7 @@ class SaveExistingPostVoteCountsToCustomFields < ActiveRecord::Migration[5.1]
     if vote_totals.any?
       vote_totals.each do |k, v|
         if post = Post.find_by(id: k)
-          post.custom_fields['vote_history'] = post.vote_history.to_json
+          post.custom_fields['vote_history'] = post.qa_vote_history.to_json
           post.custom_fields['vote_count'] = v[:count].to_i
           post.custom_fields['voted'] = v[:voted]
           post.save_custom_fields(true)

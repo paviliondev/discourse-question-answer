@@ -80,25 +80,29 @@ nav.post-controls button.comment {
 
 // identical to classes in other plugins
 
-.topic-tip {
+.qa-topic-tip {
   position: relative;
   margin-top: 5px;
-}
+  
+  .tip-details {
+    background-color: dark-light-diff($primary, $secondary, 95%, -85%);
+    box-shadow: shadow('dropdown');
+    padding: 10px 15px;
+    position: absolute;
+    top: 32px;
+    z-index: 9999;
+    width: 300px;
+    
+    p {
+      margin: 0;
+    }
 
-.tip-details {
-  background-color: dark-light-diff($primary, $secondary, 95%, -85%);
-  box-shadow: shadow('dropdown');
-  padding: 10px 15px;
-  position: absolute;
-  top: 32px;
-  z-index: 9999;
-  width: 300px;
+    ul {
+      margin-bottom: 0;
+    }
 
-  ul {
-    margin-bottom: 0;
-  }
-
-  li {
-    margin: 2px 0;
+    li {
+      margin: 2px 0;
+    }
   }
 }

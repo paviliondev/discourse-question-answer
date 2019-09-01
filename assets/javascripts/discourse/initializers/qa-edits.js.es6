@@ -42,7 +42,7 @@ export default {
             && !model.get('reply_to_post_number')
             && model.get('qa_enabled')) {
           return helper.attach('qa-post', {
-            count: model.get('vote_count'),
+            count: model.get('qa_vote_count'),
             post: model
           });
         }
