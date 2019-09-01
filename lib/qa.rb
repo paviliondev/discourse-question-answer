@@ -121,6 +121,22 @@ class QuestionAnswer::VotesController < ::ApplicationController
   def ensure_qa_enabled
     Topic.qa_enabled(@post.topic)
   end
+
+  def ensure_can_act
+    if Topic.voted(@post.topic, @user)
+      if self.action_name === QuestionAnswer::Vote::CREATE
+        raise Discourse::InvalidAccess.new, I18n.t('vote.error.alread_voted')
+      end
+
+      if self.action_name === QuestionAnswer::Vote::DESTROY && !QuestionAnswer::Vote.can_undo(@post, @user)
+        raise Discourse::InvalidAccess.new, I18n.t('vote.error.undo_vote_action_window',
+          minutes: SiteSetting.qa_undo_vote_action_window
+        )
+      end
+    elsif self.action_name === QuestionAnswer::Vote::DESTROY
+      raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_has_not_voted')
+    end
+  end
 end
 
 class QuestionAnswer::Vote
@@ -132,22 +148,24 @@ class QuestionAnswer::Vote
   def self.vote(post, user, args)
     modifier = 0
 
-    if args[:direction] === UP
-      modifier = args[:action] === CREATE ? 1 : -1
-    end
-
-    post.custom_fields['vote_count'] = post.qa_vote_count + modifier
-
     voted = post.qa_voted
 
     if args[:direction] === UP
       if args[:action] === CREATE
         voted.push(user.id)
+        modifier = 1
       elsif args[:action] === DESTROY
-        voted.delete(user.id)
+        modifier = 0
+        voted.delete_if do |user_id|
+          if user_id === user.id
+            modifier = modifier - 1
+            true
+          end
+        end
       end
     end
 
+    post.custom_fields['vote_count'] = post.qa_vote_count + modifier
     post.custom_fields['voted'] = voted
 
     votes = post.qa_vote_history
@@ -159,12 +177,11 @@ class QuestionAnswer::Vote
       created_at: Time.now
     )
 
-    post.custom_fields['vote_history'] = votes.to_json
+    post.custom_fields['vote_history'] = votes
 
     if post.save_custom_fields(true)
       Topic.qa_update_vote_order(post.topic)
       post.publish_change_to_clients! :acted
-
       true
     else
       false

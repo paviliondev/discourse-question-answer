@@ -16,15 +16,11 @@ if respond_to?(:register_svg_icon)
 end
 
 after_initialize do
-  Category.register_custom_field_type('qa_enabled', :boolean)
-  Category.register_custom_field_type('qa_one_to_many', :boolean)
-  add_to_serializer(:basic_category, :qa_enabled) { object.qa_enabled }
-  add_to_serializer(:basic_category, :qa_one_to_many) { object.qa_one_to_many }
-
   [
     'qa_enabled',
     'qa_one_to_many'
   ].each do |key|
+    Category.register_custom_field_type(key, :boolean)
     Site.preloaded_category_custom_fields << key if Site.respond_to? :preloaded_category_custom_fields
     add_to_serializer(:basic_category, key.to_sym) { object.send(key) }
   end
@@ -65,6 +61,8 @@ after_initialize do
   class ::PostActionType
     singleton_class.prepend PostActionTypeExtension
   end
+  
+  register_post_custom_field_type('vote_history', :json)
 
   load File.expand_path('../lib/qa.rb', __FILE__)
   load File.expand_path('../lib/qa_post_edits.rb', __FILE__)
