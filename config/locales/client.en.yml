@@ -22,22 +22,11 @@ en:
     post:
       actions:
         undo:
-          vote: "Undo vote"
+          vote: "Undo your upvote." 
         people:
-          vote: "voted for this"
-          vote_capped:
-            one: "and {{count}} other voted for this"
-            other: "and {{count}} others voted for this"
+          vote: "upvoted this post."
         by_you:
-          vote: "You voted for this post"
-        by_you_and_others:
-          vote:
-            one: "You and 1 other voted for this post"
-            other: "You and {{count}} other people voted for this post"
-        by_others:
-          vote:
-            one: "1 person voted for this post"
-            other: "{{count}} people voted for this post"
+          vote: "You upvoted this post."
 
     topic:
       one_to_many:

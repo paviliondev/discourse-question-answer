@@ -110,6 +110,8 @@ class QuestionAnswer::VotesController < ::ApplicationController
       if self.action_name === QuestionAnswer::Vote::CREATE
         raise Discourse::InvalidAccess.new, I18n.t('vote.error.alread_voted')
       end
+      
+      puts "CAN UNDO: #{QuestionAnswer::Vote.can_undo(@post, @user)}"
 
       if self.action_name === QuestionAnswer::Vote::DESTROY && !QuestionAnswer::Vote.can_undo(@post, @user)
         raise Discourse::InvalidAccess.new, I18n.t('vote.error.undo_vote_action_window',
@@ -158,12 +160,11 @@ class QuestionAnswer::Vote
       created_at: Time.now
     )
 
-    post.custom_fields['vote_history'] = votes.to_json
+    post.custom_fields['vote_history'] = votes
 
     if post.save_custom_fields(true)
       Topic.update_vote_order(post.topic)
       post.publish_change_to_clients! :acted
-
       true
     else
       false

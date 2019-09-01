@@ -58,6 +58,26 @@ nav.post-controls button.comment {
   padding-left: 105px;
 }
 
+.vote-container {
+
+  .vote-links {
+    text-align: right;
+    
+    a {
+      margin-left: 5px;
+    }
+  }
+
+  .voters {
+    margin-top: 5px;
+    text-align: right;
+
+    a {
+      margin-right: 5px;
+    }
+  }
+}
+
 // identical to classes in other plugins
 
 .topic-tip {

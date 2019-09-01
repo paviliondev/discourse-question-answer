@@ -4,7 +4,7 @@ import { h } from 'virtual-dom';
 import { avatarFor } from 'discourse/widgets/post';
 import { dateNode, numberNode } from 'discourse/helpers/node';
 import { REPLY } from "discourse/models/composer";
-import { undoVote, whoVoted, voteActionId } from '../lib/qa-utilities';
+import { undoVote, whoVoted } from '../lib/qa-utilities';
 import { avatarAtts } from 'discourse/widgets/actions-summary';
 import PostsWithPlaceholders from 'discourse/lib/posts-with-placeholders';
 
@@ -20,14 +20,6 @@ export default {
     withPluginApi('0.8.12', api => {
 
       api.reopenWidget('post-menu', {
-        defaultState(attrs) {
-          let defaultState = this._super();
-          if (attrs.qa_enabled) {
-            defaultState = $.extend({}, defaultState, { voters: [] });
-          }
-          return defaultState;
-        },
-
         menuItems() {
           const attrs = this.attrs;
           let result = this.siteSettings.post_menu.split('|');
@@ -41,41 +33,6 @@ export default {
             result = result.filter((b) => b !== 'reply');
           }
           return result;
-        },
-
-        html(attrs, state) {
-          let contents = this._super(attrs, state);
-          if (attrs.qa_enabled && state.voters.length) {
-            contents.push(
-              this.attach("small-user-list", {
-                users: state.voters,
-                listClassName: "voters",
-                description: "post.actions.people.vote"
-              })
-            );
-          }
-          return contents;
-        },
-
-        getWhoVoted() {
-          const { attrs, state } = this;
-
-          whoVoted({
-            post_id: attrs.postId
-          }).then(result => {
-            if (result.voters) {
-              state.voters = result.voters.map(avatarAtts);
-            }
-          });
-        },
-
-        toggleWhoVoted() {
-          const state = this.state;
-          if (state.voters.length) {
-            state.voters = [];
-          } else {
-            return this.getWhoVoted();
-          }
         }
       });
 
@@ -299,22 +256,106 @@ export default {
         }
       });
 
-      api.attachWidgetAction('post', 'undoPostAction', function(typeId) {
-        if (typeId === voteActionId) {
-          const post = this.model;
+      api.reopenWidget('post-body', {
+        buildKey: attrs => `post-body-${attrs.id}`,
+
+        defaultState(attrs) {
+          let state = this._super();
+          if (attrs.qa_enabled) {
+            state = $.extend({}, state, { voters: [] });
+          }
+          return state;
+        },
+
+        html(attrs, state) {
+          let contents = this._super(attrs, state);
+
+          if (attrs.qa_enabled) {
+            const model = this.findAncestorModel();
+            let action = model.actionByName['vote'];
+            let voteLinks = [];
+
+            attrs.actionsSummary = attrs.actionsSummary.filter(
+              as => as.action !== 'vote'
+            );
+
+            if (action.acted && action.can_undo) {
+              voteLinks.push(
+                this.attach('link', {
+                  action: 'undoUserVote',
+                  rawLabel: I18n.t('post.actions.undo.vote')
+                })
+              );
+            }
+
+            if (action.count > 0) {
+              voteLinks.push(
+                this.attach('link', {
+                  action: 'toggleWhoVoted',
+                  rawLabel: `${action.count} ${I18n.t('post.actions.people.vote')}`
+                })
+              );
+            }
+
+            if (voteLinks.length) {
+              let voteContents = [ h('div.vote-links', voteLinks) ];
+
+              if (state.voters.length) {
+                voteContents.push(
+                  this.attach("small-user-list", {
+                    users: state.voters,
+                    listClassName: "voters"
+                  })
+                );
+              }
+
+              let actionSummaryIndex = contents.map(w => w.name).indexOf('actions-summary');
+              let insertAt = actionSummaryIndex + 1;
+
+              contents.splice(insertAt - 1, 0, h('div.vote-container', voteContents));
+            }
+          }
+
+          return contents;
+        },
+
+        undoUserVote() {
+          const post = this.findAncestorModel();
           const user = this.currentUser;
-
-          post.set('topic.voted', false);
-
-          let vote = {
+          const vote = {
             user_id: user.id,
             post_id: post.id,
             direction: 'up'
           };
 
-          undoVote({ vote });
-        } else {
-          this._super(typeId);
+          undoVote({ vote }).then(result => {
+            if (result.success) {
+              post.set('topic.voted', false);
+            }
+          });
+        },
+
+        toggleWhoVoted() {
+          const state = this.state;
+          if (state.voters.length) {
+            state.voters = [];
+          } else {
+            return this.getWhoVoted();
+          }
+        },
+
+        getWhoVoted() {
+          const { attrs, state } = this;
+          const post = {
+            post_id: attrs.id
+          };
+          
+          whoVoted(post).then(result => {
+            if (result.voters) {
+              state.voters = result.voters.map(avatarAtts);
+              this.scheduleRerender();
+            }
+          });
         }
       });
 
