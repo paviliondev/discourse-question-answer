@@ -309,7 +309,7 @@ export default {
                 );
               }
 
-              let actionSummaryIndex = contents.map(w => w.name).indexOf('actions-summary');
+              let actionSummaryIndex = contents.map(w => w && w.name).indexOf('actions-summary');
               let insertAt = actionSummaryIndex + 1;
 
               contents.splice(insertAt - 1, 0, h('div.vote-container', voteContents));
