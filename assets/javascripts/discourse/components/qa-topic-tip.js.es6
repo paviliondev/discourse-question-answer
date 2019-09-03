@@ -8,9 +8,11 @@ export default Ember.Component.extend({
 
     let rawDetails = I18n.t(this.get('details'), this.get('detailsOpts'));
 
-    cookAsync(rawDetails).then(cooked => {
-      this.set('cookedDetails', cooked);
-    });
+    if (rawDetails) {
+      cookAsync(rawDetails).then(cooked => {
+        this.set('cookedDetails', cooked);
+      });
+    }
   },
 
   willDestroyElement() {
