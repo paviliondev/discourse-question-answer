@@ -269,10 +269,10 @@ export default {
 
         html(attrs, state) {
           let contents = this._super(attrs, state);
+          const model = this.findAncestorModel();
+          let action = model.actionByName['vote'];
 
-          if (attrs.qa_enabled) {
-            const model = this.findAncestorModel();
-            let action = model.actionByName['vote'];
+          if (action && attrs.qa_enabled) {
             let voteLinks = [];
 
             attrs.actionsSummary = attrs.actionsSummary.filter(
