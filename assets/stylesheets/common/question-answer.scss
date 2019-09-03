@@ -19,8 +19,14 @@
   margin: 0;
 }
 
-.time-gap+.topic-post.answer .topic-body, .time-gap+.topic-post.comment .topic-body {
-  border-top: 1px solid $primary-low;
+.time-gap + .topic-post.answer, .time-gap + .topic-post.comment {
+  .topic-avatar {
+    border-top: 1px solid $primary-low;
+  }
+  
+  .topic-body {
+    border-top: 1px solid $primary-low;
+  }
 }
 
 .topic-post.answer+.time-gap, .topic-post.comment+.time-gap {
