@@ -11,7 +11,7 @@ he:
     qa_tl2_vote_limit: "כמות ההצבעות המקסימלית לרמת אמון 2 עבור תוסף Q&A"
     qa_tl3_vote_limit: "כמות ההצבעות המקסימלית לרמת אמון 3 עבור תוסף Q&A"
     qa_tl4_vote_limit: "כמות ההצבעות המקסימלית לרמת אמון 4 עבור תוסף Q&A"
-    qa_tl_allow_multiple_votes_per_post: "אפשר למשתמשים להבציע מספר פעמים על אותו פוסט."
+    qa_tl_allow_multiple_votes_per_post: "אפשר למשתמשים להצביע מספר פעמים על אותו פוסט."
 
   post_action_types:
     vote:
