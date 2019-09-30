@@ -1,0 +1,72 @@
+he:
+  js:
+    category:
+      enable_qa: "הפוך את כל הנושאים בקטגוריה זו להיות בפורמט Q&A."
+      qa_one_to_many: "פורמט Q&A אחד לרבים."
+
+    composer:
+      composer_actions:
+        reply_to_question:
+          label: ענה על השאלה
+          desc: ענה על השאלה בפוסט הראשון
+        comment_on_answer:
+          label: "תגובה לתשובה של %{postUsername}"
+          desc: תגובה לתשובה
+        one_to_many_entry:
+          label: הוסף פוסט חדש
+          desc: הוסף פוסט חדש
+        comment_on_entry:
+          label: "הגב על הפוסט של ${postUsername}"
+          desc: הגב על הפוסט
+
+    post:
+      actions:
+        undo:
+          vote: "בטל הצבעה." 
+        people:
+          vote: "הצביעו לפוסט."
+        by_you:
+          vote: "הצבעת לפוסט זה."
+
+    topic:
+      one_to_many:
+        title: "פוסט חדש"
+        help: "צור פוסט חדש"
+      answer:
+        title: 'תשובה'
+        help: 'הוסף תשובה לשאלה'
+      comment:
+        title: 'תגובה'
+        help: 'הוסף תגובה חדשה'
+        show_comments:
+          all: 'הראה {{count}} תגובות'
+          more: 'הראה {{count}} תגובות נוספות'
+
+      tip:
+        qa:
+          title: "שאלה"
+          details: "משתמשים יכולים להצביע בעד התגובה שעונה הכי טוב על הפוסט.
+                    <ul>
+                    <li>משתמש בעל רמת אמון 1 יכול לבצע {{tl1Limit}} הצבעות.</li>
+                    <li>משתמש בעל רמת אמון 2 יכול לבצע {{tl1Limit}} הצבעות.</li>
+                    <li>משתמש בעל רמת אמון 3 יכול לבצע {{tl1Limit}} הצבעות.</li>
+                    <li>משתמש בעל רמת אמון 4 יכול לבצע {{tl1Limit}} הצבעות.</li>
+                    <li>סדר התגובות נקבע לפי כמות ההצבעות</li>
+                    </ul>"
+        qa_one_to_many:
+          title: "אחד להרבה"
+          details: "רק מחבר הנושא יכול לפרסם רשומות. כל המשתמשים יכולים לפרסם תגובות."
+
+    vote:
+      already_voted: "ניתן להצביע רק פעם אחת לשאלה."
+      user_over_limit: "הגעת לכמות המקסימלית של ההצבעות."
+      one_vote_per_post: "ניתן להצביע רק פעם אחת לפוסט."
+
+    last_answer_lowercase: תשובה אחרונה
+    last_one_to_many_lowercase: פוסט אחרון
+    answer_lowercase:
+      one: תשובה
+      other: תשובות
+    one_to_many_lowercase:
+      one: פוסט
+      other: פוסטים
