@@ -1,4 +1,4 @@
-class SaveExistingPostVoteCountsToCustomFields < ActiveRecord::Migration[5.1]
+class SaveExistingPostVoteCountsToCustomFields < ::ActiveRecord::Migration[5.1]
   def up
     vote_totals = {}
 
