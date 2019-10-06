@@ -1,6 +1,7 @@
 en:
   js:
     category:
+      qa_settings_label: "Question Answer"
       enable_qa: "Make all topics in this category QnA."
       qa_one_to_many: "QnA one-to-many format."
 

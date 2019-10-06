@@ -1,13 +1,18 @@
-<section class='field'>
-  <label>
-    {{input type="checkbox" checked=category.custom_fields.qa_enabled}}
-    {{i18n 'category.enable_qa'}}
-  </label>
-</section>
+<section>
+  <h3> {{i18n "category.qa_settings_label"}}</h3>
 
-<section class='field'>
-  <label>
-    {{input type="checkbox" checked=category.custom_fields.qa_one_to_many}}
-    {{i18n 'category.qa_one_to_many'}}
-  </label>
+  <section class='field'>
+    <label>
+      {{input type="checkbox" checked=category.custom_fields.qa_enabled}}
+      {{i18n 'category.enable_qa'}}
+    </label>
+  </section>
+
+  <section class='field'>
+    <label>
+      {{input type="checkbox" checked=category.custom_fields.qa_one_to_many}}
+      {{i18n 'category.qa_one_to_many'}}
+    </label>
+  </section>
+
 </section>
