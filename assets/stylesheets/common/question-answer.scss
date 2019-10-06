@@ -112,3 +112,22 @@ nav.post-controls button.comment {
     }
   }
 }
+
+// rtl
+
+html.rtl {
+  .qa-post {
+    padding-right: 0;
+    padding-left: 20px;
+    float: right;
+    
+    & + article {
+      float: right;
+    }
+  }
+  
+  .topic-post.comment {
+    padding-left: 0;
+    padding-right: 110px;
+  }
+}
