@@ -18,7 +18,10 @@ end
 after_initialize do
   [
     'qa_enabled',
-    'qa_one_to_many'
+    'qa_one_to_many',
+    'qa_disable_like_on_answers',
+    'qa_disable_like_on_questions',
+    'qa_disable_like_on_comments'
   ].each do |key|
     Category.register_custom_field_type(key, :boolean)
     Site.preloaded_category_custom_fields << key if Site.respond_to? :preloaded_category_custom_fields
@@ -33,6 +36,18 @@ after_initialize do
 
     def qa_one_to_many
       ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_one_to_many'])
+    end
+    
+    def qa_disable_like_on_answers
+      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_answers'])
+    end
+    
+    def qa_disable_like_on_questions
+      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_questions'])
+    end
+    
+    def qa_disable_like_on_comments
+      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_comments'])
     end
   end
 
