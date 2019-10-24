@@ -217,3 +217,14 @@ class ::TopicViewSerializer
     qa_enabled
   end
 end
+
+class ::TopicListItemSerializer
+  attributes :qa_enabled, :answer_count
+  def qa_enabled
+    Topic.qa_enabled object
+  end
+
+  def answer_count
+    qa_enabled ? object.answer_count : false ;
+  end
+end
