@@ -225,6 +225,6 @@ class ::TopicListItemSerializer
   end
 
   def answer_count
-    qa_enabled ? object.answer_count : false ;
+    qa_enabled ? object.answer_count : false
   end
 end
