@@ -24,9 +24,16 @@ export default {
           const attrs = this.attrs;
           let result = this.siteSettings.post_menu.split('|');
           if (attrs.qa_enabled) {
-            if (this.siteSettings.qa_disable_like_on_answers &&
-                !attrs.firstPost &&
-                !attrs.reply_to_post_number) {
+            const post = this.findAncestorModel();
+            const category = post.topic.category;
+            
+            let type = attrs.firstPost ? 'questions' :
+                      (attrs.reply_to_post_number ? 'comments' : 'answers');
+            
+            let disableLikes = siteSettings.qa_disable_like_on_answers ||
+                               (category && category[`qa_disable_like_on_${type}`]);
+            
+            if (disableLikes) {
               result = result.filter((b) => b !== 'like');
             }
 
