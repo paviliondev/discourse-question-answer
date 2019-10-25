@@ -14,7 +14,6 @@ export default {
     const store = container.lookup('store:main');
     const currentUser = container.lookup('current-user:main');
     const siteSettings = container.lookup("site-settings:main");
-    const topicSettings = container.lookup('controller:topic');
 
     if (!siteSettings.qa_enabled) return;
 
@@ -25,20 +24,16 @@ export default {
           const attrs = this.attrs;
           let result = this.siteSettings.post_menu.split('|');
           if (attrs.qa_enabled) {
-            var disable_likes_flag = false;
-            if (this.siteSettings.qa_disable_like_on_answers) {
-              disable_likes_flag = true;
-            } else if (topicSettings.get('model.category') !== 'undefined') {
-              if (attrs.firstPost && topicSettings.get('model.category').qa_disable_like_on_questions) {
-                disable_likes_flag = true;
-              } else if (attrs.reply_to_post_number &&  topicSettings.get('model.category').qa_disable_like_on_comments) {
-                disable_likes_flag = true;
-              } else if (!attrs.firstPost && !attrs.reply_to_post_number && topicSettings.get('model.category').qa_disable_like_on_answers) {
-                disable_likes_flag = true;
-              }
-            }
-
-            if (disable_likes_flag) {
+            const post = this.findAncestorModel();
+            const category = post.topic.category;
+            
+            let type = attrs.firstPost ? 'questions' :
+                      (attrs.reply_to_post_number ? 'comments' : 'answers');
+            
+            let disableLikes = siteSettings.qa_disable_like_on_answers ||
+                               (category && category[`qa_disable_like_on_${type}`]);
+            
+            if (disableLikes) {
               result = result.filter((b) => b !== 'like');
             }
 
