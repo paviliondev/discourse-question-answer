@@ -7,6 +7,7 @@ en:
       qa_disable_like_on_answers: "Disable likes on answers in this QnA category"
       qa_disable_like_on_questions: "Disable likes on questions in this QnA category"
       qa_disable_like_on_comments: "Disable likes on comments in this QnA category"
+      qa_disable_bottom_votes: "Disable bottom votes in this QnA category"
 
     composer:
       composer_actions:

@@ -304,7 +304,9 @@ export default {
               );
             }
 
-            if (voteLinks.length) {
+            const category = model.topic.category;
+            let disableBottomVotes = (category ? category.qa_disable_bottom_votes : false);
+            if (voteLinks.length && !disableBottomVotes) {
               let voteContents = [ h('div.vote-links', voteLinks) ];
 
               if (state.voters.length) {
