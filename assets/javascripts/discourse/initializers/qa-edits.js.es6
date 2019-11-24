@@ -87,6 +87,7 @@ export default {
         },
 
         html(attrs, state) {
+          console.log('post-stream')
           let posts = attrs.posts || [];
           let postArray = this.capabilities.isAndroid ? posts : posts.toArray();
 
@@ -275,6 +276,7 @@ export default {
         },
 
         html(attrs, state) {
+          console.log('post-body')
           let contents = this._super(attrs, state);
           const model = this.findAncestorModel();
           let action = model.actionByName['vote'];
@@ -475,6 +477,7 @@ export default {
 
       api.reopenWidget('post', {
         html(attrs) {
+          console.log('post')
           if (attrs.cloaked) { return ''; }
 
           if (attrs.qa_enabled && !attrs.firstPost) {
@@ -509,6 +512,7 @@ export default {
       api.reopenWidget('topic-map-summary', {
         html(attrs, state) {
           if (attrs.qa_enabled) {
+            console.log('topic-map-summary')
             return this.qaMap(attrs, state);
           } else {
             return this._super(attrs, state);
