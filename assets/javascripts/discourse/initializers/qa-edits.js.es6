@@ -90,6 +90,8 @@ export default {
           console.log('post-stream')
           let posts = attrs.posts || [];
           let postArray = this.capabilities.isAndroid ? posts : posts.toArray();
+          
+          console.log('post-stream before if')
 
           if (postArray[0] && postArray[0].qa_enabled) {
             let answerId = null;
@@ -97,9 +99,13 @@ export default {
             let defaultComments = Number(siteSettings.qa_comments_default);
             let commentCount = 0;
             let lastVisible = null;
+            
+            console.log('post-stream before for each')
 
             postArray.forEach((p, i) => {
               p['oneToMany'] = p.topic.category.qa_one_to_many;
+              
+              console.log('post: ', p, i)
 
               if (p.reply_to_post_number) {
                 commentCount++;
@@ -113,11 +119,14 @@ export default {
                 if ((!postArray[i+1] ||
                     !postArray[i+1].reply_to_post_number) &&
                     !p['showComment']) {
+                      
+                  console.log('if first')
                   postArray[lastVisible]['answerId'] = answerId;
                   postArray[lastVisible]['attachCommentToggle'] = true;
                   postArray[lastVisible]['hiddenComments'] = commentCount - defaultComments;
                 }
               } else {
+                console.log('if second')
                 p['attachCommentToggle'] = !p['oneToMany'];
                 p['topicUserId'] = p.topic.user_id
                 answerId = p.id;
@@ -125,6 +134,8 @@ export default {
                 lastVisible = i;
               }
             });
+            
+            console.log('after forEach')
 
             if (this.capabilities.isAndroid) {
               attrs.posts = postArray;
@@ -276,7 +287,6 @@ export default {
         },
 
         html(attrs, state) {
-          console.log('post-body')
           let contents = this._super(attrs, state);
           const model = this.findAncestorModel();
           let action = model.actionByName['vote'];
@@ -477,7 +487,6 @@ export default {
 
       api.reopenWidget('post', {
         html(attrs) {
-          console.log('post')
           if (attrs.cloaked) { return ''; }
 
           if (attrs.qa_enabled && !attrs.firstPost) {
@@ -512,7 +521,6 @@ export default {
       api.reopenWidget('topic-map-summary', {
         html(attrs, state) {
           if (attrs.qa_enabled) {
-            console.log('topic-map-summary')
             return this.qaMap(attrs, state);
           } else {
             return this._super(attrs, state);
