@@ -103,9 +103,8 @@ export default {
             console.log('post-stream before for each')
 
             postArray.forEach((p, i) => {
+              console.log('post: ', p, i);
               p['oneToMany'] = p.topic.category.qa_one_to_many;
-              
-              console.log('post: ', p, i)
 
               if (p.reply_to_post_number) {
                 commentCount++;
@@ -121,6 +120,8 @@ export default {
                     !p['showComment']) {
                       
                   console.log('if first')
+                  console.log('lastVisible: ', lastVisible)
+                  console.log('hidden: ', commentCount, defaultComments)
                   postArray[lastVisible]['answerId'] = answerId;
                   postArray[lastVisible]['attachCommentToggle'] = true;
                   postArray[lastVisible]['hiddenComments'] = commentCount - defaultComments;
