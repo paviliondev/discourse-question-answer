@@ -69,7 +69,7 @@ class ::Topic
     topic_vote_limit.to_i >= topic_vote_count
   end
 
-  def self.qa_votes(topic, user)
+  def self.qa_votes(topic, user) #rename to something like qa_user_votes?
     return nil if !user || !SiteSetting.qa_enabled
     PostCustomField.where(post_id: topic.posts.map(&:id),
                           name: 'voted',
