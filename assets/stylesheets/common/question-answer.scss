@@ -120,10 +120,6 @@ html.rtl {
     padding-right: 0;
     padding-left: 20px;
     float: right;
-    
-    & + article {
-      float: right;
-    }
   }
   
   .topic-post.comment {
