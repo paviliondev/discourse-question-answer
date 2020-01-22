@@ -2,9 +2,7 @@
   float: left;
 
   .btn {
-    background: white;
-
-    &:hover {
+     &:hover {
       background: dark-light-diff($primary, $secondary, 65%, -75%);
       color: $secondary;
     }
