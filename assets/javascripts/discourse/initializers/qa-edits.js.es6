@@ -1,5 +1,5 @@
 import { withPluginApi } from 'discourse/lib/plugin-api';
-import { default as computed, on, observes } from 'ember-addons/ember-computed-decorators';
+import discourseComputed, { on, observes } from "discourse-common/utils/decorators";
 import { h } from 'virtual-dom';
 import { avatarFor } from 'discourse/widgets/post';
 import { dateNode, numberNode } from 'discourse/helpers/node';
@@ -235,7 +235,7 @@ export default {
           }
         },
 
-        @computed('pluginPostSnapshot')
+        @discourseComputed('pluginPostSnapshot')
         commenting(post) {
           return post && post.topic.qa_enabled && !post.get('firstPost') && !post.reply_to_post_number;
         },
@@ -252,7 +252,7 @@ export default {
           return content;
         },
 
-        @computed("options", "canWhisper", "action", 'commenting')
+        @discourseComputed("options", "canWhisper", "action", 'commenting')
         content(options, canWhisper, action, commenting) {
           let items = this._super(...arguments);
 
@@ -380,7 +380,7 @@ export default {
       });
 
       api.modifyClass('model:topic', {
-        @computed('qa_enabled')
+        @discourseComputed('qa_enabled')
         showQaTip(qaEnabled) {
           return qaEnabled && this.siteSettings.qa_show_topic_tip;
         }
@@ -455,12 +455,12 @@ export default {
       });
 
       api.modifyClass("component:topic-progress", {
-        @computed('postStream.loaded', 'topic.currentPost', 'postStream.filteredPostsCount', 'topic.qa_enabled')
+        @discourseComputed('postStream.loaded', 'topic.currentPost', 'postStream.filteredPostsCount', 'topic.qa_enabled')
         hideProgress(loaded, currentPost, filteredPostsCount, qaEnabled) {
           return qaEnabled || (!loaded) || (!currentPost) || (!this.site.mobileView && filteredPostsCount < 2);
         },
 
-        @computed('progressPosition', 'topic.last_read_post_id', 'topic.qa_enabled')
+        @discourseComputed('progressPosition', 'topic.last_read_post_id', 'topic.qa_enabled')
         showBackButton(position, lastReadId, qaEnabled) {
           if (!lastReadId || qaEnabled) { return; }
 
