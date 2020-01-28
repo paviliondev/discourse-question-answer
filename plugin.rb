@@ -15,7 +15,15 @@ if respond_to?(:register_svg_icon)
   register_svg_icon "info"
 end
 
+require_relative 'lib/question_answer'
+
 after_initialize do
+  load File.expand_path('../lib/qa.rb', __FILE__)
+  load File.expand_path('../lib/qa_post_edits.rb', __FILE__)
+  load File.expand_path('../lib/qa_topic_edits.rb', __FILE__)
+  load File.expand_path('../lib/qa_one_to_many_edits.rb', __FILE__)
+  load File.expand_path('../jobs/update_post_order.rb', __FILE__)
+
   [
     'qa_enabled',
     'qa_one_to_many',
@@ -37,15 +45,15 @@ after_initialize do
     def qa_one_to_many
       ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_one_to_many'])
     end
-    
+
     def qa_disable_like_on_answers
       ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_answers'])
     end
-    
+
     def qa_disable_like_on_questions
       ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_questions'])
     end
-    
+
     def qa_disable_like_on_comments
       ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_comments'])
     end
@@ -76,12 +84,6 @@ after_initialize do
   class ::PostActionType
     singleton_class.prepend PostActionTypeExtension
   end
-  
-  register_post_custom_field_type('vote_history', :json)
 
-  load File.expand_path('../lib/qa.rb', __FILE__)
-  load File.expand_path('../lib/qa_post_edits.rb', __FILE__)
-  load File.expand_path('../lib/qa_topic_edits.rb', __FILE__)
-  load File.expand_path('../lib/qa_one_to_many_edits.rb', __FILE__)
-  load File.expand_path('../jobs/update_post_order.rb', __FILE__)
+  register_post_custom_field_type('vote_history', :json)
 end

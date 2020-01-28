@@ -18,6 +18,7 @@ RSpec.describe QuestionAnswer::VotesController, :type => :request do
   end
   let(:get_voters) { ->(params = nil) { get '/qa/voters.json', params: params || vote_params } }
   let(:create_vote) { ->(params = nil) { post '/qa/vote.json', params: params || vote_params } }
+  let(:delete_vote) { ->(params = nil) { delete '/qa/vote.json', params: params || vote_params } }
 
   before do
     SiteSetting.qa_enabled = true
@@ -100,13 +101,25 @@ RSpec.describe QuestionAnswer::VotesController, :type => :request do
 
     it 'should success if has voted' do
       create_vote.call
-      delete '/qa/vote.json', params: vote_params
+      delete_vote.call
 
       expect(response.status).to eq(200)
     end
 
     it 'should error if never voted' do
-      delete '/qa/vote.json', params: vote_params
+      delete_vote.call
+
+      expect(response.status).to eq(403)
+    end
+
+    it 'should cant undo vote' do
+      SiteSetting.qa_undo_vote_action_window = 1
+
+      create_vote.call
+
+      sleep 65
+
+      delete_vote.call
 
       expect(response.status).to eq(403)
     end
