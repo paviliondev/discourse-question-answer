@@ -87,8 +87,10 @@ RSpec.describe QuestionAnswer::VotesController, :type => :request do
     end
 
     it 'should error if already voted' do
-      2.times { create_vote.call }
+      create_vote.call
+      expect(response.status).to eq(200)
 
+      create_vote.call
       expect(response.status).to eq(403)
     end
   end
@@ -107,6 +109,20 @@ RSpec.describe QuestionAnswer::VotesController, :type => :request do
       delete '/qa/vote.json', params: vote_params
 
       expect(response.status).to eq(403)
+    end
+  end
+
+  describe '#voters' do
+    before { sign_in(qa_user) }
+
+    it 'should return correct users' do
+      create_vote.call
+      get_voters.call
+
+      parsed = JSON.parse(response.body)
+      users = parsed["voters"].map { |u| u["id"] }
+
+      expect(users.include?(qa_user.id)).to eq(true)
     end
   end
 end
