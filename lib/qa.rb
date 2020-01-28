@@ -34,9 +34,9 @@ class QuestionAnswer::VotesController < ::ApplicationController
     if !Topic.qa_can_vote(@post.topic, @user)
       raise Discourse::InvalidAccess.new(nil, nil,
         custom_message: 'vote.error.user_over_limit'
-      ) 
+      )
     end
-    
+
     if !@post.qa_can_vote(@user.id)
       raise Discourse::InvalidAccess.new(nil, nil,
         custom_message: 'vote.error.one_vote_per_post'
