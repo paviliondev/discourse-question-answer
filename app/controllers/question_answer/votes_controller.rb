@@ -2,8 +2,6 @@ require_dependency 'application_controller'
 require_dependency 'topic'
 
 module QuestionAnswer
-  Voter = Struct.new(:user)
-
   class VotesController < ApplicationController
     before_action :ensure_logged_in
     before_action :find_vote_post

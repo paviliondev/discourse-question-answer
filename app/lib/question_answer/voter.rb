@@ -1,0 +1,1 @@
+Voter = Struct.new(:user)

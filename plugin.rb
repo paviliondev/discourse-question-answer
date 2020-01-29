@@ -38,51 +38,55 @@ after_initialize do
 
   require_dependency 'category'
   class ::Category
-    def qa_enabled
-      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_enabled'])
-    end
+    # def qa_enabled
+    #   ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_enabled'])
+    # end
+    #
+    # def qa_one_to_many
+    #   ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_one_to_many'])
+    # end
+    #
+    # def qa_disable_like_on_answers
+    #   ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_answers'])
+    # end
+    #
+    # def qa_disable_like_on_questions
+    #   ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_questions'])
+    # end
+    #
+    # def qa_disable_like_on_comments
+    #   ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_comments'])
+    # end
 
-    def qa_one_to_many
-      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_one_to_many'])
-    end
-
-    def qa_disable_like_on_answers
-      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_answers'])
-    end
-
-    def qa_disable_like_on_questions
-      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_questions'])
-    end
-
-    def qa_disable_like_on_comments
-      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_comments'])
-    end
+    include QuestionAnswer::CategoryExtension
   end
 
   require_dependency 'category_custom_field'
   class ::CategoryCustomField
-    after_commit :update_post_order, if: :qa_enabled_changed
+    # after_commit :update_post_order, if: :qa_enabled_changed
+    #
+    # def qa_enabled_changed
+    #   name == 'qa_enabled'
+    # end
+    #
+    # def update_post_order
+    #   Jobs.enqueue(:update_post_order, category_id: category_id)
+    # end
 
-    def qa_enabled_changed
-      name == 'qa_enabled'
-    end
-
-    def update_post_order
-      Jobs.enqueue(:update_post_order, category_id: category_id)
-    end
+    include QuestionAnswer::CategoryCustomFieldExtension
   end
 
   PostActionType.types[:vote] = 100
 
-  module PostActionTypeExtension
-    def public_types
-      @public_types ||= super.except(:vote)
-    end
-  end
+  # module PostActionTypeExtension
+  #   def public_types
+  #     @public_types ||= super.except(:vote)
+  #   end
+  # end
 
   require_dependency 'post_action_type'
   class ::PostActionType
-    singleton_class.prepend PostActionTypeExtension
+    singleton_class.prepend QuestionAnswer::PostActionTypeExtension
   end
 
   register_post_custom_field_type('vote_history', :json)
