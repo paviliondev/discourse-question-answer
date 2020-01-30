@@ -48,9 +48,7 @@ after_initialize do
   end
 
   register_post_custom_field_type('vote_history', :json)
-
-  Post.register_custom_field_type('vote_count', :integer)
-  Post.register_custom_field_type('vote_history', :json)
+  register_post_custom_field_type('vote_count', :integer)
 
   class ::Post
     self.ignored_columns = %w[vote_count]
@@ -68,7 +66,7 @@ after_initialize do
     include QuestionAnswer::TopicExtension
   end
 
-  class TopicView
+  class ::TopicView
     prepend QuestionAnswer::TopicViewExtension
   end
 
