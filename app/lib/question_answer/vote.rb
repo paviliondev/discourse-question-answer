@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module QuestionAnswer
   class Vote
     CREATE = 'create'
@@ -10,15 +12,15 @@ module QuestionAnswer
 
       voted = post.qa_voted
 
-      if args[:direction] === UP
-        if args[:action] === CREATE
+      if args[:direction] == UP
+        if args[:action] == CREATE
           voted.push(user.id)
           modifier = 1
-        elsif args[:action] === DESTROY
+        elsif args[:action] == DESTROY
           modifier = 0
           voted.delete_if do |user_id|
-            if user_id === user.id
-              modifier = modifier - 1
+            if user_id == user.id
+              modifier -= 1
               true
             end
           end
@@ -50,7 +52,7 @@ module QuestionAnswer
 
     def self.can_undo(post, user)
       window = SiteSetting.qa_undo_vote_action_window.to_i
-      window === 0 || post.qa_last_voted(user.id).to_i > window.minutes.ago.to_i
+      window.zero? || post.qa_last_voted(user.id).to_i > window.minutes.ago.to_i
     end
   end
 end

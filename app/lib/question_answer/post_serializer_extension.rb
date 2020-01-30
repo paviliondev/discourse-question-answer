@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module QuestionAnswer
   module PostSerializerExtension
     def actions_summary
-      summaries = super.reject { |s| s[:id] === PostActionType.types[:vote] }
+      summaries = super.reject { |s| s[:id] == PostActionType.types[:vote] }
 
       if object.qa_enabled
         user = scope.current_user
@@ -21,7 +23,7 @@ module QuestionAnswer
           end
         end
 
-        summary.delete(:count) if summary[:count] == 0
+        summary.delete(:count) if summary[:count].zero?
 
         if summary[:can_act] || summary[:count]
           summaries + [summary]
@@ -83,14 +85,6 @@ module QuestionAnswer
     end
 
     def include_last_answer_post_number?
-      object.qa_enabled
-    end
-
-    def last_answerer
-      object.topic.last_answerer
-    end
-
-    def include_last_answerer?
       object.qa_enabled
     end
   end

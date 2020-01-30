@@ -1,4 +1,4 @@
-require_dependency 'post_action_user_serializer'
+# frozen_string_literal: true
 
 module QuestionAnswer
   class VoterSerializer < PostActionUserSerializer

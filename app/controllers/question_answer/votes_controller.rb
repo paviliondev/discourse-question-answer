@@ -1,5 +1,4 @@
-require_dependency 'application_controller'
-require_dependency 'topic'
+# frozen_string_literal: true
 
 module QuestionAnswer
   class VotesController < ApplicationController
@@ -10,14 +9,18 @@ module QuestionAnswer
     before_action :ensure_can_act, only: [:create, :destroy]
 
     def create
-      if !::Topic.qa_can_vote(@post.topic, @user)
-        raise Discourse::InvalidAccess.new(nil, nil,
+      unless Topic.qa_can_vote(@post.topic, @user)
+        raise Discourse::InvalidAccess.new(
+          nil,
+          nil,
           custom_message: 'vote.error.user_over_limit'
         )
       end
 
-      if !@post.qa_can_vote(@user.id)
-        raise Discourse::InvalidAccess.new(nil, nil,
+      unless @post.qa_can_vote(@user.id)
+        raise Discourse::InvalidAccess.new(
+          nil,
+          nil,
           custom_message: 'vote.error.one_vote_per_post'
         )
       end
@@ -33,8 +36,11 @@ module QuestionAnswer
     end
 
     def destroy
-      if Topic.qa_votes(@post.topic, @user).length == 0
-        raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_has_not_voted')
+      if Topic.qa_votes(@post.topic, @user).length.zero?
+        raise(
+          Discourse::InvalidAccess.new,
+          I18n.t('vote.error.user_has_not_voted')
+        )
       end
 
       if QuestionAnswer::Vote.vote(@post, @user, vote_args)
@@ -52,13 +58,15 @@ module QuestionAnswer
 
       if @post.qa_voted.any?
         @post.qa_voted.each do |user_id|
-          if user = User.find_by(id: user_id)
+          if (user = User.find_by(id: user_id))
             voters.push(Voter.new(user))
           end
         end
       end
 
-      render_json_dump(voters: serialize_data(voters, QuestionAnswer::VoterSerializer))
+      render_json_dump(
+        voters: serialize_data(voters, QuestionAnswer::VoterSerializer)
+      )
     end
 
     private
@@ -70,7 +78,7 @@ module QuestionAnswer
     def vote_args
       {
         direction: vote_params[:direction],
-        action: self.action_name
+        action: action_name
       }
     end
 
@@ -82,19 +90,15 @@ module QuestionAnswer
         post_id = params[:post_id]
       end
 
-      if post = Post.find_by(id: post_id)
-        @post = post
-      else
-        raise Discourse::NotFound
-      end
+      @post = Post.find_by(id: post_id)
+
+      raise Discourse::NotFound unless @post
     end
 
     def find_vote_user
-      if vote_params[:user_id] && user = User.find_by(id: vote_params[:user_id])
-        @user = user
-      else
-        raise Discourse::NotFound
-      end
+      @user = User.find_by(id: vote_params[:user_id])
+
+      raise Discourse::NotFound unless @user
     end
 
     def ensure_qa_enabled
@@ -103,17 +107,26 @@ module QuestionAnswer
 
     def ensure_can_act
       if Topic.qa_votes(@post.topic, @user).present?
-        if self.action_name === QuestionAnswer::Vote::CREATE
-          raise Discourse::InvalidAccess.new, I18n.t('vote.error.alread_voted')
-        end
-
-        if self.action_name === QuestionAnswer::Vote::DESTROY && !QuestionAnswer::Vote.can_undo(@post, @user)
-          raise Discourse::InvalidAccess.new, I18n.t('vote.error.undo_vote_action_window',
-            minutes: SiteSetting.qa_undo_vote_action_window
+        if action_name == QuestionAnswer::Vote::CREATE
+          raise(
+            Discourse::InvalidAccess.new,
+            I18n.t('vote.error.alread_voted')
           )
         end
-      elsif self.action_name === QuestionAnswer::Vote::DESTROY
-        raise Discourse::InvalidAccess.new, I18n.t('vote.error.user_has_not_voted')
+
+        can_undo = QuestionAnswer::Vote.can_undo(@post, @user)
+
+        if action_name == QuestionAnswer::Vote::DESTROY && !can_undo
+          window = SiteSetting.qa_undo_vote_action_window
+          msg = I18n.t('vote.error.undo_vote_action_window', minutes: window)
+
+          raise Discourse::InvalidAccess.new, msg
+        end
+      elsif action_name == QuestionAnswer::Vote::DESTROY
+        raise(
+          Discourse::InvalidAccess.new,
+          I18n.t('vote.error.user_has_not_voted')
+        )
       end
     end
   end

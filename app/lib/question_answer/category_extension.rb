@@ -1,23 +1,19 @@
+# frozen_string_literal: true
+
 module QuestionAnswer
   module CategoryExtension
-    def qa_enabled
-      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_enabled'])
+    def qa_cast(key)
+      ActiveModel::Type::Boolean.new.cast(custom_fields[key])
     end
 
-    def qa_one_to_many
-      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_one_to_many'])
-    end
-
-    def qa_disable_like_on_answers
-      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_answers'])
-    end
-
-    def qa_disable_like_on_questions
-      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_questions'])
-    end
-
-    def qa_disable_like_on_comments
-      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_comments'])
+    %i[
+      qa_enabled
+      qa_one_to_many
+      qa_disable_like_on_answers
+      qa_disable_like_on_questions
+      qa_disable_like_on_comments
+    ].each do |key|
+      define_method(key) { qa_cast(key) }
     end
   end
 end

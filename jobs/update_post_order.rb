@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Jobs
   class UpdatePostOrder < ::Jobs::Base
     def execute(args)

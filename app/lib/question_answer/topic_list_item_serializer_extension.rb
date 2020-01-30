@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module QuestionAnswer
   module TopicListItemSerializerExtension
     attributes :qa_enabled,
@@ -19,5 +21,4 @@ module QuestionAnswer
       include_qa_enabled?
     end
   end
-
 end

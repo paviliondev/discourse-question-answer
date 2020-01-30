@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module QuestionAnswer
   module CategoryCustomFieldExtension
     after_commit :update_post_order, if: :qa_enabled_changed

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe QuestionAnswer::VotesController, :type => :request do
+RSpec.describe QuestionAnswer::VotesController do
   fab!(:tag) { Fabricate(:tag) }
   fab!(:topic) { Fabricate(:topic, tags: [tag]) }
   fab!(:qa_post) { Fabricate(:post, topic: topic) } # don't set this as :post
@@ -16,9 +16,15 @@ RSpec.describe QuestionAnswer::VotesController, :type => :request do
       }
     }
   end
-  let(:get_voters) { ->(params = nil) { get '/qa/voters.json', params: params || vote_params } }
-  let(:create_vote) { ->(params = nil) { post '/qa/vote.json', params: params || vote_params } }
-  let(:delete_vote) { ->(params = nil) { delete '/qa/vote.json', params: params || vote_params } }
+  let(:get_voters) do
+    ->(params = nil) { get '/qa/voters.json', params: params || vote_params }
+  end
+  let(:create_vote) do
+    ->(params = nil) { post '/qa/vote.json', params: params || vote_params }
+  end
+  let(:delete_vote) do
+    ->(params = nil) { delete '/qa/vote.json', params: params || vote_params }
+  end
 
   before do
     SiteSetting.qa_enabled = true
@@ -133,7 +139,7 @@ RSpec.describe QuestionAnswer::VotesController, :type => :request do
       get_voters.call
 
       parsed = JSON.parse(response.body)
-      users = parsed["voters"].map { |u| u["id"] }
+      users = parsed['voters'].map { |u| u['id'] }
 
       expect(users.include?(qa_user.id)).to eq(true)
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 QuestionAnswer::Engine.routes.draw do
   resource :vote
   get 'voters' => 'votes#voters'

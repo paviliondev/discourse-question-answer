@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module QuestionAnswer
   module TopicViewSerializerExtension
     attributes :qa_enabled,
@@ -63,7 +65,11 @@ module QuestionAnswer
     end
 
     def last_answerer
-      BasicUserSerializer.new(object.topic.last_answerer, scope: scope, root: false)
+      BasicUserSerializer.new(
+        object.topic.last_answerer,
+        scope: scope,
+        root: false
+      )
     end
 
     def include_last_answerer
