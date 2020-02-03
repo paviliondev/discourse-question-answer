@@ -1,19 +1,19 @@
-import { createWidget } from 'discourse/widgets/widget';
-import { castVote } from '../lib/qa-utilities';
-import { h } from 'virtual-dom';
+import { createWidget } from "discourse/widgets/widget";
+import { castVote } from "../lib/qa-utilities";
+import { h } from "virtual-dom";
 
-export default createWidget('qa-post', {
-  tagName: 'div.qa-post',
+export default createWidget("qa-post", {
+  tagName: "div.qa-post",
 
   sendShowLogin() {
-    const appRoute = this.register.lookup('route:application');
-    appRoute.send('showLogin');
+    const appRoute = this.register.lookup("route:application");
+    appRoute.send("showLogin");
   },
 
   html(attrs) {
     const contents = [
-      this.attach('qa-button', { direction: 'up' }),
-      h('div.count', `${attrs.count}`)
+      this.attach("qa-button", { direction: "up" }),
+      h("div.count", `${attrs.count}`)
     ];
     return contents;
   },
@@ -35,13 +35,13 @@ export default createWidget('qa-post', {
 
     castVote({ vote }).then(result => {
       if (result.success) {
-        post.set('topic.qa_voted', true);
+        post.set("topic.qa_voted", true);
 
         if (result.qa_can_vote) {
-          post.set('topic.qa_can_vote', result.qa_can_vote);
+          post.set("topic.qa_can_vote", result.qa_can_vote);
         }
         if (result.qa_votes) {
-          post.set('topic.qa_votes', result.qa_votes);
+          post.set("topic.qa_votes", result.qa_votes);
         }
       }
     });

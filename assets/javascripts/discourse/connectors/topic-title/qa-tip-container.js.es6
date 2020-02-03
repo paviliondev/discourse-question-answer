@@ -1,10 +1,11 @@
 export default {
   setupComponent(attrs, component) {
-    const oneToMany = attrs.model.category && attrs.model.category.qa_one_to_many;
+    const oneToMany =
+      attrs.model.category && attrs.model.category.qa_one_to_many;
     const siteSettings = attrs.model.siteSettings;
     const showTip = attrs.model.showQaTip;
 
-    let topicType = oneToMany ? 'qa_one_to_many' : 'qa';
+    let topicType = oneToMany ? "qa_one_to_many" : "qa";
     let label = `topic.tip.${topicType}.title`;
     let details = `topic.tip.${topicType}.details`;
     let detailsOpts = {
