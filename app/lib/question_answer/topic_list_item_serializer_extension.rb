@@ -2,8 +2,10 @@
 
 module QuestionAnswer
   module TopicListItemSerializerExtension
-    attributes :qa_enabled,
-               :answer_count
+    def self.included(base)
+      base.attributes :qa_enabled,
+                      :answer_count
+    end
 
     def qa_enabled
       true

@@ -2,7 +2,9 @@
 
 module QuestionAnswer
   module CategoryCustomFieldExtension
-    after_commit :update_post_order, if: :qa_enabled_changed
+    def self.included(base)
+      base.after_commit :update_post_order, if: :qa_enabled_changed
+    end
 
     def qa_enabled_changed
       name == 'qa_enabled'

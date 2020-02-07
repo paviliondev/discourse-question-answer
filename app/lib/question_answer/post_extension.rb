@@ -2,7 +2,9 @@
 
 module QuestionAnswer
   module PostExtension
-    after_create :qa_update_vote_order, if: :qa_enabled
+    def self.included(base)
+      base.after_create :qa_update_vote_order, if: :qa_enabled
+    end
 
     def qa_vote_count
       if custom_fields['vote_count'].present?
@@ -44,8 +46,7 @@ module QuestionAnswer
       return unless user_votes.any?
 
       user_votes
-        .min_by { |v| v['created_at'].to_i }
-        .first['created_at']
+        .min_by { |v| v['created_at'].to_i }['created_at']
         .to_datetime
     end
 

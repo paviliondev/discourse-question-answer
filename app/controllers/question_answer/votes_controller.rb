@@ -59,7 +59,7 @@ module QuestionAnswer
       if @post.qa_voted.any?
         @post.qa_voted.each do |user_id|
           if (user = User.find_by(id: user_id))
-            voters.push(Voter.new(user))
+            voters.push(QuestionAnswer::Voter.new(user))
           end
         end
       end

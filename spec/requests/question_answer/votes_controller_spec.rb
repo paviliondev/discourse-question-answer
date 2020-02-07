@@ -119,15 +119,18 @@ RSpec.describe QuestionAnswer::VotesController do
     end
 
     it 'should cant undo vote' do
-      SiteSetting.qa_undo_vote_action_window = 1
+      # this takes 1 minute just to sleep
+      if ENV['QA_TEST_UNDO_VOTE']
+        SiteSetting.qa_undo_vote_action_window = 1
 
-      create_vote.call
+        create_vote.call
 
-      sleep 65
+        sleep 65
 
-      delete_vote.call
+        delete_vote.call
 
-      expect(response.status).to eq(403)
+        expect(response.status).to eq(403)
+      end
     end
   end
 

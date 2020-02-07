@@ -1,3 +1,5 @@
 # frozen_string_literal: true
 
-Voter = Struct.new(:user)
+module QuestionAnswer
+  Voter = Struct.new(:user)
+end

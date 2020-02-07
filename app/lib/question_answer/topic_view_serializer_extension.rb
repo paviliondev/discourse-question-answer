@@ -2,15 +2,17 @@
 
 module QuestionAnswer
   module TopicViewSerializerExtension
-    attributes :qa_enabled,
-               :qa_votes,
-               :qa_can_vote,
-               :last_answered_at,
-               :last_commented_on,
-               :answer_count,
-               :comment_count,
-               :last_answer_post_number,
-               :last_answerer
+    def self.included(base)
+      base.attributes :qa_enabled,
+                      :qa_votes,
+                      :qa_can_vote,
+                      :last_answered_at,
+                      :last_commented_on,
+                      :answer_count,
+                      :comment_count,
+                      :last_answer_post_number,
+                      :last_answerer
+    end
 
     def qa_enabled
       object.qa_enabled

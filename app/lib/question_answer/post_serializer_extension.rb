@@ -2,6 +2,17 @@
 
 module QuestionAnswer
   module PostSerializerExtension
+    def self.included(base)
+      base.attributes :qa_vote_count,
+                      :qa_voted,
+                      :qa_enabled,
+                      :last_answerer,
+                      :last_answered_at,
+                      :answer_count,
+                      :last_answer_post_number,
+                      :last_answerer
+    end
+
     def actions_summary
       summaries = super.reject { |s| s[:id] == PostActionType.types[:vote] }
 
@@ -34,15 +45,6 @@ module QuestionAnswer
         summaries
       end
     end
-
-    attributes :qa_vote_count,
-               :qa_voted,
-               :qa_enabled,
-               :last_answerer,
-               :last_answered_at,
-               :answer_count,
-               :last_answer_post_number,
-               :last_answerer
 
     def qa_vote_count
       object.qa_vote_count
