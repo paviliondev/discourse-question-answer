@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'rails_helper'
+
 describe QuestionAnswer::CategoryCustomFieldExtension do
   it 'should call callback correctly' do
     custom_field = CategoryCustomField.new(name: 'qa_enabled')
