@@ -51,8 +51,6 @@ after_initialize do
   register_post_custom_field_type('vote_count', :integer)
 
   class ::Post
-    self.ignored_columns = %w[vote_count]
-
     include QuestionAnswer::PostExtension
   end
 

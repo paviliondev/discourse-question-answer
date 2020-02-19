@@ -3,6 +3,7 @@
 module QuestionAnswer
   module PostExtension
     def self.included(base)
+      base.ignored_columns = %w[vote_count]
       base.after_create :qa_update_vote_order, if: :qa_enabled
     end
 
@@ -46,7 +47,7 @@ module QuestionAnswer
       return unless user_votes.any?
 
       user_votes
-        .min_by { |v| v['created_at'].to_i }['created_at']
+        .max_by { |v| v['created_at'].to_datetime.to_i }['created_at']
         .to_datetime
     end
 
