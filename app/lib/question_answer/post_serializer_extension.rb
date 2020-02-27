@@ -2,45 +2,32 @@
 
 module QuestionAnswer
   module PostSerializerExtension
-    def self.included(base)
-      base.attributes :qa_vote_count,
-                      :qa_voted,
-                      :qa_enabled,
-                      :last_answerer,
-                      :last_answered_at,
-                      :answer_count,
-                      :last_answer_post_number,
-                      :last_answerer
-    end
-
     def actions_summary
       summaries = super.reject { |s| s[:id] == PostActionType.types[:vote] }
 
-      if object.qa_enabled
-        user = scope.current_user
-        summary = {
-          id: PostActionType.types[:vote],
-          count: object.qa_vote_count
-        }
+      return summaries unless object.qa_enabled
 
-        if user
-          voted = object.qa_voted.include?(user.id)
+      user = scope.current_user
+      summary = {
+        id: PostActionType.types[:vote],
+        count: object.qa_vote_count
+      }
 
-          if voted
-            summary[:acted] = true
-            summary[:can_undo] = QuestionAnswer::Vote.can_undo(object, user)
-          else
-            summary[:can_act] = true
-          end
-        end
+      if user
+        voted = object.qa_voted.include?(user.id)
 
-        summary.delete(:count) if summary[:count].zero?
-
-        if summary[:can_act] || summary[:count]
-          summaries + [summary]
+        if voted
+          summary[:acted] = true
+          summary[:can_undo] = QuestionAnswer::Vote.can_undo(object, user)
         else
-          summaries
+          summary[:can_act] = true
         end
+      end
+
+      summary.delete(:count) if summary[:count].zero?
+
+      if summary[:can_act] || summary[:count]
+        summaries + [summary]
       else
         summaries
       end
