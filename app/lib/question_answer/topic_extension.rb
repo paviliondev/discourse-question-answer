@@ -16,7 +16,7 @@ module QuestionAnswer
     def answers
       @answers ||= begin
         posts
-          .where(reply_to_post_number: [nil, ''])
+          .where(reply_to_post_number: nil)
           .order('created_at ASC')
       end
     end
@@ -24,7 +24,7 @@ module QuestionAnswer
     def comments
       @comments ||= begin
         posts
-          .where.not(reply_to_post_number: [nil, ''])
+          .where.not(reply_to_post_number: nil)
           .order('created_at ASC')
       end
     end

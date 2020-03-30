@@ -1,8 +1,8 @@
 # name: discourse-question-answer
 # about: Question / Answer Style Topics
 # version: 0.3
-# authors: Angus McLeod
-# url: https://github.com/angusmcleod/discourse-question-answer
+# authors: Angus McLeod, Muhlis Cahyono (muhlisbc@gmail.com)
+# url: https://github.com/paviliondev/discourse-question-answer
 
 %i[common desktop mobile].each do |type|
   register_asset "stylesheets/#{type}/question-answer.scss", type
