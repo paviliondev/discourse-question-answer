@@ -64,18 +64,20 @@ module QuestionAnswer
     # class methods
     module ClassMethods
       def qa_can_vote(topic, user)
-        return false if !user || !SiteSetting.qa_enabled
+        return false if user.blank? || !SiteSetting.qa_enabled
 
         topic_vote_count = qa_votes(topic, user).length
+
         if topic_vote_count.positive? && !SiteSetting.qa_trust_level_vote_limits
           return false
         end
 
         trust_level = user.trust_level
+
         return false if trust_level.zero?
 
         topic_vote_limit = SiteSetting.send("qa_tl#{trust_level}_vote_limit")
-        topic_vote_limit.to_i >= topic_vote_count
+        topic_vote_limit.to_i > topic_vote_count
       end
 
       # rename to something like qa_user_votes?
