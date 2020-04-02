@@ -7,8 +7,9 @@ Fabricator(:comment, from: :post) do
 end
 
 describe QuestionAnswer::TopicExtension do
-  fab!(:user)  { Fabricate(:user) }
-  fab!(:topic) { Fabricate(:topic) }
+  fab!(:user) { Fabricate(:user) }
+  fab!(:category) { Fabricate(:category) }
+  fab!(:topic) { Fabricate(:topic, category: category) }
   fab!(:answers) do
     5.times.map { Fabricate(:post, topic: topic) }.sort_by { |a| a.created_at }
   end
@@ -128,6 +129,90 @@ describe QuestionAnswer::TopicExtension do
         SiteSetting.send("qa_tl#{user.trust_level}_vote_limit=", 2)
 
         expect(Topic.qa_can_vote(topic, user)).to eq(true)
+      end
+    end
+
+    describe '#qa_votes' do
+      it 'should return nil if user is blank' do
+        expect(Topic.qa_votes(topic, nil)).to eq(nil)
+      end
+
+      it 'should return nil if disabled' do
+        SiteSetting.qa_enabled = false
+
+        expect(Topic.qa_votes(topic, user)).to eq(nil)
+      end
+
+      it 'should return voted post IDs' do
+        expected = answers.first(3).map do |a|
+          vote.call(a, user)
+
+          a.id
+        end.sort
+
+        expect(Topic.qa_votes(topic, user).sort).to eq(expected)
+      end
+    end
+
+    describe '#qa_enabled' do
+      let(:set_tags) do
+        ->() do
+          tags = 2.times.map { Fabricate(:tag) }
+          topic.tags = tags
+          SiteSetting.qa_tags = tags.map(&:name).join('|')
+
+          topic.save!
+          topic.reload
+        end
+      end
+
+      it 'should return false if topic is blank' do
+        expect(Topic.qa_enabled(nil)).to eq(false)
+      end
+
+      it 'should return false if disabled' do
+        set_tags.call
+        SiteSetting.qa_enabled = false
+
+        expect(Topic.qa_enabled(topic)).to eq(false)
+      end
+
+      it 'should return false if catefory topic' do
+        set_tags.call
+
+        category.topic_id = topic.id
+        category.save!
+        category.reload
+
+        expect(Topic.qa_enabled(topic)).to eq(false)
+      end
+
+      it 'should return false by default' do
+        expect(Topic.qa_enabled(topic)).to eq(false)
+      end
+
+      it 'should return true if has enabled tags' do
+        tags = 2.times.map { Fabricate(:tag) }
+        topic.tags = tags
+        SiteSetting.qa_tags = tags.map(&:name).join('|')
+
+        expect(Topic.qa_enabled(topic)).to eq(true)
+      end
+
+      it 'should return true on enabled category' do
+        category.custom_fields['qa_enabled'] = true
+        category.save!
+        category.reload
+
+        expect(Topic.qa_enabled(topic)).to eq(true)
+      end
+
+      it 'should return true if question subtype' do
+        topic.subtype = 'question'
+        topic.save!
+        topic.reload
+
+        expect(Topic.qa_enabled(topic)).to eq(true)
       end
     end
   end
