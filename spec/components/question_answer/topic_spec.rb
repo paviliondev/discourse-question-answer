@@ -14,13 +14,11 @@ describe QuestionAnswer::TopicExtension do
     5.times.map { Fabricate(:post, topic: topic) }.sort_by { |a| a.created_at }
   end
   fab!(:comments) do
-    answer_post_nums = answers.map(&:post_number)
-
     5.times.map do
       Fabricate(
         :comment,
         topic: topic,
-        reply_to_post_number: answer_post_nums.sample
+        reply_to_post_number: 2
       )
     end.sort_by { |c| c.created_at }
   end
@@ -213,6 +211,37 @@ describe QuestionAnswer::TopicExtension do
         topic.reload
 
         expect(Topic.qa_enabled(topic)).to eq(true)
+      end
+    end
+
+    describe '#qa_update_vote_order' do
+      it 'should order by vote count' do
+        post1 = topic.answers[1]
+        post2 = topic.answers.last
+
+        expect(post1.sort_order < post2.sort_order).to eq(true)
+
+        vote.call(post2, user)
+
+        post1.reload
+        post2.reload
+
+        expect(post1.sort_order > post2.sort_order).to eq(true)
+        expect(post1.post_number < post2.post_number).to eq(true)
+      end
+
+      it 'should group ordering by answer' do
+        answer = topic.answers.last
+        comment = topic.comments.last
+
+        expect(answer.sort_order < comment.sort_order).to eq(true)
+
+        Topic.qa_update_vote_order(topic.id)
+
+        answer.reload
+        comment.reload
+
+        expect(answer.sort_order > comment.sort_order).to eq(true)
       end
     end
   end
