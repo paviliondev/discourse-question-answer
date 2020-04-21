@@ -1,9 +1,8 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
-import {
-  default as computed,
+import discourseComputed, {
   on,
   observes
-} from "ember-addons/ember-computed-decorators";
+} from "discourse-common/utils/decorators";
 import { h } from "virtual-dom";
 import { avatarFor } from "discourse/widgets/post";
 import { dateNode, numberNode } from "discourse/helpers/node";
@@ -100,11 +99,8 @@ export default {
         },
 
         html(attrs, state) {
-          console.log("post-stream");
           let posts = attrs.posts || [];
           let postArray = this.capabilities.isAndroid ? posts : posts.toArray();
-
-          console.log("post-stream before if");
 
           if (postArray[0] && postArray[0].qa_enabled) {
             let answerId = null;
@@ -113,10 +109,7 @@ export default {
             let commentCount = 0;
             let lastVisible = null;
 
-            console.log("post-stream before for each");
-
             postArray.forEach((p, i) => {
-              console.log("post: ", p, i);
               p["oneToMany"] = p.topic.category.qa_one_to_many;
 
               if (p.reply_to_post_number) {
@@ -135,16 +128,12 @@ export default {
                     !postArray[i + 1].reply_to_post_number) &&
                   !p["showComment"]
                 ) {
-                  console.log("if first");
-                  console.log("lastVisible: ", lastVisible);
-                  console.log("hidden: ", commentCount, defaultComments);
                   postArray[lastVisible]["answerId"] = answerId;
                   postArray[lastVisible]["attachCommentToggle"] = true;
                   postArray[lastVisible]["hiddenComments"] =
                     commentCount - defaultComments;
                 }
               } else {
-                console.log("if second");
                 p["attachCommentToggle"] = !p["oneToMany"];
                 p["topicUserId"] = p.topic.user_id;
                 answerId = p.id;
@@ -152,8 +141,6 @@ export default {
                 lastVisible = i;
               }
             });
-
-            console.log("after forEach");
 
             if (this.capabilities.isAndroid) {
               attrs.posts = postArray;
@@ -254,7 +241,7 @@ export default {
           }
         },
 
-        @computed("pluginPostSnapshot")
+        @discourseComputed("pluginPostSnapshot")
         commenting(post) {
           return (
             post &&
@@ -278,7 +265,7 @@ export default {
           return content;
         },
 
-        @computed("options", "canWhisper", "action", "commenting")
+        @discourseComputed("options", "canWhisper", "action", "commenting")
         content(options, canWhisper, action, commenting) {
           let items = this._super(...arguments);
 
@@ -423,7 +410,7 @@ export default {
       });
 
       api.modifyClass("model:topic", {
-        @computed("qa_enabled")
+        @discourseComputed("qa_enabled")
         showQaTip(qaEnabled) {
           return qaEnabled && this.siteSettings.qa_show_topic_tip;
         }
@@ -504,7 +491,7 @@ export default {
       });
 
       api.modifyClass("component:topic-progress", {
-        @computed(
+        @discourseComputed(
           "postStream.loaded",
           "topic.currentPost",
           "postStream.filteredPostsCount",
@@ -519,7 +506,7 @@ export default {
           );
         },
 
-        @computed(
+        @discourseComputed(
           "progressPosition",
           "topic.last_read_post_id",
           "topic.qa_enabled"

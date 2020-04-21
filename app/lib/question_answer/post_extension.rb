@@ -8,8 +8,8 @@ module QuestionAnswer
     end
 
     def qa_vote_count
-      if custom_fields['vote_count'].present?
-        custom_fields['vote_count'].to_i
+      if vote_count = custom_fields['vote_count']
+        [*vote_count].first.to_i
       else
         0
       end

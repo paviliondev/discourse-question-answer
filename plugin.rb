@@ -44,13 +44,15 @@ after_initialize do
   end
 
   class ::PostSerializer
-    attributes  :qa_vote_count,
-                :qa_voted,
-                :qa_enabled,
-                :last_answerer,
-                :last_answered_at,
-                :answer_count,
-                :last_answer_post_number
+    attributes(
+      :qa_vote_count,
+      :qa_voted,
+      :qa_enabled,
+      :last_answerer,
+      :last_answered_at,
+      :answer_count,
+      :last_answer_post_number
+    )
 
     prepend QuestionAnswer::PostSerializerExtension
   end
