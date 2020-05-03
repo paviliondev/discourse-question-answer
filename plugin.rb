@@ -1,87 +1,98 @@
+# frozen_string_literal: true
+
 # name: discourse-question-answer
 # about: Question / Answer Style Topics
 # version: 0.3
-# authors: Angus McLeod
-# url: https://github.com/angusmcleod/discourse-question-answer
+# authors: Angus McLeod, Muhlis Cahyono (muhlisbc@gmail.com)
+# url: https://github.com/paviliondev/discourse-question-answer
 
-register_asset 'stylesheets/common/question-answer.scss'
-register_asset 'stylesheets/desktop/question-answer.scss', :desktop
-register_asset 'stylesheets/mobile/question-answer.scss', :mobile
-
-enabled_site_setting :qa_enabled
-
-if respond_to?(:register_svg_icon)
-  register_svg_icon "angle-up"
-  register_svg_icon "info"
+%i[common desktop mobile].each do |type|
+  register_asset "stylesheets/#{type}/question-answer.scss", type
 end
 
+enabled_site_setting :qa_enabled
+require_relative 'lib/question_answer'
+
 after_initialize do
-  [
-    'qa_enabled',
-    'qa_one_to_many',
-    'qa_disable_like_on_answers',
-    'qa_disable_like_on_questions',
-    'qa_disable_like_on_comments'
+  load File.expand_path('jobs/update_post_order.rb', __dir__)
+
+  if respond_to?(:register_svg_icon)
+    register_svg_icon 'angle-up'
+    register_svg_icon 'info'
+  end
+
+  %w[
+    qa_enabled
+    qa_one_to_many
+    qa_disable_like_on_answers
+    qa_disable_like_on_questions
+    qa_disable_like_on_comments
   ].each do |key|
     Category.register_custom_field_type(key, :boolean)
-    Site.preloaded_category_custom_fields << key if Site.respond_to? :preloaded_category_custom_fields
     add_to_serializer(:basic_category, key.to_sym) { object.send(key) }
-  end
 
-  require_dependency 'category'
-  class ::Category
-    def qa_enabled
-      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_enabled'])
-    end
-
-    def qa_one_to_many
-      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_one_to_many'])
-    end
-    
-    def qa_disable_like_on_answers
-      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_answers'])
-    end
-    
-    def qa_disable_like_on_questions
-      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_questions'])
-    end
-    
-    def qa_disable_like_on_comments
-      ActiveModel::Type::Boolean.new.cast(self.custom_fields['qa_disable_like_on_comments'])
+    if Site.respond_to?(:preloaded_category_custom_fields)
+      Site.preloaded_category_custom_fields << key
     end
   end
 
-  require_dependency 'category_custom_field'
-  class ::CategoryCustomField
-    after_commit :update_post_order, if: :qa_enabled_changed
+  class ::Guardian
+    attr_accessor :post_opts
+    prepend QuestionAnswer::GuardianExtension
+  end
 
-    def qa_enabled_changed
-      name == 'qa_enabled'
-    end
+  class ::PostCreator
+    prepend QuestionAnswer::PostCreatorExtension
+  end
 
-    def update_post_order
-      Jobs.enqueue(:update_post_order, category_id: category_id)
-    end
+  class ::PostSerializer
+    attributes(
+      :qa_vote_count,
+      :qa_voted,
+      :qa_enabled,
+      :last_answerer,
+      :last_answered_at,
+      :answer_count,
+      :last_answer_post_number
+    )
+
+    prepend QuestionAnswer::PostSerializerExtension
+  end
+
+  register_post_custom_field_type('vote_history', :json)
+  register_post_custom_field_type('vote_count', :integer)
+
+  class ::Post
+    include QuestionAnswer::PostExtension
   end
 
   PostActionType.types[:vote] = 100
 
-  module PostActionTypeExtension
-    def public_types
-      @public_types ||= super.except(:vote)
-    end
-  end
-
-  require_dependency 'post_action_type'
   class ::PostActionType
-    singleton_class.prepend PostActionTypeExtension
+    singleton_class.prepend QuestionAnswer::PostActionTypeExtension
   end
-  
-  register_post_custom_field_type('vote_history', :json)
 
-  load File.expand_path('../lib/qa.rb', __FILE__)
-  load File.expand_path('../lib/qa_post_edits.rb', __FILE__)
-  load File.expand_path('../lib/qa_topic_edits.rb', __FILE__)
-  load File.expand_path('../lib/qa_one_to_many_edits.rb', __FILE__)
-  load File.expand_path('../jobs/update_post_order.rb', __FILE__)
+  class ::Topic
+    include QuestionAnswer::TopicExtension
+  end
+
+  class ::TopicView
+    prepend QuestionAnswer::TopicViewExtension
+  end
+
+  class ::TopicViewSerializer
+    include QuestionAnswer::TopicViewSerializerExtension
+  end
+
+  class ::TopicListItemSerializer
+    include QuestionAnswer::TopicListItemSerializerExtension
+  end
+
+  class ::Category
+    include QuestionAnswer::CategoryExtension
+  end
+
+  class ::CategoryCustomField
+    include QuestionAnswer::CategoryCustomFieldExtension
+  end
 end
