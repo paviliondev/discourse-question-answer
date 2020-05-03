@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # name: discourse-question-answer
 # about: Question / Answer Style Topics
 # version: 0.3

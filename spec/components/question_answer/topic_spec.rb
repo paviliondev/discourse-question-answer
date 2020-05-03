@@ -11,7 +11,7 @@ describe QuestionAnswer::TopicExtension do
   fab!(:category) { Fabricate(:category) }
   fab!(:topic) { Fabricate(:topic, category: category) }
   fab!(:answers) do
-    5.times.map { Fabricate(:post, topic: topic) }.sort_by { |a| a.created_at }
+    5.times.map { Fabricate(:post, topic: topic) }.sort_by(&:created_at)
   end
   fab!(:comments) do
     5.times.map do
@@ -20,14 +20,14 @@ describe QuestionAnswer::TopicExtension do
         topic: topic,
         reply_to_post_number: 2
       )
-    end.sort_by { |c| c.created_at }
+    end.sort_by(&:created_at)
   end
   let(:up) { QuestionAnswer::Vote::UP }
   let(:create) { QuestionAnswer::Vote::CREATE }
   let(:destroy) { QuestionAnswer::Vote::DESTROY }
   let(:vote) do
-    ->(post, u) do
-      QuestionAnswer::Vote.vote(post, u, { direction: up, action: create })
+    -> (post, u) do
+      QuestionAnswer::Vote.vote(post, u, direction: up, action: create)
     end
   end
 
@@ -154,7 +154,7 @@ describe QuestionAnswer::TopicExtension do
 
     describe '#qa_enabled' do
       let(:set_tags) do
-        ->() do
+        lambda do
           tags = 2.times.map { Fabricate(:tag) }
           topic.tags = tags
           SiteSetting.qa_tags = tags.map(&:name).join('|')

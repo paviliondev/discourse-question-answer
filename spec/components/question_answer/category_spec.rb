@@ -16,7 +16,7 @@ end
 
 describe QuestionAnswer::CategoryExtension do
   fab!(:category) { Fabricate(:category) }
-  let(:fields) {
+  let(:fields) do
     %w[
       qa_enabled
       qa_one_to_many
@@ -24,7 +24,7 @@ describe QuestionAnswer::CategoryExtension do
       qa_disable_like_on_questions
       qa_disable_like_on_comments
     ]
-  }
+  end
 
   it 'should cast custom fields correctly' do
     fields.each do |f|

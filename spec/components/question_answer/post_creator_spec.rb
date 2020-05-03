@@ -6,8 +6,8 @@ describe QuestionAnswer::PostCreatorExtension do
   fab!(:user) { Fabricate(:user) }
 
   it 'should assign post_opts to guardian' do
-    test_string = "Test string"
-    opts = { raw: "Test string" }
+    test_string = 'Test string'
+    opts = { raw: test_string }
     post_creator = PostCreator.new(user, opts)
 
     post_creator.valid?
