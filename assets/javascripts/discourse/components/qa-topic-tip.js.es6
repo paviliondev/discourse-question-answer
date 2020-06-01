@@ -1,12 +1,14 @@
 import { cookAsync } from "discourse/lib/text";
 
 export default Ember.Component.extend({
-  classNames: "qa-topic-tip",
+  classNames: ["qa-topic-tip"],
 
   didInsertElement() {
-    Ember.$(document).on("click", Ember.run.bind(this, this.documentClick));
+    this._super(...arguments);
 
-    let rawDetails = I18n.t(this.get("details"), this.get("detailsOpts"));
+    $(document).on("click", Ember.run.bind(this, this.documentClick));
+
+    const rawDetails = I18n.t(this.details, this.detailsOpts);
 
     if (rawDetails) {
       cookAsync(rawDetails).then(cooked => {
@@ -16,12 +18,13 @@ export default Ember.Component.extend({
   },
 
   willDestroyElement() {
-    Ember.$(document).off("click", Ember.run.bind(this, this.documentClick));
+    $(document).off("click", Ember.run.bind(this, this.documentClick));
   },
 
   documentClick(e) {
-    let $element = this.$();
-    let $target = $(e.target);
+    const $element = $(this.element);
+    const $target = $(e.target);
+
     if ($target.closest($element).length < 1 && this._state !== "destroying") {
       this.set("showDetails", false);
     }
