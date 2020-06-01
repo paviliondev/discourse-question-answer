@@ -45,7 +45,6 @@ function initPlugin(api) {
 
   api.decorateWidget("post:before", function(helper) {
     const model = helper.getModel();
-    console.log(model);
 
     if (
       model &&
