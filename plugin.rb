@@ -2,7 +2,7 @@
 
 # name: discourse-question-answer
 # about: Question / Answer Style Topics
-# version: 0.3
+# version: 1.0.0
 # authors: Angus McLeod, Muhlis Cahyono (muhlisbc@gmail.com)
 # url: https://github.com/paviliondev/discourse-question-answer
 
