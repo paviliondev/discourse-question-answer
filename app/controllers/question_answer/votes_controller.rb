@@ -6,7 +6,7 @@ module QuestionAnswer
     before_action :find_vote_post
     before_action :find_vote_user, only: [:create, :destroy]
     before_action :ensure_qa_enabled, only: [:create, :destroy]
-    before_action :ensure_can_act, only: [:create, :destroy]
+    # before_action :ensure_can_act, only: [:create, :destroy]
 
     def create
       unless Topic.qa_can_vote(@post.topic, @user)
@@ -37,10 +37,20 @@ module QuestionAnswer
 
     def destroy
       if Topic.qa_votes(@post.topic, @user).length.zero?
-        raise(
-          Discourse::InvalidAccess.new,
-          I18n.t('vote.error.user_has_not_voted')
+        raise Discourse::InvalidAccess.new(
+          nil,
+          nil,
+          custom_message: 'vote.error.user_has_not_voted'
         )
+      end
+
+      if !QuestionAnswer::Vote.can_undo(@post, @user)
+        window = SiteSetting.qa_undo_vote_action_window
+        msg = I18n.t('vote.error.undo_vote_action_window', minutes: window)
+
+        render_json_error(msg, status: 403)
+
+        return
       end
 
       if QuestionAnswer::Vote.vote(@post, @user, vote_args)
@@ -105,29 +115,29 @@ module QuestionAnswer
       Topic.qa_enabled(@post.topic)
     end
 
-    def ensure_can_act
-      if Topic.qa_votes(@post.topic, @user).present?
-        if action_name == QuestionAnswer::Vote::CREATE
-          raise(
-            Discourse::InvalidAccess.new,
-            I18n.t('vote.error.alread_voted')
-          )
-        end
-
-        can_undo = QuestionAnswer::Vote.can_undo(@post, @user)
-
-        if action_name == QuestionAnswer::Vote::DESTROY && !can_undo
-          window = SiteSetting.qa_undo_vote_action_window
-          msg = I18n.t('vote.error.undo_vote_action_window', minutes: window)
-
-          raise Discourse::InvalidAccess.new, msg
-        end
-      elsif action_name == QuestionAnswer::Vote::DESTROY
-        raise(
-          Discourse::InvalidAccess.new,
-          I18n.t('vote.error.user_has_not_voted')
-        )
-      end
-    end
+  #   def ensure_can_act
+  #     if Topic.qa_votes(@post.topic, @user).present?
+  #       if action_name == QuestionAnswer::Vote::CREATE
+  #         raise(
+  #           Discourse::InvalidAccess.new,
+  #           I18n.t('vote.error.alread_voted')
+  #         )
+  #       end
+  #
+  #       can_undo = QuestionAnswer::Vote.can_undo(@post, @user)
+  #
+  #       if action_name == QuestionAnswer::Vote::DESTROY && !can_undo
+  #         window = SiteSetting.qa_undo_vote_action_window
+  #         msg = I18n.t('vote.error.undo_vote_action_window', minutes: window)
+  #
+  #         raise Discourse::InvalidAccess.new, msg
+  #       end
+  #     elsif action_name == QuestionAnswer::Vote::DESTROY
+  #       raise(
+  #         Discourse::InvalidAccess.new,
+  #         I18n.t('vote.error.user_has_not_voted')
+  #       )
+  #     end
+  #   end
   end
 end

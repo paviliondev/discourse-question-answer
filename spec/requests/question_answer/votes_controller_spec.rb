@@ -130,6 +130,10 @@ RSpec.describe QuestionAnswer::VotesController do
         delete_vote.call
 
         expect(response.status).to eq(403)
+
+        msg = I18n.t('vote.error.undo_vote_action_window', minutes: 1)
+
+        expect(JSON.parse(response.body)['errors'][0]).to eq(msg)
       end
     end
   end

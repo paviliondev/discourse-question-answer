@@ -24,3 +24,13 @@
 .qa-post + article {
   overflow: hidden;
 }
+
+.time-gap + .topic-post.answer, .time-gap + .topic-post.comment {
+  .topic-body, .topic-avatar {
+    padding-top: 15px;
+  }
+
+  .qa-post {
+    margin-top: 15px;
+  }
+}

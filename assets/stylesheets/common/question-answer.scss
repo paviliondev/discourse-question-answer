@@ -20,11 +20,7 @@
 }
 
 .time-gap + .topic-post.answer, .time-gap + .topic-post.comment {
-  .topic-avatar {
-    border-top: 1px solid $primary-low;
-  }
-  
-  .topic-body {
+  .topic-avatar, .topic-body {
     border-top: 1px solid $primary-low;
   }
 }
@@ -37,20 +33,28 @@ nav.post-controls button.comment {
   font-size: 1em;
 }
 
-.topic-post.comment {
-  display: none;
+.topic-post {
+  &.comment {
+    display: none;
 
-  &.show {
-    display: block;
+    &.show {
+      display: block;
+    }
+
+    .avatar-flair {
+      width: 12px;
+      height: 12px;
+      right: 16px;
+
+      i {
+        font-size: 8px;
+      }
+    }
   }
 
-  .avatar-flair {
-    width: 12px;
-    height: 12px;
-    right: 16px;
-
-    i {
-      font-size: 8px;
+  &.comment, &.answer {
+    .post-notice.new-user {
+      display: none;
     }
   }
 }
@@ -68,7 +72,7 @@ nav.post-controls button.comment {
 
   .vote-links {
     text-align: right;
-    
+
     a {
       margin-left: 5px;
     }
@@ -89,7 +93,7 @@ nav.post-controls button.comment {
 .qa-topic-tip {
   position: relative;
   margin-top: 5px;
-  
+
   .tip-details {
     background-color: dark-light-diff($primary, $secondary, 95%, -85%);
     box-shadow: shadow('dropdown');
@@ -98,7 +102,7 @@ nav.post-controls button.comment {
     top: 32px;
     z-index: 9999;
     width: 300px;
-    
+
     p {
       margin: 0;
     }
@@ -120,14 +124,20 @@ html.rtl {
     padding-right: 0;
     padding-left: 20px;
     float: right;
-    
+
     & + article {
       float: right;
     }
   }
-  
+
   .topic-post.comment {
     padding-left: 0;
     padding-right: 110px;
+  }
+
+  .vote-container {
+    .voters, .vote-links {
+      text-align: left;
+    }
   }
 }
