@@ -26,7 +26,7 @@ en:
     post:
       actions:
         undo:
-          vote: "Undo your upvote." 
+          vote: "Undo your upvote."
         people:
           vote: "upvoted this post."
         by_you:
@@ -65,6 +65,8 @@ en:
       already_voted: "You can only vote once per question."
       user_over_limit: "You cannot exceed the number of votes for your trust level."
       one_vote_per_post: "You can only vote once for each post."
+
+    user_vote_count: "<strong>{{voteCount}}</strong> Votes"
 
     last_answer_lowercase: last answer
     last_one_to_many_lowercase: last entry

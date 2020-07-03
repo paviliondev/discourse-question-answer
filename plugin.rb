@@ -2,7 +2,7 @@
 
 # name: discourse-question-answer
 # about: Question / Answer Style Topics
-# version: 1.0.0
+# version: 1.1.0
 # authors: Angus McLeod, Muhlis Cahyono (muhlisbc@gmail.com)
 # url: https://github.com/paviliondev/discourse-question-answer
 
@@ -94,5 +94,21 @@ after_initialize do
 
   class ::CategoryCustomField
     include QuestionAnswer::CategoryCustomFieldExtension
+  end
+
+  add_to_class(:user, :vote_count) do
+    post_ids = posts.pluck(:id)
+
+    PostCustomField
+      .where(post_id: post_ids, name: 'vote_count')
+      .sum('value::int')
+  end
+
+  add_to_serializer(:user, :vote_count) do
+    object.vote_count
+  end
+
+  add_to_serializer(:user_card, :vote_count) do
+    object.vote_count
   end
 end

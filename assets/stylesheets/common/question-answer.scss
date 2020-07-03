@@ -88,6 +88,15 @@ nav.post-controls button.comment {
   }
 }
 
+.user-vote-count {
+  color: $primary-high;
+
+  strong {
+    font-size: 1.2em;
+    color: $primary;
+  }
+}
+
 // identical to classes in other plugins
 
 .qa-topic-tip {
