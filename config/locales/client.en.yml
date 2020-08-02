@@ -66,7 +66,7 @@ en:
       user_over_limit: "You cannot exceed the number of votes for your trust level."
       one_vote_per_post: "You can only vote once for each post."
 
-    user_vote_count: "<strong>{{voteCount}}</strong> Votes"
+    user_vote_count: "<strong>{{voteCount}}</strong> Upvotes"
 
     last_answer_lowercase: last answer
     last_one_to_many_lowercase: last entry

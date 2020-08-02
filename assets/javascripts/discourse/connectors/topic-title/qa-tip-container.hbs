@@ -1,3 +1,10 @@
+{{#if model.qa_enabled}}
+  {{d-section
+    pageClass="topic-qa-enabled"
+    scrollTop=false
+  }}
+{{/if}}
+
 {{#if showTip}}
   {{qa-topic-tip
     label=label

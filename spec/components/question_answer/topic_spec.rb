@@ -175,7 +175,7 @@ describe QuestionAnswer::TopicExtension do
         expect(Topic.qa_enabled(topic)).to eq(false)
       end
 
-      it 'should return false if catefory topic' do
+      it 'should return false if category topic' do
         set_tags.call
 
         category.topic_id = topic.id
@@ -195,6 +195,17 @@ describe QuestionAnswer::TopicExtension do
         SiteSetting.qa_tags = tags.map(&:name).join('|')
 
         expect(Topic.qa_enabled(topic)).to eq(true)
+      end
+
+      it 'should return true if has blacklist tags' do
+        tags = 3.times.map { Fabricate(:tag) }
+
+        SiteSetting.qa_blacklist_tags = tags.first.name
+        SiteSetting.qa_tags = tags.map(&:name).join('|')
+
+        topic.tags = tags
+
+        expect(Topic.qa_enabled(topic)).to eq(false)
       end
 
       it 'should return true on enabled category' do

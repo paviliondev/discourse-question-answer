@@ -95,6 +95,11 @@ module QuestionAnswer
         return false if !topic || topic&.is_category_topic?
 
         tags = topic.tags.map(&:name)
+
+        if !(tags & SiteSetting.qa_blacklist_tags.split('|')).empty?
+          return false
+        end
+
         has_qa_tag = !(tags & SiteSetting.qa_tags.split('|')).empty?
         is_qa_category = topic.category.present? && topic.category.qa_enabled
         is_qa_subtype = topic.subtype == 'question'
