@@ -76,3 +76,5 @@ en:
     one_to_many_lowercase:
       one: entry
       other: entries
+    qa:
+      answer_count: "{{answerCount}} Answers"

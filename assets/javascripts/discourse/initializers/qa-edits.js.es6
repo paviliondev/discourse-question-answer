@@ -44,7 +44,16 @@ function initPlugin(api) {
   });
 
   api.decorateWidget("post:before", function(helper) {
+    const result = [];
     const model = helper.getModel();
+    const firstAnswer = helper.widget.model.get("topic.first_answer_id");
+
+    if (helper.attrs.id === firstAnswer && model.qa_enabled) {
+      const answerCount = helper.widget.model.get("topic.answer_count");
+      const answers = I18n.t("qa.answer_count", { answerCount });
+
+      result.push(helper.h("div.qa-answer-count.small-action", answers));
+    }
 
     if (
       model &&
@@ -52,11 +61,15 @@ function initPlugin(api) {
       !model.get("reply_to_post_number") &&
       model.get("qa_enabled")
     ) {
-      return helper.attach("qa-post", {
+      const qaPost = helper.attach("qa-post", {
         count: model.get("qa_vote_count"),
         post: model
       });
+
+      result.push(qaPost);
     }
+
+    return result;
   });
 
   api.decorateWidget("post:after", function(helper) {
@@ -209,7 +222,7 @@ function initPlugin(api) {
     if (
       attrs.canCreatePost &&
       attrs.qa_enabled &&
-      !attrs.firstPost &&
+      // !attrs.firstPost &&
       !attrs.reply_to_post_number
     ) {
       let args = {
@@ -241,7 +254,7 @@ function initPlugin(api) {
       return (
         post &&
         post.get("topic.qa_enabled") &&
-        !post.get("firstPost") &&
+        // !post.get("firstPost") &&
         !post.reply_to_post_number
       );
     },
@@ -556,7 +569,15 @@ function initPlugin(api) {
 
     openCommentCompose() {
       this.sendWidgetAction("showComments", this.attrs.id);
-      this.sendWidgetAction("replyToPost", this.model);
+      this.sendWidgetAction("replyToPost", this.model).then(() => {
+        Ember.run.next(this, () => {
+          const composer = Discourse.__container__.lookup("controller:composer");
+
+          if (!composer.model.post) {
+            composer.model.set("post", this.model);
+          }
+        });
+      });
     }
   });
 

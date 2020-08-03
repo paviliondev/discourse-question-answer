@@ -12,8 +12,13 @@ module QuestionAnswer
         :answer_count,
         :comment_count,
         :last_answer_post_number,
-        :last_answerer
+        :last_answerer,
+        :first_answer_id
       )
+    end
+
+    def first_answer_id
+      object.topic.first_answer&.id
     end
 
     def qa_enabled

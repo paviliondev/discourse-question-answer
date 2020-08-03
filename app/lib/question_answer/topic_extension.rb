@@ -21,6 +21,14 @@ module QuestionAnswer
       end
     end
 
+    def first_answer
+      posts
+        .where(reply_to_post_number: nil)
+        .where.not(post_number: 1)
+        .order('sort_order')
+        .first
+    end
+
     def comments
       @comments ||= begin
         posts
@@ -128,14 +136,16 @@ module QuestionAnswer
 
         count = 2
 
+        # OP comments
+        posts.where(reply_to_post_number: 1).each do |c|
+          c.update(sort_order: count)
+          count += 1
+        end
+
         answers.each do |a|
           a.update(sort_order: count)
 
-          comments = begin
-            posts
-              .where(reply_to_post_number: a.post_number)
-              .order('post_number ASC')
-          end
+          comments = a.comments
 
           if comments.any?
             comments.each do |c|

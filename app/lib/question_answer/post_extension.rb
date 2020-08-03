@@ -55,5 +55,11 @@ module QuestionAnswer
       SiteSetting.qa_tl_allow_multiple_votes_per_post ||
         !qa_voted.include?(user_id)
     end
+
+    def comments
+      Post
+        .where(reply_to_post_number: self.post_number)
+        .order('post_number ASC')
+    end
   end
 end
