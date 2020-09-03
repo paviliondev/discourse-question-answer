@@ -114,30 +114,5 @@ module QuestionAnswer
     def ensure_qa_enabled
       Topic.qa_enabled(@post.topic)
     end
-
-  #   def ensure_can_act
-  #     if Topic.qa_votes(@post.topic, @user).present?
-  #       if action_name == QuestionAnswer::Vote::CREATE
-  #         raise(
-  #           Discourse::InvalidAccess.new,
-  #           I18n.t('vote.error.alread_voted')
-  #         )
-  #       end
-  #
-  #       can_undo = QuestionAnswer::Vote.can_undo(@post, @user)
-  #
-  #       if action_name == QuestionAnswer::Vote::DESTROY && !can_undo
-  #         window = SiteSetting.qa_undo_vote_action_window
-  #         msg = I18n.t('vote.error.undo_vote_action_window', minutes: window)
-  #
-  #         raise Discourse::InvalidAccess.new, msg
-  #       end
-  #     elsif action_name == QuestionAnswer::Vote::DESTROY
-  #       raise(
-  #         Discourse::InvalidAccess.new,
-  #         I18n.t('vote.error.user_has_not_voted')
-  #       )
-  #     end
-  #   end
   end
 end
