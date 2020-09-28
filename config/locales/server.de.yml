@@ -1,0 +1,30 @@
+de:
+  site_settings:
+    qa_tags: "Schlagwörter, die QnA für ein Thema aktivieren"
+    qa_show_topic_tip: "Zeige einen Hinweis über die Funktionsweise von QnA Themen unter dem Titel des QnA Themas"
+    qa_enabled: "Aktiviere das QA Plugin"
+    qa_disable_like_on_answers: "Deaktiviert die Like Schaltfläche für Antworten in QnA Themen"
+    qa_undo_vote_action_window: "Anzahl an Minuten, in denen Nutzer Stimmen in QnA Themen zurücknehmen können (0 bedeutet kein Limit)"
+    qa_comments_default: "Maximale Anzahl an Kommentaren, die standardmäßig angezeigt werden."
+    qa_trust_level_vote_limits: "Setze maximale Anzahl an Stimmen abhängig von der Vertrauensstufe."
+    qa_tl1_vote_limit: "Maximale Anzahl an Stimmen für Nutzer mit Vertrauensstufe 1"
+    qa_tl2_vote_limit: "Maximale Anzahl an Stimmen für Nutzer mit Vertrauensstufe 2"
+    qa_tl3_vote_limit: "Maximale Anzahl an Stimmen für Nutzer mit Vertrauensstufe 3"
+    qa_tl4_vote_limit: "Maximale Anzahl an Stimmen für Nutzer mit Vertrauensstufe 4"
+    qa_tl_allow_multiple_votes_per_post: "Erlaube, dass Nutzer mehrfach für einen Beitrag stimmen dürfen."
+    qa_blacklist_tags: "Schlagwörter, die QnA für ein Thema deaktivieren"
+
+  post_action_types:
+    vote:
+      title: 'Abstimmen'
+      description: 'Stimme für diesen Beitrag'
+      short_description: 'Stimme für diesen Beitrag'
+      long_form: 'hat für diesen Beitrag gestimmt'
+
+  vote:
+    error:
+      user_has_not_voted: "Nutzer hat nicht abgestimmt."
+      user_over_limit: "Du kannst nicht öfter abstimmen, als es deine Vertrauensstufe erlaubt."
+      already_voted: "Du kannst nur einmal pro Frage abstimmen."
+      undo_vote_action_window: "Du kannst Stimmen für ein Thema maximal %{minutes} nach dem Abstimmen rückgängig machen."
+      one_vote_per_post: "Du kannst nur einmal pro Beitrag abstimmen."
