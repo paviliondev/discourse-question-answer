@@ -11,7 +11,6 @@ import { undoVote, whoVoted, setAsAnswer } from "../lib/qa-utilities";
 import { smallUserAtts } from "discourse/widgets/actions-summary";
 import PostsWithPlaceholders from "discourse/lib/posts-with-placeholders";
 import { next } from "@ember/runloop";
-import DiscourseURL from "discourse/lib/url";
 
 function initPlugin(api) {
   const store = api.container.lookup("store:main");
