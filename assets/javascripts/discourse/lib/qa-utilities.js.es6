@@ -25,4 +25,13 @@ const whoVoted = function(data) {
   }).catch(popupAjaxError);
 };
 
+export function setAsAnswer(post) {
+  return ajax("/qa/set_as_answer", {
+    type: "POST",
+    data: {
+      post_id: post.id
+    }
+  }).catch(popupAjaxError);
+}
+
 export { undoVote, castVote, voteActionId, whoVoted };

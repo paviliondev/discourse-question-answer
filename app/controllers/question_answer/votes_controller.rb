@@ -6,7 +6,7 @@ module QuestionAnswer
     before_action :find_vote_post
     before_action :find_vote_user, only: [:create, :destroy]
     before_action :ensure_qa_enabled, only: [:create, :destroy]
-    # before_action :ensure_can_act, only: [:create, :destroy]
+    before_action :ensure_staff, only: [:set_as_answer]
 
     def create
       unless Topic.qa_can_vote(@post.topic, @user)
@@ -63,6 +63,15 @@ module QuestionAnswer
       end
     end
 
+    def set_as_answer
+      @post.reply_to_post_number = nil
+
+      @post.save!
+      Topic.qa_update_vote_order(@post.topic)
+
+      render json: success_json
+    end
+
     def voters
       voters = []
 
@@ -112,7 +121,7 @@ module QuestionAnswer
     end
 
     def ensure_qa_enabled
-      Topic.qa_enabled(@post.topic)
+      raise Discourse::InvalidAccess.new unless Topic.qa_enabled(@post.topic)
     end
   end
 end

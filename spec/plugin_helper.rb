@@ -6,6 +6,7 @@ SimpleCov.configure do
   add_filter do |src|
     src.filename !~ /discourse-question-answer/ ||
     src.filename =~ /spec/ ||
-    src.filename =~ /db/
+    src.filename =~ /db/ ||
+    src.filename =~ /plugin\.rb/
   end
 end

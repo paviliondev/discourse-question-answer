@@ -7,6 +7,9 @@ RSpec.describe QuestionAnswer::VotesController do
   fab!(:topic) { Fabricate(:topic, tags: [tag]) }
   fab!(:qa_post) { Fabricate(:post, topic: topic) } # don't set this as :post
   fab!(:qa_user) { Fabricate(:user) }
+  fab!(:qa_answer) { Fabricate(:post, topic: topic, reply_to_post_number: qa_post.post_number) }
+  fab!(:admin) { Fabricate(:admin) }
+
   let(:vote_params) do
     {
       vote: {
@@ -24,6 +27,9 @@ RSpec.describe QuestionAnswer::VotesController do
   end
   let(:delete_vote) do
     ->(params = nil) { delete '/qa/vote.json', params: params || vote_params }
+  end
+  let(:set_as_answer) do
+    ->(post_id) { post '/qa/set_as_answer.json', params: { post_id: post_id } }
   end
 
   before do
@@ -149,6 +155,32 @@ RSpec.describe QuestionAnswer::VotesController do
       users = parsed['voters'].map { |u| u['id'] }
 
       expect(users.include?(qa_user.id)).to eq(true)
+    end
+  end
+
+  describe '#set_as_answer' do
+    context 'admin' do
+      before { sign_in(admin) }
+
+      it "should set comment as an answer" do
+        expect(qa_answer.reply_to_post_number).to_not eq(nil)
+
+        set_as_answer.call(qa_answer.id)
+
+        qa_answer.reload
+
+        expect(qa_answer.reply_to_post_number).to eq(nil)
+      end
+    end
+
+    context 'user' do
+      before { sign_in(qa_user) }
+
+      it 'should return 403' do
+        set_as_answer.call(qa_answer.id)
+
+        expect(response.status).to eq(403)
+      end
     end
   end
 end

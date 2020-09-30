@@ -8,6 +8,10 @@
     font-size: 1.2em;
     box-sizing: border-box;
   }
+
+  nav.post-controls .show-replies {
+    display: none;
+  }
 }
 
 .qa-post {

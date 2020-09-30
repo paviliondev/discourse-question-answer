@@ -7,9 +7,11 @@ import { h } from "virtual-dom";
 import { avatarFor } from "discourse/widgets/post";
 import { dateNode, numberNode } from "discourse/helpers/node";
 import { REPLY } from "discourse/models/composer";
-import { undoVote, whoVoted } from "../lib/qa-utilities";
-import { avatarAtts } from "discourse/widgets/actions-summary";
+import { undoVote, whoVoted, setAsAnswer } from "../lib/qa-utilities";
+import { smallUserAtts } from "discourse/widgets/actions-summary";
 import PostsWithPlaceholders from "discourse/lib/posts-with-placeholders";
+import { next } from "@ember/runloop";
+import DiscourseURL from "discourse/lib/url";
 
 function initPlugin(api) {
   const store = api.container.lookup("store:main");
@@ -76,7 +78,9 @@ function initPlugin(api) {
     const model = helper.getModel();
     if (model.attachCommentToggle && model.hiddenComments > 0) {
       let type =
-        Number(helper.widget.siteSettings.qa_comments_default) > 0 ? "more" : "all";
+        Number(helper.widget.siteSettings.qa_comments_default) > 0
+          ? "more"
+          : "all";
       return helper.attach("link", {
         action: "showComments",
         actionParam: model.answerId,
@@ -118,6 +122,10 @@ function initPlugin(api) {
         let lastVisible = null;
 
         postArray.forEach((p, i) => {
+          if (!p.topic) {
+            return;
+          }
+
           p["oneToMany"] = p.topic.category.qa_one_to_many;
 
           if (p.reply_to_post_number) {
@@ -132,8 +140,7 @@ function initPlugin(api) {
             if (p["showComment"]) lastVisible = i;
 
             if (
-              (!postArray[i + 1] ||
-                !postArray[i + 1].reply_to_post_number) &&
+              (!postArray[i + 1] || !postArray[i + 1].reply_to_post_number) &&
               !p["showComment"]
             ) {
               postArray[lastVisible]["answerId"] = answerId;
@@ -342,9 +349,7 @@ function initPlugin(api) {
           voteLinks.push(
             this.attach("link", {
               action: "toggleWhoVoted",
-              rawLabel: `${action.count} ${I18n.t(
-                "post.actions.people.vote"
-              )}`
+              rawLabel: `${action.count} ${I18n.t("post.actions.people.vote")}`
             })
           );
         }
@@ -410,7 +415,7 @@ function initPlugin(api) {
 
       whoVoted(post).then(result => {
         if (result.voters) {
-          state.voters = result.voters.map(avatarAtts);
+          state.voters = result.voters.map(smallUserAtts);
           this.scheduleRerender();
         }
       });
@@ -446,11 +451,7 @@ function initPlugin(api) {
         let insertPost = () => posts.unshiftObject(stored);
 
         const qaEnabled = this.get("topic.qa_enabled");
-        if (
-          qaEnabled &&
-          post.post_number === 2 &&
-          posts[0].post_number === 1
-        ) {
+        if (qaEnabled && post.post_number === 2 && posts[0].post_number === 1) {
           insertPost = () => posts.insertAt(1, stored);
         }
 
@@ -570,8 +571,8 @@ function initPlugin(api) {
     openCommentCompose() {
       this.sendWidgetAction("showComments", this.attrs.id);
       this.sendWidgetAction("replyToPost", this.model).then(() => {
-        Ember.run.next(this, () => {
-          const composer = Discourse.__container__.lookup("controller:composer");
+        next(this, () => {
+          const composer = api.container.lookup("controller:composer");
 
           if (!composer.model.post) {
             composer.model.set("post", this.model);
@@ -620,8 +621,7 @@ function initPlugin(api) {
         ])
       );
 
-      let lastAnswerUrl =
-        attrs.topicUrl + "/" + attrs.last_answer_post_number;
+      let lastAnswerUrl = attrs.topicUrl + "/" + attrs.last_answer_post_number;
       let postType = attrs.oneToMany ? "one_to_many" : "answer";
 
       contents.push(
@@ -661,10 +661,7 @@ function initPlugin(api) {
       contents.push(
         h("li.secondary", [
           numberNode(attrs.participantCount),
-          h(
-            "h4",
-            I18n.t("users_lowercase", { count: attrs.participantCount })
-          )
+          h("h4", I18n.t("users_lowercase", { count: attrs.participantCount }))
         ])
       );
 
@@ -672,10 +669,7 @@ function initPlugin(api) {
         contents.push(
           h("li.secondary", [
             numberNode(attrs.topicLikeCount),
-            h(
-              "h4",
-              I18n.t("likes_lowercase", { count: attrs.topicLikeCount })
-            )
+            h("h4", I18n.t("likes_lowercase", { count: attrs.topicLikeCount }))
           ])
         );
       }
@@ -684,10 +678,7 @@ function initPlugin(api) {
         contents.push(
           h("li.secondary", [
             numberNode(attrs.topicLinkLength),
-            h(
-              "h4",
-              I18n.t("links_lowercase", { count: attrs.topicLinkLength })
-            )
+            h("h4", I18n.t("links_lowercase", { count: attrs.topicLinkLength }))
           ])
         );
       }
@@ -716,6 +707,33 @@ function initPlugin(api) {
       );
 
       return [nav, h("ul.clearfix", contents)];
+    }
+  });
+
+  api.reopenWidget("post-admin-menu", {
+    html() {
+      const result = this._super(...arguments);
+
+      if (this.attrs.qa_enabled && this.attrs.comment) {
+        const button = {
+          label: "qa.set_as_answer",
+          action: "setAsAnswer",
+          className: "popup-menu-button",
+          secondaryAction: "closeAdminMenu"
+        };
+
+        result.children.push(this.attach("post-admin-menu-button", button));
+      }
+
+      return result;
+    },
+
+    setAsAnswer() {
+      const post = this.findAncestorModel();
+
+      setAsAnswer(post).then(result => {
+        location.reload();
+      });
     }
   });
 }
