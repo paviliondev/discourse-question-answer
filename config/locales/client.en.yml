@@ -78,4 +78,4 @@ en:
       other: entries
     qa:
       answer_count: "{{answerCount}} Answers"
-      set_as_answer: "Set as an Answer"
+      set_as_answer: "Move to Answers"
