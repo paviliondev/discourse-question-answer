@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QuestionAnswer
-  class VotesController < ApplicationController
+  class VotesController < ::ApplicationController
     before_action :ensure_logged_in
     before_action :find_vote_post
     before_action :find_vote_user, only: [:create, :destroy]

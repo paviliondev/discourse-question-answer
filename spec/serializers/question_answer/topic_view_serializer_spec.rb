@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require_relative '../../plugin_helper'
 
 describe QuestionAnswer::TopicViewSerializerExtension do
   fab!(:category) { Fabricate(:category) }

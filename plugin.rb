@@ -11,10 +11,30 @@
 end
 
 enabled_site_setting :qa_enabled
-require_relative 'lib/question_answer'
 
-after_initialize do
-  load File.expand_path('jobs/update_post_order.rb', __dir__)
+after_initialize do  
+  %w(
+    ../lib/question_answer/engine.rb
+    ../lib/question_answer/vote.rb
+    ../lib/question_answer/voter.rb
+    ../extensions/category_custom_field_extension.rb
+    ../extensions/category_extension.rb
+    ../extensions/guardian_extension.rb
+    ../extensions/post_action_type_extension.rb
+    ../extensions/post_creator_extension.rb
+    ../extensions/post_extension.rb
+    ../extensions/post_serializer_extension.rb
+    ../extensions/topic_extension.rb
+    ../extensions/topic_list_item_serializer_extension.rb
+    ../extensions/topic_view_extension.rb
+    ../extensions/topic_view_serializer_extension.rb
+    ../app/controllers/question_answer/votes_controller.rb
+    ../app/serializers/question_answer/voter_serializer.rb
+    ../config/routes.rb
+    ../jobs/update_post_order.rb
+  ).each do |path|
+    load File.expand_path(path, __FILE__)
+  end
 
   if respond_to?(:register_svg_icon)
     register_svg_icon 'angle-up'

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require_relative '../../plugin_helper'
 
 describe QuestionAnswer::Vote do
   fab!(:user)  { Fabricate(:user) }

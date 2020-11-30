@@ -2,11 +2,10 @@
 
 require 'simplecov'
 
-SimpleCov.configure do
-  add_filter do |src|
-    src.filename !~ /discourse-question-answer/ ||
-    src.filename =~ /spec/ ||
-    src.filename =~ /db/ ||
-    src.filename =~ /plugin\.rb/
-  end
+SimpleCov.start do
+  root "plugins/discourse-question-answer"
+  track_files "plugins/discourse-question-answer/**/*.rb"
+  add_filter { |src| src.filename =~ /(\/spec\/|\/db\/|plugin\.rb)/ }
 end
+
+require 'rails_helper'

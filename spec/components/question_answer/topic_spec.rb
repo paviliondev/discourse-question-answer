@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require_relative '../../plugin_helper'
 
 Fabricator(:comment, from: :post) do
   reply_to_post_number

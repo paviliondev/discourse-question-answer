@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require_relative '../../plugin_helper'
 
 describe QuestionAnswer::PostActionTypeExtension do
   it 'should recognize vote action' do

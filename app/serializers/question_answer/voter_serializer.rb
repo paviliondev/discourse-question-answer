@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QuestionAnswer
-  class VoterSerializer < PostActionUserSerializer
+  class VoterSerializer < ::PostActionUserSerializer
     def post_url
       nil
     end
