@@ -3,10 +3,13 @@
 module Jobs
   class UpdatePostOrder < ::Jobs::Base
     def execute(args)
-      category = Category.find(args[:category_id])
+      category = Category.find_by(id: args[:category_id])
+
+      return if category.blank?
+
       qa_enabled = category.qa_enabled
 
-      Topic.where(category_id: args[:category_id]).each do |topic|
+      Topic.where(category_id: category.id).each do |topic|
         if qa_enabled
           Topic.qa_update_vote_order(topic.id)
         else
