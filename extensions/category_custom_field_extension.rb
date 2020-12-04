@@ -11,7 +11,7 @@ module QuestionAnswer
     end
 
     def update_post_order
-      Jobs.enqueue(:update_post_order, category_id: category_id)
+      Jobs.enqueue(:update_category_post_order, category_id: category_id)
     end
   end
 end

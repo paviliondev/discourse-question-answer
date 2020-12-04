@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Jobs
-  class UpdatePostOrder < ::Jobs::Base
+  class UpdateCategoryPostOrder < ::Jobs::Base
     def execute(args)
       category = Category.find_by(id: args[:category_id])
 
