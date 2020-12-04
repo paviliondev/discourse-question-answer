@@ -1,7 +1,7 @@
 {
   "RSpec": {
     "coverage": {
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/lib/question_answer/engine.rb": {
+      "/src/plugins/discourse-question-answer/lib/question_answer/engine.rb": {
         "lines": [
           1,
           1,
@@ -11,7 +11,7 @@
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/lib/question_answer/vote.rb": {
+      "/src/plugins/discourse-question-answer/lib/question_answer/vote.rb": {
         "lines": [
           null,
           null,
@@ -73,7 +73,7 @@
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/lib/question_answer/voter.rb": {
+      "/src/plugins/discourse-question-answer/lib/question_answer/voter.rb": {
         "lines": [
           null,
           null,
@@ -82,7 +82,7 @@
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/extensions/category_custom_field_extension.rb": {
+      "/src/plugins/discourse-question-answer/extensions/category_custom_field_extension.rb": {
         "lines": [
           null,
           null,
@@ -103,14 +103,14 @@
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/extensions/category_extension.rb": {
+      "/src/plugins/discourse-question-answer/extensions/category_extension.rb": {
         "lines": [
           null,
           null,
           1,
           1,
           1,
-          332,
+          338,
           null,
           null,
           1,
@@ -120,13 +120,13 @@
           null,
           null,
           null,
-          337,
+          343,
           null,
           null,
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/extensions/guardian_extension.rb": {
+      "/src/plugins/discourse-question-answer/extensions/guardian_extension.rb": {
         "lines": [
           null,
           null,
@@ -151,7 +151,7 @@
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/extensions/post_action_type_extension.rb": {
+      "/src/plugins/discourse-question-answer/extensions/post_action_type_extension.rb": {
         "lines": [
           null,
           null,
@@ -164,7 +164,7 @@
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/extensions/post_creator_extension.rb": {
+      "/src/plugins/discourse-question-answer/extensions/post_creator_extension.rb": {
         "lines": [
           null,
           null,
@@ -178,7 +178,7 @@
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/extensions/post_extension.rb": {
+      "/src/plugins/discourse-question-answer/extensions/post_extension.rb": {
         "lines": [
           null,
           null,
@@ -214,7 +214,7 @@
           null,
           null,
           1,
-          137,
+          141,
           null,
           null,
           1,
@@ -239,7 +239,7 @@
           null,
           null,
           1,
-          29,
+          78,
           null,
           null,
           null,
@@ -247,7 +247,7 @@
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/extensions/post_serializer_extension.rb": {
+      "/src/plugins/discourse-question-answer/extensions/post_serializer_extension.rb": {
         "lines": [
           null,
           null,
@@ -331,7 +331,7 @@
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/extensions/topic_extension.rb": {
+      "/src/plugins/discourse-question-answer/extensions/topic_extension.rb": {
         "lines": [
           null,
           null,
@@ -342,10 +342,10 @@
           null,
           null,
           1,
-          3,
-          3,
-          3,
-          3,
+          4,
+          4,
+          4,
+          4,
           null,
           null,
           1,
@@ -404,6 +404,10 @@
           18,
           null,
           null,
+          1,
+          2,
+          null,
+          null,
           null,
           1,
           1,
@@ -433,63 +437,64 @@
           null,
           null,
           1,
-          173,
+          179,
           null,
-          158,
+          164,
           null,
-          156,
+          162,
           null,
-          156,
+          162,
           1,
           null,
           null,
-          155,
-          155,
-          155,
+          161,
+          161,
+          161,
           null,
-          155,
+          161,
           null,
           null,
           1,
-          46,
+          47,
           null,
-          46,
+          47,
+          47,
           null,
-          46,
+          47,
           null,
-          null,
-          46,
-          null,
-          null,
+          47,
           null,
           null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          46,
-          null,
-          null,
-          46,
+          47,
           5,
           5,
           null,
           null,
-          46,
-          29,
           null,
-          29,
-          null,
-          29,
-          7,
-          35,
-          35,
+          47,
           null,
           null,
-          22,
           null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          47,
+          31,
+          null,
+          31,
+          null,
+          31,
+          8,
+          36,
+          36,
+          null,
+          null,
+          null,
+          31,
           null,
           null,
           null,
@@ -497,7 +502,7 @@
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/extensions/topic_list_item_serializer_extension.rb": {
+      "/src/plugins/discourse-question-answer/extensions/topic_list_item_serializer_extension.rb": {
         "lines": [
           null,
           null,
@@ -527,7 +532,32 @@
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/extensions/topic_view_extension.rb": {
+      "/src/plugins/discourse-question-answer/extensions/topic_tag_extension.rb": {
+        "lines": [
+          null,
+          null,
+          1,
+          1,
+          1,
+          1,
+          null,
+          null,
+          1,
+          4,
+          4,
+          null,
+          0,
+          null,
+          null,
+          null,
+          1,
+          0,
+          null,
+          null,
+          null
+        ]
+      },
+      "/src/plugins/discourse-question-answer/extensions/topic_view_extension.rb": {
         "lines": [
           null,
           null,
@@ -540,7 +570,7 @@
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/extensions/topic_view_serializer_extension.rb": {
+      "/src/plugins/discourse-question-answer/extensions/topic_view_serializer_extension.rb": {
         "lines": [
           null,
           null,
@@ -632,7 +662,7 @@
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/app/controllers/question_answer/votes_controller.rb": {
+      "/src/plugins/discourse-question-answer/app/controllers/question_answer/votes_controller.rb": {
         "lines": [
           null,
           null,
@@ -763,7 +793,7 @@
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/app/serializers/question_answer/voter_serializer.rb": {
+      "/src/plugins/discourse-question-answer/app/serializers/question_answer/voter_serializer.rb": {
         "lines": [
           null,
           null,
@@ -776,7 +806,7 @@
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/config/routes.rb": {
+      "/src/plugins/discourse-question-answer/config/routes.rb": {
         "lines": [
           null,
           null,
@@ -791,7 +821,7 @@
           null
         ]
       },
-      "/Users/angusmcleod/discourse/discourse/plugins/discourse-question-answer/jobs/update_post_order.rb": {
+      "/src/plugins/discourse-question-answer/jobs/update_category_post_order.rb": {
         "lines": [
           null,
           null,
@@ -799,6 +829,9 @@
           1,
           1,
           0,
+          null,
+          0,
+          null,
           0,
           null,
           0,
@@ -808,6 +841,29 @@
           0,
           0,
           null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "/src/plugins/discourse-question-answer/jobs/update_topic_post_order.rb": {
+        "lines": [
+          null,
+          null,
+          1,
+          1,
+          1,
+          2,
+          null,
+          2,
+          null,
+          2,
+          1,
+          null,
+          1,
+          4,
           null,
           null,
           null,
@@ -816,6 +872,6 @@
         ]
       }
     },
-    "timestamp": 1606769905
+    "timestamp": 1607070080
   }
 }

@@ -3,16 +3,21 @@
 require_relative '../../plugin_helper'
 
 describe QuestionAnswer::TopicTagExtension do
-  let (:qa_tag) { Fabricate(:tag, name: 'question') }
-  let (:non_qa_tag) { Fabricate(:tag, name: 'tag1') }
-  
+  fab!(:topic) { Fabricate(:topic) }
+  fab!(:qa_tag) { Fabricate(:tag, name: 'question') }
+  fab!(:non_qa_tag) { Fabricate(:tag, name: 'tag1') }
+  fab!(:topic_tag_qa) { Fabricate(:topic_tag, tag: qa_tag, topic: topic) }
+  fab!(:topic_tag_non_qa) { Fabricate(:topic_tag, tag: non_qa_tag, topic: topic) }
+
   it 'should call callback correctly' do
-    topic_tag = TopicTag.new(tag_id: qa_tag.id)
+    expect(topic_tag_qa.qa_tag?).to eq(true)
+    TopicTag.any_instance.expects(:update_post_order).once
 
-    expect(topic_tag.qa_tag?).to eq(true)
+    topic_tag_qa.destroy # destroy to test if callback called
 
-    topic_tag = TopicTag.new(tag_id: non_qa_tag.id)
+    expect(topic_tag_non_qa.qa_tag?).to eq(false)
+    TopicTag.any_instance.expects(:update_post_order).never
 
-    expect(topic_tag.qa_tag?).to eq(false)
+    topic_tag_non_qa.destroy
   end
 end

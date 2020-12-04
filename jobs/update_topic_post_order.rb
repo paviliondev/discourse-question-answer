@@ -6,7 +6,7 @@ module Jobs
       topic = Topic.find_by(id: args[:topic_id])
 
       return if topic.blank?
-      
+
       if topic.qa_enabled
         Topic.qa_update_vote_order(topic.id)
       else

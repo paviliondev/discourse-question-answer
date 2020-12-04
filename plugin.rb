@@ -12,7 +12,7 @@ end
 
 enabled_site_setting :qa_enabled
 
-after_initialize do  
+after_initialize do
   %w(
     ../lib/question_answer/engine.rb
     ../lib/question_answer/vote.rb
@@ -116,6 +116,10 @@ after_initialize do
 
   class ::CategoryCustomField
     include QuestionAnswer::CategoryCustomFieldExtension
+  end
+
+  class ::TopicTag
+    include QuestionAnswer::TopicTagExtension
   end
 
   add_to_class(:user, :vote_count) do
