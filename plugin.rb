@@ -2,7 +2,7 @@
 
 # name: discourse-question-answer
 # about: Question / Answer Style Topics
-# version: 1.5.0
+# version: 1.6.0
 # authors: Angus McLeod, Muhlis Cahyono (muhlisbc@gmail.com)
 # url: https://github.com/paviliondev/discourse-question-answer
 
@@ -34,6 +34,7 @@ after_initialize do
     ../config/routes.rb
     ../jobs/update_category_post_order.rb
     ../jobs/update_topic_post_order.rb
+    ../jobs/qa_update_topics_post_order.rb
   ).each do |path|
     load File.expand_path(path, __FILE__)
   end
