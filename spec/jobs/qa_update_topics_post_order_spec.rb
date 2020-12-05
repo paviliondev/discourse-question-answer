@@ -24,25 +24,6 @@ describe Jobs::QAUpdateTopicsPostOrder do
   fab!(:tag) { Fabricate(:tag, name: 'question') }
   fab!(:qa_topic) { Fabricate(:topic, tags: [tag]) }
   fab!(:messed_topic) { Fabricate(:topic) }
-  # fab!(:qa_topic_posts) do
-  #   reply_to_post_number_map = {
-  #     "2" => 5,
-  #     "3" => 4
-  #   }
-  #
-  #   5.times.map do |n|
-  #
-  #   end
-  # end
-  # let(:qa_topic_posts_expected_map) do
-  #   {
-  #     "1" => 1,
-  #     "2" => 5,
-  #     "3" => 3,
-  #     "4" => 2,
-  #     "5" => 4
-  #   }
-  # end
 
   it 'should fix post order correctly' do
     expect(qa_topic.qa_enabled).to eq(true)
