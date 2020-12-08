@@ -57,7 +57,8 @@ module QuestionAnswer
     end
 
     def comments
-      Post
+      topic
+        .posts
         .where(reply_to_post_number: self.post_number)
         .order('post_number ASC')
     end

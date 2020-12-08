@@ -69,6 +69,10 @@ module QuestionAnswer
       @last_answerer ||= User.find(answers.last[:user_id])
     end
 
+    def qa_enabled
+      Topic.qa_enabled(self)
+    end
+
     # class methods
     module ClassMethods
       def qa_can_vote(topic, user)
@@ -119,8 +123,17 @@ module QuestionAnswer
         return unless SiteSetting.qa_enabled
 
         posts = Post.where(topic_id: topic_id)
+        op = posts.find_by(post_number: 1)
 
-        posts.where(post_number: 1).update(sort_order: 1)
+        op.update(sort_order: 1)
+
+        count = 2
+
+        # OP comments
+        op.comments.each do |c|
+          c.update(sort_order: count)
+          count += 1
+        end
 
         answers = begin
           posts
@@ -134,14 +147,6 @@ module QuestionAnswer
             ) DESC, post_number ASC")
         end
 
-        count = 2
-
-        # OP comments
-        posts.where(reply_to_post_number: 1).each do |c|
-          c.update(sort_order: count)
-          count += 1
-        end
-
         answers.each do |a|
           a.update(sort_order: count)
 
@@ -152,9 +157,9 @@ module QuestionAnswer
               count += 1
               c.update(sort_order: count)
             end
-          else
-            count += 1
           end
+
+          count += 1
         end
       end
     end

@@ -2,7 +2,7 @@
 
 # name: discourse-question-answer
 # about: Question / Answer Style Topics
-# version: 1.5.0
+# version: 1.6.0
 # authors: Angus McLeod, Muhlis Cahyono (muhlisbc@gmail.com)
 # url: https://github.com/paviliondev/discourse-question-answer
 
@@ -12,7 +12,7 @@ end
 
 enabled_site_setting :qa_enabled
 
-after_initialize do  
+after_initialize do
   %w(
     ../lib/question_answer/engine.rb
     ../lib/question_answer/vote.rb
@@ -26,12 +26,15 @@ after_initialize do
     ../extensions/post_serializer_extension.rb
     ../extensions/topic_extension.rb
     ../extensions/topic_list_item_serializer_extension.rb
+    ../extensions/topic_tag_extension.rb
     ../extensions/topic_view_extension.rb
     ../extensions/topic_view_serializer_extension.rb
     ../app/controllers/question_answer/votes_controller.rb
     ../app/serializers/question_answer/voter_serializer.rb
     ../config/routes.rb
-    ../jobs/update_post_order.rb
+    ../jobs/update_category_post_order.rb
+    ../jobs/update_topic_post_order.rb
+    ../jobs/qa_update_topics_post_order.rb
   ).each do |path|
     load File.expand_path(path, __FILE__)
   end
@@ -114,6 +117,10 @@ after_initialize do
 
   class ::CategoryCustomField
     include QuestionAnswer::CategoryCustomFieldExtension
+  end
+
+  class ::TopicTag
+    include QuestionAnswer::TopicTagExtension
   end
 
   add_to_class(:user, :vote_count) do

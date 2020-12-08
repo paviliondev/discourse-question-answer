@@ -1,0 +1,2 @@
+coverage/*
+!coverage/.last_run.json
