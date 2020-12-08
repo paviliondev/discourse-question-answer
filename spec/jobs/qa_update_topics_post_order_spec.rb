@@ -39,7 +39,7 @@ describe Jobs::QAUpdateTopicsPostOrder do
     messed_post_4 = create_post.call(messed_topic, 4, 2)
     messed_post_5 = create_post.call(messed_topic, 5, 1)
 
-    Jobs::QAUpdateTopicsPostOrder.new.execute({})
+    Jobs::QAUpdateTopicsPostOrder.new.execute_onceoff({})
 
     expect(qa_post_1.reload.sort_order).to eq(1)
     expect(qa_post_2.reload.sort_order).to eq(5)

@@ -2,7 +2,7 @@
 
 module Jobs
   class QAUpdateTopicsPostOrder < ::Jobs::Onceoff
-    def execute(_args)
+    def execute_onceoff(_args)
       Topic.find_each do |topic|
         if topic.qa_enabled
           Topic.qa_update_vote_order(topic.id)
