@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Jobs
-  class QAUpdateTopicsPostOrder < ::Jobs::Onceoff
+  class QaUpdateTopicsPostOrder < ::Jobs::Onceoff
     def execute_onceoff(_args)
       Topic.find_each do |topic|
         if topic.qa_enabled
