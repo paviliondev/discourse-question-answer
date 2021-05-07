@@ -623,23 +623,24 @@ function initPlugin(api) {
       let lastAnswerUrl = attrs.topicUrl + "/" + attrs.last_answer_post_number;
       let postType = attrs.oneToMany ? "one_to_many" : "answer";
 
-      contents.push(
-        h(
-          "li",
-          h("a", { attributes: { href: lastAnswerUrl } }, [
-            h("h4", I18n.t(`last_${postType}_lowercase`)),
-            h("div.topic-map-post.last-answer", [
-              avatarFor("tiny", {
-                username: attrs.last_answerer.username,
-                template: attrs.last_answerer.avatar_template,
-                name: attrs.last_answerer.name
-              }),
-              dateNode(attrs.last_answered_at)
+      if(this.siteSettings.qa_show_last_answerer){
+        contents.push(
+          h(
+            "li",
+            h("a", { attributes: { href: lastAnswerUrl } }, [
+              h("h4", I18n.t(`last_${postType}_lowercase`)),
+              h("div.topic-map-post.last-answer", [
+                avatarFor("tiny", {
+                  username: attrs.last_answerer.username,
+                  template: attrs.last_answerer.avatar_template,
+                  name: attrs.last_answerer.name
+                }),
+                dateNode(attrs.last_answered_at)
+              ])
             ])
-          ])
-        )
-      );
-
+          )
+        );
+      }
       contents.push(
         h("li", [
           numberNode(attrs.answer_count),
