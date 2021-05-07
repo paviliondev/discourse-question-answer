@@ -13,6 +13,7 @@ en:
     qa_tl4_vote_limit: "The vote limit for the question and answer plugin for trust level 4 users"
     qa_tl_allow_multiple_votes_per_post: "Allow users to vote multiple times for the same post."
     qa_blacklist_tags: "Tags to disable QnA on topic"
+    qa_show_last_answerer: "Return last answerer data on topic request."
 
   post_action_types:
     vote:
