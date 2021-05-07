@@ -38,3 +38,6 @@ plugins:
   qa_blacklist_tags:
     type: list
     default: ""
+  qa_show_last_answerer:
+    default: false
+    client: true

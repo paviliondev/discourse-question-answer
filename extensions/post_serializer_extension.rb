@@ -50,7 +50,7 @@ module QuestionAnswer
     end
 
     def include_last_answerer?
-      object.qa_enabled
+      this.siteSettings.qa_show_last_answerer
     end
 
     def last_answered_at
