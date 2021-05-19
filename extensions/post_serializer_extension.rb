@@ -46,7 +46,11 @@ module QuestionAnswer
     end
 
     def last_answerer
-      object.topic.last_answerer
+      BasicUserSerializer.new(
+        object.topic.last_answerer,
+        scope: scope,
+        root: false
+      ).as_json
     end
 
     def include_last_answerer?
