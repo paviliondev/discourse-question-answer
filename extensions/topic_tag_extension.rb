@@ -5,10 +5,10 @@ module QuestionAnswer
     def self.included(base)
       base.after_destroy :update_post_order, if: :qa_tag?
     end
-    
+
     def qa_tag?
       if tag = Tag.find_by(id: tag_id)
-        !([tag.name] & SiteSetting.qa_tags.split('|')).empty? 
+        !([tag.name] & SiteSetting.qa_tags.split('|')).empty?
       else
         false
       end

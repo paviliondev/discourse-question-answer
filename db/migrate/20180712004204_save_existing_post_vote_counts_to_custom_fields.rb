@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SaveExistingPostVoteCountsToCustomFields < ::ActiveRecord::Migration[5.1]
   def up
     vote_totals = {}
