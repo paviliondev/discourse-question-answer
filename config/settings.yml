@@ -38,3 +38,6 @@ plugins:
   qa_blacklist_tags:
     type: list
     default: ""
+  qa_enabled_globally:
+    default: false
+    client: true

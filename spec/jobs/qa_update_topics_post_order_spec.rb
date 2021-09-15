@@ -8,7 +8,7 @@ Fabricator(:post_with_sort_order, from: :post) do
   reply_to_post_number
 end
 
-describe Jobs::QAUpdateTopicsPostOrder do
+describe Jobs::QaUpdateTopicsPostOrder do
   let(:create_post) do
     ->(topic, post_number, sort_order, reply_to_post_number = nil) do
       args = {

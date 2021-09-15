@@ -13,6 +13,7 @@ en:
     qa_tl4_vote_limit: "The vote limit for the question and answer plugin for trust level 4 users"
     qa_tl_allow_multiple_votes_per_post: "Allow users to vote multiple times for the same post."
     qa_blacklist_tags: "Tags to disable QnA on topic"
+    qa_enabled_globally: "Users can enable QnA on any topic"
 
   post_action_types:
     vote:
