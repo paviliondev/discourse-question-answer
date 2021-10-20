@@ -27,7 +27,7 @@ module QuestionAnswer
 
       if QuestionAnswer::Vote.vote(@post, @user, vote_args)
         render json: success_json.merge(
-          qa_votes: Topic.qa_votes(@post.topic, @user),
+          qa_votes: Topic.qa_votes(@post.topic, @user).pluck(:post_id),
           qa_can_vote: Topic.qa_can_vote(@post.topic, @user)
         )
       else
@@ -36,7 +36,7 @@ module QuestionAnswer
     end
 
     def destroy
-      if Topic.qa_votes(@post.topic, @user).length.zero?
+      if Topic.qa_votes(@post.topic, @user).exists?
         raise Discourse::InvalidAccess.new(
           nil,
           nil,
@@ -73,18 +73,17 @@ module QuestionAnswer
     end
 
     def voters
-      voters = []
+      # TODO: Need to paginate
+      # TODO: Should be distinct users?
+      # TODO: Probably a site setting to hide/show voters
+      @guardian.ensure_can_see!(@post)
 
-      if @post.qa_voted.any?
-        @post.qa_voted.each do |user_id|
-          if (user = User.find_by(id: user_id))
-            voters.push(QuestionAnswer::Voter.new(user))
-          end
-        end
-      end
+      voters = User
+        .joins(:question_answer_votes)
+        .where(question_answer_votes: { post_id: @post.id })
 
       render_json_dump(
-        voters: serialize_data(voters, QuestionAnswer::VoterSerializer)
+        voters: serialize_data(voters, BasicUserSerializer)
       )
     end
 

@@ -16,9 +16,8 @@ after_initialize do
   %w(
     ../lib/question_answer/engine.rb
     ../lib/question_answer/vote.rb
-    ../lib/question_answer/voter.rb
-    ../extensions/category_custom_field_extension.rb
     ../extensions/category_extension.rb
+    ../extensions/category_custom_field_extension.rb
     ../extensions/guardian_extension.rb
     ../extensions/post_action_type_extension.rb
     ../extensions/post_creator_extension.rb
@@ -30,7 +29,7 @@ after_initialize do
     ../extensions/topic_view_extension.rb
     ../extensions/topic_view_serializer_extension.rb
     ../app/controllers/question_answer/votes_controller.rb
-    ../app/serializers/question_answer/voter_serializer.rb
+    ../app/models/question_answer_vote.rb
     ../config/routes.rb
     ../jobs/update_category_post_order.rb
     ../jobs/update_topic_post_order.rb
@@ -123,15 +122,22 @@ after_initialize do
     include QuestionAnswer::TopicTagExtension
   end
 
+  # TODO: Performance of the query degrades as the number of posts a user has voted
+  # on increases. We should probably keep a counter cache in the user's
+  # custom fields.
   add_to_class(:user, :vote_count) do
-    post_ids = posts.pluck(:id)
-
     PostCustomField
-      .where(post_id: post_ids, name: 'vote_count')
+      .joins(post: :user)
+      .where("users.id = ?", self.id)
+      .where(name: 'vote_count')
       .sum('value::int')
   end
 
   add_to_serializer(:user_card, :vote_count) do
     object.vote_count
+  end
+
+  class ::User
+    has_many :question_answer_votes
   end
 end

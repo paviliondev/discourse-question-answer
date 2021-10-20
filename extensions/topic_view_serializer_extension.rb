@@ -5,8 +5,6 @@ module QuestionAnswer
     def self.included(base)
       base.attributes(
         :qa_enabled,
-        :qa_votes,
-        :qa_can_vote,
         :last_answered_at,
         :last_commented_on,
         :answer_count,
@@ -23,14 +21,6 @@ module QuestionAnswer
 
     def qa_enabled
       object.qa_enabled
-    end
-
-    def qa_votes
-      Topic.qa_votes(object.topic, scope.current_user)
-    end
-
-    def qa_can_vote
-      Topic.qa_can_vote(object.topic, scope.current_user)
     end
 
     def last_answered_at

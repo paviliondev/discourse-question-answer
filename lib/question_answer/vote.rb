@@ -8,45 +8,26 @@ module QuestionAnswer
     DOWN = 'down'
 
     def self.vote(post, user, args)
-      modifier = 0
+      ActiveRecord::Base.transaction do
+        modifier = 0
 
-      voted = post.qa_voted
-
-      if args[:direction] == UP
-        if args[:action] == CREATE
-          voted.push(user.id)
-          modifier = 1
-        elsif args[:action] == DESTROY
-          modifier = 0
-          voted.delete_if do |user_id|
-            if user_id == user.id
-              modifier -= 1
-              true
-            end
+        if args[:direction] == UP
+          if args[:action] == CREATE
+            QuestionAnswerVote.create!(user: user, post: post)
+            modifier = 1
+          elsif args[:action] == DESTROY
+            modifier = -(QuestionAnswerVote.delete_all(user: user, post: post))
           end
         end
-      end
 
-      post.custom_fields['vote_count'] = post.qa_vote_count + modifier
-      post.custom_fields['voted'] = voted
+        post.custom_fields['vote_count'] = post.qa_vote_count + modifier
 
-      votes = post.qa_vote_history
-
-      votes.push(
-        direction: args[:direction],
-        action: args[:action],
-        user_id: user.id,
-        created_at: Time.now
-      )
-
-      post.custom_fields['vote_history'] = votes
-
-      if post.save_custom_fields(true)
-        Topic.qa_update_vote_order(post.topic)
-        post.publish_change_to_clients! :acted
-        true
-      else
-        false
+        if post.save_custom_fields(true)
+          post.publish_change_to_clients! :acted
+          true
+        else
+          false
+        end
       end
     end
 

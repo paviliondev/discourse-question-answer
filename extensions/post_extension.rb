@@ -23,14 +23,6 @@ module QuestionAnswer
       end
     end
 
-    def qa_vote_history
-      if custom_fields['vote_history'].present?
-        [*custom_fields['vote_history']]
-      else
-        []
-      end
-    end
-
     def qa_enabled
       ::Topic.qa_enabled(topic)
     end
@@ -40,15 +32,10 @@ module QuestionAnswer
     end
 
     def qa_last_voted(user_id)
-      user_votes = qa_vote_history.select do |v|
-        v['user_id'].to_i == user_id && v['action'] == 'create'
-      end
-
-      return unless user_votes.any?
-
-      user_votes
-        .max_by { |v| v['created_at'].to_datetime.to_i }['created_at']
-        .to_datetime
+      QuestionAnswerVote
+        .where(post_id: self.id, user_id: user_id)
+        .order(created_at: :desc)
+        .pluck_first(:created_at)
     end
 
     def qa_can_vote(user_id)

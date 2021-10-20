@@ -78,7 +78,7 @@ module QuestionAnswer
       def qa_can_vote(topic, user)
         return false if user.blank? || !SiteSetting.qa_enabled
 
-        topic_vote_count = qa_votes(topic, user).length
+        topic_vote_count = qa_votes(topic, user).count
 
         if topic_vote_count.positive? && !SiteSetting.qa_trust_level_vote_limits
           return false
@@ -96,9 +96,12 @@ module QuestionAnswer
       def qa_votes(topic, user)
         return nil if !user || !SiteSetting.qa_enabled
 
-        PostCustomField.where(post_id: topic.posts.map(&:id),
-                              name: 'voted',
-                              value: user.id).pluck(:post_id)
+        # This is a very inefficient way since the performance degrades as the
+        # number of voted posts in the topic increases.
+        QuestionAnswerVote
+          .joins("INNER JOIN posts ON posts.id = question_answer_votes.post_id")
+          .where(user: user)
+          .where("posts.topic_id = ?", topic.id)
       end
 
       def qa_enabled(topic)
