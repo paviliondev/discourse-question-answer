@@ -30,7 +30,11 @@ describe QuestionAnswer::PostSerializerExtension do
       ).as_json
     end
   end
-  let(:dependent_keys) { %i[last_answerer last_answered_at answer_count last_answer_post_number] }
+
+  let(:dependent_keys) do
+    %i[last_answerer last_answered_at answer_count last_answer_post_number]
+  end
+
   let(:obj_keys) { %i[qa_vote_count qa_voted qa_enabled] }
 
   context 'qa enabled' do
@@ -95,9 +99,15 @@ describe QuestionAnswer::PostSerializerExtension do
     end
 
     it 'should return correct value from topic' do
-      dependent_keys.each do |k|
-        expect(create_serializer.call[k]).to eq(post.topic.public_send(k))
-      end
+      serializer = create_serializer.call
+
+      expect(serializer[:last_answerer][:id]).to eq(post.user.id)
+      expect(serializer[:last_answerer][:username]).to eq(post.user.username)
+      expect(serializer[:last_answerer][:name]).to eq(post.user.name)
+      expect(serializer[:last_answerer][:avatar_template]).to eq(post.user.avatar_template)
+      expect(serializer[:last_answerer_at]).to eq(nil)
+      expect(serializer[:answer_count]).to eq(0)
+      expect(serializer[:last_answer_post_number]).to eq(1)
     end
   end
 

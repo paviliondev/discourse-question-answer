@@ -7,17 +7,17 @@ module QuestionAnswer
       base.after_create :qa_update_vote_order, if: :qa_enabled
     end
 
-    def qa_vote_count
-      if vote_count = custom_fields['vote_count']
+    def qa_vote_count(fields = custom_fields)
+      if vote_count = fields['vote_count']
         [*vote_count].first.to_i
       else
         0
       end
     end
 
-    def qa_voted
-      if custom_fields['voted'].present?
-        [*custom_fields['voted']].map(&:to_i)
+    def qa_voted(fields = custom_fields)
+      if (voted = fields['voted']).present?
+        [*voted].map(&:to_i)
       else
         []
       end
