@@ -10,11 +10,11 @@ module QuestionAnswer
       user = scope.current_user
       summary = {
         id: PostActionType.types[:vote],
-        count: object.qa_vote_count
+        count: self.qa_vote_count
       }
 
       if user
-        voted = object.qa_voted.include?(user.id)
+        voted = self.qa_voted.include?(user.id)
 
         if voted
           summary[:acted] = true
@@ -34,11 +34,11 @@ module QuestionAnswer
     end
 
     def qa_vote_count
-      object.qa_vote_count
+      object.qa_vote_count(post_custom_fields)
     end
 
     def qa_voted
-      object.qa_voted
+      object.qa_voted(post_custom_fields)
     end
 
     def qa_enabled

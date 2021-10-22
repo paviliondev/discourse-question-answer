@@ -63,7 +63,7 @@ describe QuestionAnswer::TopicViewSerializerExtension do
         expect(serializer[attr]).to eq(topic.send(attr))
       end
 
-      expect(serializer[:last_answerer].id).to eq(topic.last_answerer.id)
+      expect(serializer[:last_answerer][:id]).to eq(topic.last_answerer.id)
     end
   end
 

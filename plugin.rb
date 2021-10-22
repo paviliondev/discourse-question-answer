@@ -134,4 +134,10 @@ after_initialize do
   add_to_serializer(:user_card, :vote_count) do
     object.vote_count
   end
+
+  topic_view_post_custom_fields_allowlister do |user, topic|
+    if topic.qa_enabled
+      %w{"vote_count", "voted"}
+    end
+  end
 end
