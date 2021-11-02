@@ -24,7 +24,7 @@ export default {
     component.setProperties({
       showCreateAnswer,
       label,
-      title
+      title,
     });
   },
 
@@ -32,6 +32,6 @@ export default {
     answerQuestion() {
       const controller = getOwner(this).lookup("controller:topic");
       controller.send("replyToPost");
-    }
-  }
+    },
+  },
 };

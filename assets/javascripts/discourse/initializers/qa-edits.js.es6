@@ -1,13 +1,13 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 import discourseComputed, {
+  observes,
   on,
-  observes
 } from "discourse-common/utils/decorators";
 import { h } from "virtual-dom";
 import { avatarFor } from "discourse/widgets/post";
 import { dateNode, numberNode } from "discourse/helpers/node";
 import { REPLY } from "discourse/models/composer";
-import { undoVote, whoVoted, setAsAnswer } from "../lib/qa-utilities";
+import { setAsAnswer, undoVote, whoVoted } from "../lib/qa-utilities";
 import { smallUserAtts } from "discourse/widgets/actions-summary";
 import PostsWithPlaceholders from "discourse/lib/posts-with-placeholders";
 import { next } from "@ember/runloop";
@@ -35,16 +35,16 @@ function initPlugin(api) {
           (category && category[`qa_disable_like_on_${type}`]);
 
         if (disableLikes) {
-          result = result.filter(b => b !== "like");
+          result = result.filter((b) => b !== "like");
         }
 
-        result = result.filter(b => b !== "reply");
+        result = result.filter((b) => b !== "reply");
       }
       return result;
-    }
+    },
   });
 
-  api.decorateWidget("post:before", function(helper) {
+  api.decorateWidget("post:before", function (helper) {
     const result = [];
     const model = helper.getModel();
     const firstAnswer = helper.widget.model.get("topic.first_answer_id");
@@ -64,7 +64,7 @@ function initPlugin(api) {
     ) {
       const qaPost = helper.attach("qa-post", {
         count: model.get("qa_vote_count"),
-        post: model
+        post: model,
       });
 
       result.push(qaPost);
@@ -73,7 +73,7 @@ function initPlugin(api) {
     return result;
   });
 
-  api.decorateWidget("post:after", function(helper) {
+  api.decorateWidget("post:after", function (helper) {
     const model = helper.getModel();
     if (model.attachCommentToggle && model.hiddenComments > 0) {
       let type =
@@ -84,9 +84,9 @@ function initPlugin(api) {
         action: "showComments",
         actionParam: model.answerId,
         rawLabel: I18n.t(`topic.comment.show_comments.${type}`, {
-          count: model.hiddenComments
+          count: model.hiddenComments,
         }),
-        className: "show-comments"
+        className: "show-comments",
       });
     }
   });
@@ -136,7 +136,9 @@ function initPlugin(api) {
             p["answerId"] = answerId;
             p["attachCommentToggle"] = false;
 
-            if (p["showComment"]) lastVisible = i;
+            if (p["showComment"]) {
+              lastVisible = i;
+            }
 
             if (
               (!postArray[i + 1] || !postArray[i + 1].reply_to_post_number) &&
@@ -161,13 +163,13 @@ function initPlugin(api) {
         } else {
           attrs.posts = PostsWithPlaceholders.create({
             posts: postArray,
-            store
+            store,
           });
         }
       }
 
       return this._super(attrs, state);
-    }
+    },
   });
 
   api.includePostAttributes(
@@ -186,7 +188,7 @@ function initPlugin(api) {
     "oneToMany"
   );
 
-  api.addPostClassesCallback(attrs => {
+  api.addPostClassesCallback((attrs) => {
     if (attrs.qa_enabled && !attrs.firstPost) {
       if (attrs.comment) {
         let classes = ["comment"];
@@ -200,7 +202,7 @@ function initPlugin(api) {
     }
   });
 
-  api.addPostMenuButton("answer", attrs => {
+  api.addPostMenuButton("answer", (attrs) => {
     if (
       attrs.canCreatePost &&
       attrs.qa_enabled &&
@@ -213,7 +215,7 @@ function initPlugin(api) {
         action: "replyToPost",
         title: `topic.${postType}.help`,
         icon: "reply",
-        className: "answer create fade-out"
+        className: "answer create fade-out",
       };
 
       if (!attrs.mobileView) {
@@ -224,7 +226,7 @@ function initPlugin(api) {
     }
   });
 
-  api.addPostMenuButton("comment", attrs => {
+  api.addPostMenuButton("comment", (attrs) => {
     if (
       attrs.canCreatePost &&
       attrs.qa_enabled &&
@@ -235,7 +237,7 @@ function initPlugin(api) {
         action: "openCommentCompose",
         title: "topic.comment.help",
         icon: "comment",
-        className: "comment create fade-out"
+        className: "comment create fade-out",
       };
 
       if (!attrs.mobileView) {
@@ -284,7 +286,7 @@ function initPlugin(api) {
       let items = this._super(...arguments);
 
       if (commenting) {
-        items.forEach(item => {
+        items.forEach((item) => {
           if (item.id === "reply_to_topic") {
             item.name = I18n.t(
               "composer.composer_actions.reply_to_question.label"
@@ -298,7 +300,7 @@ function initPlugin(api) {
             item.name = I18n.t(
               "composer.composer_actions.comment_on_answer.label",
               {
-                postUsername: this.get("pluginPostSnapshot.username")
+                postUsername: this.get("pluginPostSnapshot.username"),
               }
             );
             item.description = I18n.t(
@@ -309,11 +311,11 @@ function initPlugin(api) {
       }
 
       return items;
-    }
+    },
   });
 
   api.reopenWidget("post-body", {
-    buildKey: attrs => `post-body-${attrs.id}`,
+    buildKey: (attrs) => `post-body-${attrs.id}`,
 
     defaultState(attrs) {
       let state = this._super();
@@ -332,14 +334,14 @@ function initPlugin(api) {
         let voteLinks = [];
 
         attrs.actionsSummary = attrs.actionsSummary.filter(
-          as => as.action !== "vote"
+          (as) => as.action !== "vote"
         );
 
         if (action.acted && action.can_undo) {
           voteLinks.push(
             this.attach("link", {
               action: "undoUserVote",
-              rawLabel: I18n.t("post.actions.undo.vote")
+              rawLabel: I18n.t("post.actions.undo.vote"),
             })
           );
         }
@@ -348,7 +350,7 @@ function initPlugin(api) {
           voteLinks.push(
             this.attach("link", {
               action: "toggleWhoVoted",
-              rawLabel: `${action.count} ${I18n.t("post.actions.people.vote")}`
+              rawLabel: `${action.count} ${I18n.t("post.actions.people.vote")}`,
             })
           );
         }
@@ -360,13 +362,13 @@ function initPlugin(api) {
             voteContents.push(
               this.attach("small-user-list", {
                 users: state.voters,
-                listClassName: "voters"
+                listClassName: "voters",
               })
             );
           }
 
           let actionSummaryIndex = contents
-            .map(w => w && w.name)
+            .map((w) => w && w.name)
             .indexOf("actions-summary");
           let insertAt = actionSummaryIndex + 1;
 
@@ -387,10 +389,10 @@ function initPlugin(api) {
       const vote = {
         user_id: user.id,
         post_id: post.id,
-        direction: "up"
+        direction: "up",
       };
 
-      undoVote({ vote }).then(result => {
+      undoVote({ vote }).then((result) => {
         if (result.success) {
           post.set("topic.voted", false);
         }
@@ -409,23 +411,23 @@ function initPlugin(api) {
     getWhoVoted() {
       const { attrs, state } = this;
       const post = {
-        post_id: attrs.id
+        post_id: attrs.id,
       };
 
-      whoVoted(post).then(result => {
+      whoVoted(post).then((result) => {
         if (result.voters) {
           state.voters = result.voters.map(smallUserAtts);
           this.scheduleRerender();
         }
       });
-    }
+    },
   });
 
   api.modifyClass("model:topic", {
     @discourseComputed("qa_enabled")
     showQaTip(qaEnabled) {
       return qaEnabled && this.siteSettings.qa_show_topic_tip;
-    }
+    },
   });
 
   api.modifyClass("component:topic-footer-buttons", {
@@ -439,7 +441,7 @@ function initPlugin(api) {
           this.element
         ).toggle(!qaEnabled);
       });
-    }
+    },
   });
 
   api.modifyClass("model:post-stream", {
@@ -496,7 +498,7 @@ function initPlugin(api) {
         }
       }
       return post;
-    }
+    },
   });
 
   api.modifyClass("component:topic-progress", {
@@ -528,23 +530,25 @@ function initPlugin(api) {
       const stream = this.get("postStream.stream");
       const readPos = stream.indexOf(lastReadId) || 0;
       return readPos < stream.length - 1 && readPos > position;
-    }
+    },
   });
 
   api.modifyClass("component:topic-navigation", {
     _performCheckSize() {
-      if (!this.element || this.isDestroying || this.isDestroyed) return;
+      if (!this.element || this.isDestroying || this.isDestroyed) {
+        return;
+      }
 
       if (this.get("topic.qa_enabled")) {
         const info = this.get("info");
         info.setProperties({
           renderTimeline: false,
-          renderAdminMenuButton: true
+          renderAdminMenuButton: true,
         });
       } else {
         this._super(...arguments);
       }
-    }
+    },
   });
 
   api.reopenWidget("post", {
@@ -578,7 +582,7 @@ function initPlugin(api) {
           }
         });
       });
-    }
+    },
   });
 
   function renderParticipants(userFilters, participants) {
@@ -587,9 +591,9 @@ function initPlugin(api) {
     }
 
     userFilters = userFilters || [];
-    return participants.map(p => {
+    return participants.map((p) => {
       return this.attach("topic-participant", p, {
-        state: { toggled: userFilters.includes(p.username) }
+        state: { toggled: userFilters.includes(p.username) },
       });
     });
   }
@@ -613,10 +617,10 @@ function initPlugin(api) {
             avatarFor("tiny", {
               username: attrs.createdByUsername,
               template: attrs.createdByAvatarTemplate,
-              name: attrs.createdByName
+              name: attrs.createdByName,
             }),
-            dateNode(attrs.topicCreatedAt)
-          ])
+            dateNode(attrs.topicCreatedAt),
+          ]),
         ])
       );
 
@@ -632,10 +636,10 @@ function initPlugin(api) {
               avatarFor("tiny", {
                 username: attrs.last_answerer.username,
                 template: attrs.last_answerer.avatar_template,
-                name: attrs.last_answerer.name
+                name: attrs.last_answerer.name,
               }),
-              dateNode(attrs.last_answered_at)
-            ])
+              dateNode(attrs.last_answered_at),
+            ]),
           ])
         )
       );
@@ -646,21 +650,21 @@ function initPlugin(api) {
           h(
             "h4",
             I18n.t(`${postType}_lowercase`, { count: attrs.answer_count })
-          )
+          ),
         ])
       );
 
       contents.push(
         h("li.secondary", [
           numberNode(attrs.topicViews, { className: attrs.topicViewsHeat }),
-          h("h4", I18n.t("views_lowercase", { count: attrs.topicViews }))
+          h("h4", I18n.t("views_lowercase", { count: attrs.topicViews })),
         ])
       );
 
       contents.push(
         h("li.secondary", [
           numberNode(attrs.participantCount),
-          h("h4", I18n.t("users_lowercase", { count: attrs.participantCount }))
+          h("h4", I18n.t("users_lowercase", { count: attrs.participantCount })),
         ])
       );
 
@@ -668,7 +672,7 @@ function initPlugin(api) {
         contents.push(
           h("li.secondary", [
             numberNode(attrs.topicLikeCount),
-            h("h4", I18n.t("likes_lowercase", { count: attrs.topicLikeCount }))
+            h("h4", I18n.t("likes_lowercase", { count: attrs.topicLikeCount })),
           ])
         );
       }
@@ -677,7 +681,10 @@ function initPlugin(api) {
         contents.push(
           h("li.secondary", [
             numberNode(attrs.topicLinkLength),
-            h("h4", I18n.t("links_lowercase", { count: attrs.topicLinkLength }))
+            h(
+              "h4",
+              I18n.t("links_lowercase", { count: attrs.topicLinkLength })
+            ),
           ])
         );
       }
@@ -701,12 +708,12 @@ function initPlugin(api) {
           title: "topic.toggle_information",
           icon: state.collapsed ? "chevron-down" : "chevron-up",
           action: "toggleMap",
-          className: "btn"
+          className: "btn",
         })
       );
 
       return [nav, h("ul.clearfix", contents)];
-    }
+    },
   });
 
   api.reopenWidget("post-admin-menu", {
@@ -718,7 +725,7 @@ function initPlugin(api) {
           label: "qa.set_as_answer",
           action: "setAsAnswer",
           className: "popup-menu-button",
-          secondaryAction: "closeAdminMenu"
+          secondaryAction: "closeAdminMenu",
         };
 
         result.children.push(this.attach("post-admin-menu-button", button));
@@ -730,10 +737,10 @@ function initPlugin(api) {
     setAsAnswer() {
       const post = this.findAncestorModel();
 
-      setAsAnswer(post).then(result => {
+      setAsAnswer(post).then((result) => {
         location.reload();
       });
-    }
+    },
   });
 }
 
@@ -742,8 +749,10 @@ export default {
   initialize(container) {
     const siteSettings = container.lookup("site-settings:main");
 
-    if (!siteSettings.qa_enabled) return;
+    if (!siteSettings.qa_enabled) {
+      return;
+    }
 
     withPluginApi("0.8.12", initPlugin);
-  }
+  },
 };

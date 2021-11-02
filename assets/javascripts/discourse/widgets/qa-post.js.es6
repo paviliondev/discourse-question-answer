@@ -13,7 +13,7 @@ export default createWidget("qa-post", {
   html(attrs) {
     const contents = [
       this.attach("qa-button", { direction: "up" }),
-      h("div.count", `${attrs.count}`)
+      h("div.count", `${attrs.count}`),
     ];
     return contents;
   },
@@ -30,10 +30,10 @@ export default createWidget("qa-post", {
     let vote = {
       user_id: user.id,
       post_id: post.id,
-      direction
+      direction,
     };
 
-    castVote({ vote }).then(result => {
+    castVote({ vote }).then((result) => {
       if (result.success) {
         post.set("topic.qa_voted", true);
 
@@ -45,5 +45,5 @@ export default createWidget("qa-post", {
         }
       }
     });
-  }
+  },
 });

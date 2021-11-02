@@ -3,5 +3,5 @@ export default {
     if (!attrs.category.custom_fields) {
       attrs.category.custom_fields = {};
     }
-  }
+  },
 };

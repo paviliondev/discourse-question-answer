@@ -35,13 +35,16 @@
   margin: 0;
 }
 
-.time-gap + .topic-post.answer, .time-gap + .topic-post.comment {
-  .topic-avatar, .topic-body {
+.time-gap + .topic-post.answer,
+.time-gap + .topic-post.comment {
+  .topic-avatar,
+  .topic-body {
     border-top: 1px solid $primary-low;
   }
 }
 
-.topic-post.answer+.time-gap, .topic-post.comment+.time-gap {
+.topic-post.answer + .time-gap,
+.topic-post.comment + .time-gap {
   display: none;
 }
 
@@ -68,7 +71,8 @@ nav.post-controls button.comment {
     }
   }
 
-  &.comment, &.answer {
+  &.comment,
+  &.answer {
     .post-notice.new-user {
       display: none;
     }
@@ -85,7 +89,6 @@ nav.post-controls button.comment {
 }
 
 .vote-container {
-
   .vote-links {
     text-align: right;
 
@@ -121,7 +124,7 @@ nav.post-controls button.comment {
 
   .tip-details {
     background-color: dark-light-diff($primary, $secondary, 95%, -85%);
-    box-shadow: shadow('dropdown');
+    box-shadow: shadow("dropdown");
     padding: 10px 15px;
     position: absolute;
     top: 32px;
@@ -161,7 +164,8 @@ html.rtl {
   }
 
   .vote-container {
-    .voters, .vote-links {
+    .voters,
+    .vote-links {
       text-align: left;
     }
   }

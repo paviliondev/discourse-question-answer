@@ -11,7 +11,7 @@ export default Ember.Component.extend({
     const rawDetails = I18n.t(this.details, this.detailsOpts);
 
     if (rawDetails) {
-      cookAsync(rawDetails).then(cooked => {
+      cookAsync(rawDetails).then((cooked) => {
         this.set("cookedDetails", cooked);
       });
     }
@@ -33,6 +33,6 @@ export default Ember.Component.extend({
   actions: {
     toggleDetails() {
       this.toggleProperty("showDetails");
-    }
-  }
+    },
+  },
 });

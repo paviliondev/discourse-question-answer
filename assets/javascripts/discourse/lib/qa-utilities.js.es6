@@ -3,25 +3,25 @@ import { ajax } from "discourse/lib/ajax";
 
 const voteActionId = 100;
 
-const vote = function(type, data) {
+const vote = function (type, data) {
   return ajax("/qa/vote", {
     type,
-    data
+    data,
   }).catch(popupAjaxError);
 };
 
-const undoVote = function(data) {
+const undoVote = function (data) {
   return vote("DELETE", data);
 };
 
-const castVote = function(data) {
+const castVote = function (data) {
   return vote("POST", data);
 };
 
-const whoVoted = function(data) {
+const whoVoted = function (data) {
   return ajax("/qa/voters", {
     type: "GET",
-    data
+    data,
   }).catch(popupAjaxError);
 };
 
@@ -29,8 +29,8 @@ export function setAsAnswer(post) {
   return ajax("/qa/set_as_answer", {
     type: "POST",
     data: {
-      post_id: post.id
-    }
+      post_id: post.id,
+    },
   }).catch(popupAjaxError);
 }
 
