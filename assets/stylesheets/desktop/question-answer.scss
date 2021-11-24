@@ -1,49 +1,78 @@
-.qa-post {
-  padding-right: 20px;
+.qa-answer-count,
+.qa-comments-count {
+  padding: 1.5em;
+  font-size: 1.2em;
+  box-sizing: border-box;
 }
 
-.qa-post + article {
-  position: relative;
-  float: left;
-  width: calc(100% - 65px);
+.qa-comment {
+  width: $topic-body-width;
+  border-top: 1px solid var(--primary-low);
+
+  .qa-comment-post {
+    padding: 0.7em 0;
+
+    .qa-comment-post-info {
+      display: flex;
+      margin-bottom: 1em;
+
+      .qa-comment-post-info-created {
+        display: flex;
+
+        span {
+          flex: 0 0 auto;
+          margin-right: 0;
+          color: var(--primary-med-or-secondary-med);
+        }
+      }
+
+      .qa-comment-post-username {
+        display: flex;
+        margin-right: auto;
+      }
+    }
+  }
 }
 
-.topic-post.answer .topic-body {
-  width: 653px;
-}
+.qa-comment-link {
+  margin: 1em 0;
 
-.topic-post.comment {
-  padding-left: 110px;
-  max-width: 647px;
+  .qa-comment-seperator {
+    margin: 0 0.8em;
 
-  .topic-avatar {
-    width: 30px;
+    &::after {
+      content: "|";
+    }
   }
 
-  .topic-body {
-    width: calc(100% - 30px);
-    padding: 10px 0 10px 0;
+  .qa-comment-show-more {
+    display: inline;
+  }
 
-    .regular {
-      margin-top: 0;
+  .qa-comment-add {
+    display: inline;
+  }
+}
 
-      p {
-        margin: 0;
-      }
+.qa-button {
+  .d-icon {
+    margin-right: 0;
+  }
+}
 
-      nav.post-controls .actions button {
-        font-size: 0.9em;
-        padding: 6px 8px;
-      }
+.qa-post {
+  float: left;
+
+  .btn {
+    background: white;
+
+    &:hover {
+      background: dark-light-diff($primary, $secondary, 65%, -75%);
+      color: $secondary;
     }
+  }
 
-    .post-actions {
-      margin: 0;
-    }
-
-    .post-menu-area {
-      margin-top: 5px;
-      margin-bottom: 0;
-    }
+  .count {
+    text-align: center;
   }
 }

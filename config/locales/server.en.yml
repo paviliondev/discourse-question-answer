@@ -1,4 +1,9 @@
 en:
+  post:
+    qa:
+      errors:
+        depth: "Only one level of nesting allowed when replying to a post."
+
   site_settings:
     qa_tags: "Tags to enable QnA on topic"
     qa_show_topic_tip: "Show a tip about the mechanics of QnA topics under the titles of QnA topics"

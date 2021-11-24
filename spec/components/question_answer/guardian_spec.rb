@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../../plugin_helper'
+require 'rails_helper'
 
 describe QuestionAnswer::GuardianExtension do
   fab!(:user1) { Fabricate(:user) }

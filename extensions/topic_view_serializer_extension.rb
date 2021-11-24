@@ -5,32 +5,20 @@ module QuestionAnswer
     def self.included(base)
       base.attributes(
         :qa_enabled,
-        :qa_votes,
-        :qa_can_vote,
         :last_answered_at,
         :last_commented_on,
         :answer_count,
-        :comment_count,
         :last_answer_post_number,
-        :last_answerer,
-        :first_answer_id
+        :last_answerer
       )
-    end
-
-    def first_answer_id
-      object.topic.first_answer&.id
     end
 
     def qa_enabled
       object.qa_enabled
     end
 
-    def qa_votes
-      Topic.qa_votes(object.topic, scope.current_user)
-    end
-
-    def qa_can_vote
-      Topic.qa_can_vote(object.topic, scope.current_user)
+    def include_qa_enabled?
+      object.qa_enabled
     end
 
     def last_answered_at
@@ -54,14 +42,6 @@ module QuestionAnswer
     end
 
     def include_answer_count?
-      qa_enabled
-    end
-
-    def comment_count
-      object.topic.comment_count
-    end
-
-    def include_comment_count?
       qa_enabled
     end
 

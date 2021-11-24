@@ -16,8 +16,6 @@ after_initialize do
   %w(
     ../lib/question_answer/engine.rb
     ../lib/question_answer/vote.rb
-    ../lib/question_answer/voter.rb
-    ../extensions/category_custom_field_extension.rb
     ../extensions/category_extension.rb
     ../extensions/guardian_extension.rb
     ../extensions/post_action_type_extension.rb
@@ -26,15 +24,12 @@ after_initialize do
     ../extensions/post_serializer_extension.rb
     ../extensions/topic_extension.rb
     ../extensions/topic_list_item_serializer_extension.rb
-    ../extensions/topic_tag_extension.rb
     ../extensions/topic_view_extension.rb
     ../extensions/topic_view_serializer_extension.rb
     ../app/controllers/question_answer/votes_controller.rb
-    ../app/serializers/question_answer/voter_serializer.rb
+    ../app/models/question_answer_vote.rb
+    ../app/serializers/qa_comment_post_serializer.rb
     ../config/routes.rb
-    ../jobs/update_category_post_order.rb
-    ../jobs/update_topic_post_order.rb
-    ../jobs/qa_update_topics_post_order.rb
   ).each do |path|
     load File.expand_path(path, __FILE__)
   end
@@ -69,15 +64,10 @@ after_initialize do
   end
 
   class ::PostSerializer
-    attributes(
-      :qa_vote_count,
-      :qa_voted,
-      :qa_enabled,
-      :last_answerer,
-      :last_answered_at,
-      :answer_count,
-      :last_answer_post_number
-    )
+    attributes :qa_vote_count,
+               :qa_enabled,
+               :comments,
+               :comments_count
 
     prepend QuestionAnswer::PostSerializerExtension
   end
@@ -100,6 +90,9 @@ after_initialize do
   end
 
   class ::TopicView
+    attr_accessor :comments,
+                  :comments_counts
+
     prepend QuestionAnswer::TopicViewExtension
   end
 
@@ -115,29 +108,103 @@ after_initialize do
     include QuestionAnswer::CategoryExtension
   end
 
-  class ::CategoryCustomField
-    include QuestionAnswer::CategoryCustomFieldExtension
-  end
-
-  class ::TopicTag
-    include QuestionAnswer::TopicTagExtension
-  end
-
+  # TODO: Performance of the query degrades as the number of posts a user has voted
+  # on increases. We should probably keep a counter cache in the user's
+  # custom fields.
   add_to_class(:user, :vote_count) do
-    post_ids = posts.pluck(:id)
-
-    PostCustomField
-      .where(post_id: post_ids, name: 'vote_count')
-      .sum('value::int')
+    Post.where(user_id: self.id).sum(:qa_vote_count)
   end
 
   add_to_serializer(:user_card, :vote_count) do
     object.vote_count
   end
 
-  topic_view_post_custom_fields_allowlister do |user, topic|
-    if topic.qa_enabled
-      %w{"vote_count", "voted"}
+  add_to_class(:topic_view, :user_voted_posts) do |user|
+    @user_voted_posts ||= {}
+
+    @user_voted_posts[user.id] ||= begin
+      QuestionAnswerVote.where(user: user, post: @posts).distinct.pluck(:post_id)
     end
   end
+
+  add_to_class(:topic_view, :user_voted_posts_last_timestamp) do |user|
+    @user_voted_posts_last_timestamp ||= {}
+
+    @user_voted_posts_last_timestamp[user.id] ||= begin
+      QuestionAnswerVote
+        .where(user: user, post: @posts)
+        .group(:post_id, :created_at)
+        .pluck(:post_id, :created_at)
+    end
+  end
+
+  class ::User
+    has_many :question_answer_votes
+  end
+
+  TopicView.apply_custom_default_scope do |scope, topic_view|
+    if topic_view.topic.qa_enabled &&
+      !topic_view.instance_variable_get(:@replies_to_post_number) &&
+      !topic_view.instance_variable_get(:@post_ids)
+
+      scope
+        .unscope(:order)
+        .where(
+          reply_to_post_number: nil,
+          post_type: Post.types[:regular]
+        )
+        .order("CASE post_number WHEN 1 THEN 0 ELSE 1 END, qa_vote_count DESC, post_number ASC")
+    else
+      scope
+    end
+  end
+
+  TopicView.on_preload do |topic_view|
+    topic_view.comments = {}
+
+    post_ids = topic_view.posts.pluck(:id)
+
+    comment_post_ids_sql = <<~SQL
+    SELECT
+      post_replies.reply_post_id
+    FROM post_replies
+    INNER JOIN LATERAL (
+      SELECT 1
+      FROM (
+        SELECT
+          posts.id AS post_id
+        FROM posts
+        INNER JOIN post_replies pr2 ON posts.id = pr2.reply_post_id
+        WHERE pr2.post_id = post_replies.post_id
+        AND posts.post_type = #{Post.types[:regular].to_i}
+        ORDER BY posts.post_number ASC
+        LIMIT 2
+      ) X
+      WHERE X.post_id = post_replies.reply_post_id
+    ) Y ON true
+    WHERE post_replies.post_id IN (#{post_ids.join(",")})
+    SQL
+
+    Post.where("id IN (#{comment_post_ids_sql})").order(post_number: :asc).each do |post|
+      topic_view.comments[post.reply_to_post_number] ||= []
+      topic_view.comments[post.reply_to_post_number] << post
+    end
+
+    comments_counts_sql = <<~SQL
+    SELECT
+      post_replies.post_id,
+      COUNT(*) AS comments_count
+    FROM post_replies
+    WHERE post_replies.post_id IN (#{post_ids.join(",")})
+    GROUP BY post_replies.post_id
+    SQL
+
+    topic_view.comments_counts = {}
+
+    DB.query(comments_counts_sql).each do |result|
+      topic_view.comments_counts[result.post_id] = result.comments_count
+    end
+  end
+
+  SiteSetting.enable_filtered_replies_view = true
 end

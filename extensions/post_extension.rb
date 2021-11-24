@@ -4,56 +4,26 @@ module QuestionAnswer
   module PostExtension
     def self.included(base)
       base.ignored_columns = %w[vote_count]
-      base.after_create :qa_update_vote_order, if: :qa_enabled
-    end
 
-    def qa_vote_count(fields = custom_fields)
-      if vote_count = fields['vote_count']
-        [*vote_count].first.to_i
-      else
-        0
-      end
-    end
+      base.has_many :question_answer_votes
 
-    def qa_voted(fields = custom_fields)
-      if (voted = fields['voted']).present?
-        [*voted].map(&:to_i)
-      else
-        []
-      end
-    end
-
-    def qa_vote_history
-      if custom_fields['vote_history'].present?
-        [*custom_fields['vote_history']]
-      else
-        []
-      end
+      base.validate :ensure_valid_qa_comment
     end
 
     def qa_enabled
       ::Topic.qa_enabled(topic)
     end
 
-    def qa_update_vote_order
-      ::Topic.qa_update_vote_order(topic_id)
-    end
-
     def qa_last_voted(user_id)
-      user_votes = qa_vote_history.select do |v|
-        v['user_id'].to_i == user_id && v['action'] == 'create'
-      end
-
-      return unless user_votes.any?
-
-      user_votes
-        .max_by { |v| v['created_at'].to_datetime.to_i }['created_at']
-        .to_datetime
+      QuestionAnswerVote
+        .where(post_id: self.id, user_id: user_id)
+        .order(created_at: :desc)
+        .pluck_first(:created_at)
     end
 
     def qa_can_vote(user_id)
       SiteSetting.qa_tl_allow_multiple_votes_per_post ||
-        !qa_voted.include?(user_id)
+        !QuestionAnswerVote.exists?(post_id: self.id, user_id: user_id)
     end
 
     def comments
@@ -61,6 +31,18 @@ module QuestionAnswer
         .posts
         .where(reply_to_post_number: self.post_number)
         .order('post_number ASC')
+    end
+
+    private
+
+    def ensure_valid_qa_comment
+      if will_save_change_to_reply_to_post_number? &&
+          reply_to_post_number &&
+          !Post.exists?(topic_id: topic_id, reply_to_post_number: nil, post_number: reply_to_post_number) &&
+          qa_enabled
+
+        errors.add(:base, I18n.t("post.qa.errors.depth"))
+      end
     end
   end
 end

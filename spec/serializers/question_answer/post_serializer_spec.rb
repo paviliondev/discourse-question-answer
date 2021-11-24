@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../../plugin_helper'
+require 'rails_helper'
 
 describe QuestionAnswer::PostSerializerExtension do
   fab!(:user) { Fabricate(:user) }
@@ -34,8 +34,6 @@ describe QuestionAnswer::PostSerializerExtension do
   let(:dependent_keys) do
     %i[last_answerer last_answered_at answer_count last_answer_post_number]
   end
-
-  let(:obj_keys) { %i[qa_vote_count qa_voted qa_enabled] }
 
   context 'qa enabled' do
     before do
@@ -93,21 +91,12 @@ describe QuestionAnswer::PostSerializerExtension do
     end
 
     it 'should return correct value from post' do
-      obj_keys.each do |k|
-        expect(create_serializer.call[k]).to eq(post.public_send(k))
-      end
-    end
+      QuestionAnswer::Vote.vote(post, user, { direction: up, action: create })
 
-    it 'should return correct value from topic' do
-      serializer = create_serializer.call
+      serialized = PostSerializer.new(post, scope: guardian, root: false).as_json
 
-      expect(serializer[:last_answerer][:id]).to eq(post.user.id)
-      expect(serializer[:last_answerer][:username]).to eq(post.user.username)
-      expect(serializer[:last_answerer][:name]).to eq(post.user.name)
-      expect(serializer[:last_answerer][:avatar_template]).to eq(post.user.avatar_template)
-      expect(serializer[:last_answerer_at]).to eq(nil)
-      expect(serializer[:answer_count]).to eq(0)
-      expect(serializer[:last_answer_post_number]).to eq(1)
+      expect(serialized[:qa_vote_count]).to eq(1)
+      expect(serialized[:qa_enabled]).to eq(true)
     end
   end
 

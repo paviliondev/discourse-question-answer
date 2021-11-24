@@ -5,16 +5,21 @@ module QuestionAnswer
     def actions_summary
       summaries = super.reject { |s| s[:id] == PostActionType.types[:vote] }
 
-      return summaries unless object.qa_enabled
+      return summaries unless self.qa_enabled
 
       user = scope.current_user
       summary = {
         id: PostActionType.types[:vote],
-        count: self.qa_vote_count
+        count: object.qa_vote_count
       }
 
       if user
-        voted = self.qa_voted.include?(user.id)
+        voted =
+          if @topic_view
+            @topic_view.user_voted_posts(user).include?(object.id)
+          else
+            QuestionAnswerVote.exists?(post_id: object.id, user_id: user.id)
+          end
 
         if voted
           summary[:acted] = true
@@ -33,52 +38,45 @@ module QuestionAnswer
       end
     end
 
-    def qa_vote_count
-      object.qa_vote_count(post_custom_fields)
+    def comments
+      (@topic_view.comments[object.post_number] || []).map do |post|
+        QaCommentPostSerializer.new(post, scope: scope, root:false).as_json
+      end
     end
 
-    def qa_voted
-      object.qa_voted(post_custom_fields)
+    def include_comments?
+      @topic_view && qa_enabled
     end
+
+    def comments_count
+      @topic_view.comments_counts&.dig(object.id) || 0
+    end
+
+    def include_comments_count?
+      @topic_view && qa_enabled
+    end
+
+    def qa_disable_like
+      return true if SiteSetting.qa_disable_like_on_answers
+      return !!category.qa_disable_like_on_questions if object.post_number == 1
+      return !!category.qa_disable_like_on_comments if object.reply_to_post_number
+      retrun !!category.qa_disable_like_on_answers
+    end
+
+    alias_method :include_qa_disable_like?, :include_comments?
 
     def qa_enabled
-      object.qa_enabled
+      @topic_view ? @topic_view.qa_enabled : object.qa_enabled
     end
 
-    def last_answerer
-      BasicUserSerializer.new(
-        object.topic.last_answerer,
-        scope: scope,
-        root: false
-      ).as_json
+    private
+
+    def topic
+      @topic_view ? @topic_view.topic : object.topic
     end
 
-    def include_last_answerer?
-      object.qa_enabled
-    end
-
-    def last_answered_at
-      object.topic.last_answered_at
-    end
-
-    def include_last_answered_at?
-      object.qa_enabled
-    end
-
-    def answer_count
-      object.topic.answer_count
-    end
-
-    def include_answer_count?
-      object.qa_enabled
-    end
-
-    def last_answer_post_number
-      object.topic.last_answer_post_number
-    end
-
-    def include_last_answer_post_number?
-      object.qa_enabled
+    def category
+      topic.category
     end
   end
 end

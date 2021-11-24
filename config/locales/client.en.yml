@@ -43,8 +43,8 @@ en:
         title: 'Comment'
         help: 'begin composing a comment on this answer'
         show_comments:
-          all: 'show {{count}} comments'
-          more: 'show {{count}} more comments'
+          all: 'show <b>{{count}}</b> comments'
+          more: 'show <b>{{count}}</b> more comments'
 
       tip:
         qa:
@@ -77,5 +77,11 @@ en:
       one: entry
       other: entries
     qa:
+      post:
+        add_comment: "Add a comment"
+        show_comment:
+          one: Show %{count} more comment
+          other: Show %{count} more comments
       answer_count: "{{answerCount}} Answers"
+      comments_count: "{{commentsCount}} Comments"
       set_as_answer: "Move to Answers"

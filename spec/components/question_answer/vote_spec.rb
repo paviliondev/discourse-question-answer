@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../../plugin_helper'
+require 'rails_helper'
 
 describe QuestionAnswer::Vote do
   fab!(:user)  { Fabricate(:user) }
@@ -41,11 +41,9 @@ describe QuestionAnswer::Vote do
   it 'should save vote changes to vote history' do
     QuestionAnswer::Vote.vote(post, user, vote_args)
 
-    vote_history = post.qa_vote_history
+    vote = post.question_answer_votes.last
 
-    expect(vote_history[0]['direction']).to eq('up')
-    expect(vote_history[0]['action']).to eq('create')
-    expect(vote_history[0]['user_id']).to eq(user.id)
+    expect(vote.user_id).to eq(user.id)
   end
 
   it 'should return the correct undo window' do

@@ -17,23 +17,7 @@ module QuestionAnswer
       @answers ||= begin
         posts
           .where(reply_to_post_number: nil)
-          .order('created_at ASC')
-      end
-    end
-
-    def first_answer
-      posts
-        .where(reply_to_post_number: nil)
-        .where.not(post_number: 1)
-        .order('sort_order')
-        .first
-    end
-
-    def comments
-      @comments ||= begin
-        posts
-          .where.not(reply_to_post_number: nil)
-          .order('created_at ASC')
+          .order(post_number: :asc)
       end
     end
 
@@ -41,15 +25,20 @@ module QuestionAnswer
       answers.count - 1 ## minus first post
     end
 
-    def comment_count
-      comments.count
-    end
-
     def last_answered_at
       return unless answers.any?
 
       answers.last[:created_at]
     end
+
+    def comments
+      @comments ||= begin
+        posts
+          .where.not(reply_to_post_number: nil)
+          .order(post_number: :asc)
+      end
+    end
+
 
     def last_commented_on
       return unless comments.any?
@@ -78,7 +67,7 @@ module QuestionAnswer
       def qa_can_vote(topic, user)
         return false if user.blank? || !SiteSetting.qa_enabled
 
-        topic_vote_count = qa_votes(topic, user).length
+        topic_vote_count = qa_votes(topic, user).count
 
         if topic_vote_count.positive? && !SiteSetting.qa_trust_level_vote_limits
           return false
@@ -96,9 +85,12 @@ module QuestionAnswer
       def qa_votes(topic, user)
         return nil if !user || !SiteSetting.qa_enabled
 
-        PostCustomField.where(post_id: topic.posts.map(&:id),
-                              name: 'voted',
-                              value: user.id).pluck(:post_id)
+        # This is a very inefficient way since the performance degrades as the
+        # number of voted posts in the topic increases.
+        QuestionAnswerVote
+          .joins(:post)
+          .where(user: user)
+          .where("posts.topic_id = ?", topic.id)
       end
 
       def qa_enabled(topic)
@@ -117,50 +109,6 @@ module QuestionAnswer
         is_qa_subtype = topic.subtype == 'question'
 
         has_qa_tag || is_qa_category || is_qa_subtype
-      end
-
-      def qa_update_vote_order(topic_id)
-        return unless SiteSetting.qa_enabled
-
-        posts = Post.where(topic_id: topic_id)
-        op = posts.find_by(post_number: 1)
-
-        op.update(sort_order: 1)
-
-        count = 2
-
-        # OP comments
-        op.comments.each do |c|
-          c.update(sort_order: count)
-          count += 1
-        end
-
-        answers = begin
-          posts
-            .where(reply_to_post_number: nil)
-            .where.not(post_number: 1)
-            .order("(
-              SELECT COALESCE ((
-                SELECT value::integer FROM post_custom_fields
-                WHERE post_id = posts.id AND name = 'vote_count'
-              ), 0)
-            ) DESC, post_number ASC")
-        end
-
-        answers.each do |a|
-          a.update(sort_order: count)
-
-          comments = a.comments
-
-          if comments.any?
-            comments.each do |c|
-              count += 1
-              c.update(sort_order: count)
-            end
-          end
-
-          count += 1
-        end
       end
     end
   end

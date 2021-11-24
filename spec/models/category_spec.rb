@@ -1,21 +1,10 @@
 # frozen_string_literal: true
 
-require_relative '../../plugin_helper'
+require 'rails_helper'
 
-describe QuestionAnswer::CategoryCustomFieldExtension do
-  it 'should call callback correctly' do
-    custom_field = CategoryCustomField.new(name: 'qa_enabled')
-
-    expect(custom_field.qa_enabled_changed).to eq(true)
-
-    custom_field.name = 'random_name'
-
-    expect(custom_field.qa_enabled_changed).to eq(false)
-  end
-end
-
-describe QuestionAnswer::CategoryExtension do
+describe Category do
   fab!(:category) { Fabricate(:category) }
+
   let(:fields) do
     %w[
       qa_enabled

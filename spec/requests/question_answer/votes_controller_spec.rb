@@ -1,109 +1,67 @@
 # frozen_string_literal: true
 
-require_relative '../../plugin_helper'
+require 'rails_helper'
 
 RSpec.describe QuestionAnswer::VotesController do
   fab!(:tag) { Fabricate(:tag) }
   fab!(:topic) { Fabricate(:topic, tags: [tag]) }
   fab!(:qa_post) { Fabricate(:post, topic: topic) } # don't set this as :post
   fab!(:qa_user) { Fabricate(:user) }
-  fab!(:qa_answer) { Fabricate(:post, topic: topic, reply_to_post_number: qa_post.post_number) }
-  fab!(:admin) { Fabricate(:admin) }
 
-  let(:vote_params) do
-    {
-      vote: {
-        post_id: qa_post.id,
-        user_id: qa_user.id,
-        direction: QuestionAnswer::Vote::UP
-      }
-    }
+  fab!(:qa_answer) do
+    create_post(
+      raw: "some raw here",
+      topic_id: topic.id,
+      reply_to_post_number: qa_post.post_number
+    )
   end
-  let(:get_voters) do
-    ->(params = nil) { get '/qa/voters.json', params: params || vote_params }
-  end
-  let(:create_vote) do
-    ->(params = nil) { post '/qa/vote.json', params: params || vote_params }
-  end
-  let(:delete_vote) do
-    ->(params = nil) { delete '/qa/vote.json', params: params || vote_params }
-  end
-  let(:set_as_answer) do
-    ->(post_id) { post '/qa/set_as_answer.json', params: { post_id: post_id } }
-  end
+
+  fab!(:admin) { Fabricate(:admin) }
+  fab!(:category) { Fabricate(:category) }
 
   before do
     SiteSetting.qa_enabled = true
     SiteSetting.qa_tags = tag.name
   end
 
-  describe '#ensure_logged_in' do
-    it 'should return 403 when not logged in' do
-      get_voters.call
-
-      expect(response.status).to eq(403)
-    end
-  end
-
-  context '#find_vote_post' do
-    before { sign_in(qa_user) }
-
-    it 'should find post by post_id param' do
-      get_voters.call post_id: qa_post.id
-
-      expect(response.status).to eq(200)
-    end
-
-    it 'should find post by vote.post_id param' do
-      get_voters.call
-
-      expect(response.status).to eq(200)
-    end
-
-    it 'should return 404 if no post found' do
-      get_voters.call post_id: qa_post.id + 1000
-
-      expect(response.status).to eq(404)
-    end
-  end
-
-  describe '#find_vote_user' do
-    before { sign_in(qa_user) }
-
-    it 'should return 404 if user not found' do
-      vote_params[:vote][:user_id] += 1000
-
-      create_vote.call
-
-      expect(response.status).to eq(404)
-    end
-  end
-
-  describe '#ensure_qa_enabled' do
-    it 'should return 403 if plugin disabled' do
-      SiteSetting.qa_enabled = false
-
-      sign_in(qa_user)
-      create_vote.call
-
-      expect(response.status).to eq(403)
-    end
-  end
-
   describe '#create' do
     before { sign_in(qa_user) }
 
+    it 'returns the right response when user does not have access to post' do
+      topic.update!(category: category)
+      category.update!(read_restricted: true)
+
+      post '/qa/vote.json', params: { post_id: qa_post.id }
+
+      expect(response.status).to eq(403)
+    end
+
+    it 'should return the right response if plugin is disabled' do
+      SiteSetting.qa_enabled = false
+
+      post '/qa/vote.json', params: { post_id: qa_post.id }
+
+      expect(response.status).to eq(403)
+    end
+
     it 'should success if never voted' do
-      create_vote.call
+      post '/qa/vote.json', params: { post_id: qa_post.id }
 
       expect(response.status).to eq(200)
+
+      vote = qa_post.question_answer_votes.first
+
+      expect(vote.post_id).to eq(qa_post.id)
+      expect(vote.user_id).to eq(qa_user.id)
     end
 
     it 'should error if already voted' do
-      create_vote.call
+      post '/qa/vote.json', params: { post_id: qa_post.id }
+
       expect(response.status).to eq(200)
 
-      create_vote.call
+      post '/qa/vote.json', params: { post_id: qa_post.id }
+
       expect(response.status).to eq(403)
     end
   end
@@ -112,28 +70,36 @@ RSpec.describe QuestionAnswer::VotesController do
     before { sign_in(qa_user) }
 
     it 'should success if has voted' do
-      create_vote.call
-      delete_vote.call
+      post '/qa/vote.json', params: { post_id: qa_post.id }
 
       expect(response.status).to eq(200)
+
+      vote = qa_post.question_answer_votes.first
+
+      expect(vote.post_id).to eq(qa_post.id)
+      expect(vote.user_id).to eq(qa_user.id)
+
+      delete '/qa/vote.json', params: { post_id: qa_post.id }
+
+      expect(response.status).to eq(200)
+      expect(QuestionAnswerVote.exists?(id: vote.id)).to eq(false)
     end
 
-    it 'should error if never voted' do
-      delete_vote.call
+    it 'should return the right response if user has never voted on post' do
+      delete '/qa/vote.json', params: { post_id: qa_post.id }
 
       expect(response.status).to eq(403)
     end
 
     it 'should cant undo vote' do
-      # this takes 1 minute just to sleep
-      if ENV['QA_TEST_UNDO_VOTE']
-        SiteSetting.qa_undo_vote_action_window = 1
+      SiteSetting.qa_undo_vote_action_window = 1
 
-        create_vote.call
+      post "/qa/vote.json", params: { post_id: qa_post.id }
 
-        sleep 65
+      expect(response.status).to eq(200)
 
-        delete_vote.call
+      freeze_time 2.minutes.from_now do
+        delete '/qa/vote.json', params: { post_id: qa_post.id }
 
         expect(response.status).to eq(403)
 
@@ -147,14 +113,25 @@ RSpec.describe QuestionAnswer::VotesController do
   describe '#voters' do
     before { sign_in(qa_user) }
 
+    it 'should return the right response if post does not exist' do
+      get '/qa/voters.json', params: { post_id: -1 }
+
+      expect(response.status).to eq(404)
+    end
+
     it 'should return correct users' do
-      create_vote.call
-      get_voters.call
+      post '/qa/vote.json', params: { post_id: qa_post.id }
+
+      expect(response.status).to eq(200)
+
+      get '/qa/voters.json', params: { post_id: qa_post.id }
+
+      expect(response.status).to eq(200)
 
       parsed = JSON.parse(response.body)
-      users = parsed['voters'].map { |u| u['id'] }
 
-      expect(users.include?(qa_user.id)).to eq(true)
+      expect(parsed['voters'].map { |u| u['id'] })
+        .to contain_exactly(qa_user.id)
     end
   end
 
@@ -163,13 +140,11 @@ RSpec.describe QuestionAnswer::VotesController do
       before { sign_in(admin) }
 
       it "should set comment as an answer" do
-        expect(qa_answer.reply_to_post_number).to_not eq(nil)
+        post '/qa/set_as_answer.json', params: { post_id: qa_answer.id }
 
-        set_as_answer.call(qa_answer.id)
-
-        qa_answer.reload
-
-        expect(qa_answer.reply_to_post_number).to eq(nil)
+        expect(response.status).to eq(200)
+        expect(qa_answer.reload.reply_to_post_number).to eq(nil)
+        expect(PostReply.exists?(reply_post_id: qa_answer.id)).to eq(false)
       end
     end
 
@@ -177,7 +152,7 @@ RSpec.describe QuestionAnswer::VotesController do
       before { sign_in(qa_user) }
 
       it 'should return 403' do
-        set_as_answer.call(qa_answer.id)
+        post '/qa/set_as_answer.json', params: { post_id: qa_answer.id }
 
         expect(response.status).to eq(403)
       end

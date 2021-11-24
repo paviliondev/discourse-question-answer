@@ -4,12 +4,12 @@ module QuestionAnswer
   class VotesController < ::ApplicationController
     before_action :ensure_logged_in
     before_action :find_vote_post
-    before_action :find_vote_user, only: [:create, :destroy]
+    before_action :ensure_can_see_post
     before_action :ensure_qa_enabled, only: [:create, :destroy]
     before_action :ensure_staff, only: [:set_as_answer]
 
     def create
-      unless Topic.qa_can_vote(@post.topic, @user)
+      unless Topic.qa_can_vote(@post.topic, current_user)
         raise Discourse::InvalidAccess.new(
           nil,
           nil,
@@ -17,7 +17,7 @@ module QuestionAnswer
         )
       end
 
-      unless @post.qa_can_vote(@user.id)
+      unless @post.qa_can_vote(current_user.id)
         raise Discourse::InvalidAccess.new(
           nil,
           nil,
@@ -25,10 +25,10 @@ module QuestionAnswer
         )
       end
 
-      if QuestionAnswer::Vote.vote(@post, @user, vote_args)
+      if QuestionAnswer::Vote.vote(@post, current_user, direction: 'up', action: 'create')
         render json: success_json.merge(
-          qa_votes: Topic.qa_votes(@post.topic, @user),
-          qa_can_vote: Topic.qa_can_vote(@post.topic, @user)
+          qa_votes: Topic.qa_votes(@post.topic, current_user).pluck(:post_id),
+          qa_can_vote: Topic.qa_can_vote(@post.topic, current_user)
         )
       else
         render json: failed_json, status: 422
@@ -36,7 +36,7 @@ module QuestionAnswer
     end
 
     def destroy
-      if Topic.qa_votes(@post.topic, @user).length.zero?
+      if !Topic.qa_votes(@post.topic, current_user).exists?
         raise Discourse::InvalidAccess.new(
           nil,
           nil,
@@ -44,7 +44,7 @@ module QuestionAnswer
         )
       end
 
-      if !QuestionAnswer::Vote.can_undo(@post, @user)
+      if !QuestionAnswer::Vote.can_undo(@post, current_user)
         window = SiteSetting.qa_undo_vote_action_window
         msg = I18n.t('vote.error.undo_vote_action_window', minutes: window)
 
@@ -53,10 +53,10 @@ module QuestionAnswer
         return
       end
 
-      if QuestionAnswer::Vote.vote(@post, @user, vote_args)
+      if QuestionAnswer::Vote.vote(@post, current_user, direction: 'up', action: 'destroy')
         render json: success_json.merge(
-          qa_votes: Topic.qa_votes(@post.topic, @user),
-          qa_can_vote: Topic.qa_can_vote(@post.topic, @user)
+          qa_votes: Topic.qa_votes(@post.topic, current_user),
+          qa_can_vote: Topic.qa_can_vote(@post.topic, current_user)
         )
       else
         render json: failed_json, status: 422
@@ -64,27 +64,23 @@ module QuestionAnswer
     end
 
     def set_as_answer
-      @post.reply_to_post_number = nil
-
-      @post.save!
-      Topic.qa_update_vote_order(@post.topic)
+      Post.transaction do
+        @post.update!(reply_to_post_number: nil)
+        PostReply.where(reply_post_id: @post.id).delete_all
+      end
 
       render json: success_json
     end
 
     def voters
-      voters = []
-
-      if @post.qa_voted.any?
-        @post.qa_voted.each do |user_id|
-          if (user = User.find_by(id: user_id))
-            voters.push(QuestionAnswer::Voter.new(user))
-          end
-        end
-      end
+      # TODO: Need to paginate
+      # TODO: Probably a site setting to hide/show voters
+      voters = User
+        .joins(:question_answer_votes)
+        .where(question_answer_votes: { post_id: @post.id })
 
       render_json_dump(
-        voters: serialize_data(voters, QuestionAnswer::VoterSerializer)
+        voters: serialize_data(voters, BasicUserSerializer)
       )
     end
 
@@ -114,10 +110,8 @@ module QuestionAnswer
       raise Discourse::NotFound unless @post
     end
 
-    def find_vote_user
-      @user = User.find_by(id: vote_params[:user_id])
-
-      raise Discourse::NotFound unless @user
+    def ensure_can_see_post
+      @guardian.ensure_can_see!(@post)
     end
 
     def ensure_qa_enabled
