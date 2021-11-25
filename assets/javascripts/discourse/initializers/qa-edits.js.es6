@@ -13,7 +13,6 @@ import PostsWithPlaceholders from "discourse/lib/posts-with-placeholders";
 import { next } from "@ember/runloop";
 
 function initPlugin(api) {
-  const store = api.container.lookup("store:main");
   const currentUser = api.getCurrentUser();
 
   api.reopenWidget("post-menu", {
@@ -161,7 +160,7 @@ function initPlugin(api) {
         } else {
           attrs.posts = PostsWithPlaceholders.create({
             posts: postArray,
-            store
+            store: this.store
           });
         }
       }
