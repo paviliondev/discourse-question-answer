@@ -31,34 +31,44 @@ function initPlugin(api) {
     const result = [];
     const post = helper.getModel();
 
-    if (post.qa_enabled && post.id === post.topic.postStream.stream[1]) {
+    if (post.qa_enabled) {
       const topicController = helper.widget.register.lookup("controller:topic");
 
-      if (topicController.replies_to_post_number) {
-        const commentsCount = post.topic
-          .get("postStream")
-          .postForPostNumber(
-            parseInt(topicController.replies_to_post_number, 10)
-          ).comments_count;
+      const positionInStream =
+        topicController.replies_to_post_number &&
+        parseInt(topicController.replies_to_post_number, 10) !== 1
+          ? 2
+          : 1;
 
-        if (commentsCount > 0) {
-          result.push(
-            helper.h(
-              "div.qa-comments-count.small-action",
-              I18n.t("qa.comments_count", { commentsCount })
-            )
-          );
-        }
-      } else {
-        const answerCount = post.topic.answer_count;
+      console.log(positionInStream);
 
-        if (answerCount > 0) {
-          result.push(
-            helper.h(
-              "div.qa-answer-count.small-action",
-              I18n.t("qa.answer_count", { answerCount })
-            )
-          );
+      if (post.id === post.topic.postStream.stream[positionInStream]) {
+        if (topicController.replies_to_post_number) {
+          const commentsCount = post.topic
+            .get("postStream")
+            .postForPostNumber(
+              parseInt(topicController.replies_to_post_number, 10)
+            ).comments_count;
+
+          if (commentsCount > 0) {
+            result.push(
+              helper.h(
+                "div.qa-comments-count.small-action",
+                I18n.t("qa.comments_count", { commentsCount })
+              )
+            );
+          }
+        } else {
+          const answerCount = post.topic.answer_count;
+
+          if (answerCount > 0) {
+            result.push(
+              helper.h(
+                "div.qa-answer-count.small-action",
+                I18n.t("qa.answer_count", { answerCount })
+              )
+            );
+          }
         }
       }
     }
