@@ -4,18 +4,11 @@ import discourseComputed, {
   observes,
   on,
 } from "discourse-common/utils/decorators";
-import { h } from "virtual-dom";
-import { avatarFor } from "discourse/widgets/post";
-import { dateNode, numberNode } from "discourse/helpers/node";
 import { REPLY } from "discourse/models/composer";
-import { setAsAnswer, undoVote, whoVoted } from "../lib/qa-utilities";
-import { smallUserAtts } from "discourse/widgets/actions-summary";
-import PostsWithPlaceholders from "discourse/lib/posts-with-placeholders";
+import { setAsAnswer } from "../lib/qa-utilities";
 import { next } from "@ember/runloop";
-import Post from "discourse/models/post";
 
 function initPlugin(api) {
-  const store = api.container.lookup("store:main");
   const currentUser = api.getCurrentUser();
   const pluginId = "discourse-question-answer";
 
@@ -39,8 +32,6 @@ function initPlugin(api) {
         parseInt(topicController.replies_to_post_number, 10) !== 1
           ? 2
           : 1;
-
-      console.log(positionInStream);
 
       if (post.id === post.topic.postStream.stream[positionInStream]) {
         if (topicController.replies_to_post_number) {
@@ -176,9 +167,9 @@ function initPlugin(api) {
   api.includePostAttributes(
     "qa_enabled",
     "topicUserId",
-    "oneToMany",
     "comments",
-    "qa_disable_like"
+    "qa_disable_like",
+    "qa_user_voted_direction"
   );
 
   api.addPostClassesCallback((attrs) => {
@@ -188,13 +179,8 @@ function initPlugin(api) {
   });
 
   api.addPostMenuButton("answer", (attrs) => {
-    if (
-      attrs.canCreatePost &&
-      attrs.qa_enabled &&
-      attrs.firstPost &&
-      (!attrs.oneToMany || attrs.topicUserId === currentUser.id)
-    ) {
-      let postType = attrs.oneToMany ? "one_to_many" : "answer";
+    if (attrs.canCreatePost && attrs.qa_enabled && attrs.firstPost) {
+      let postType = "answer";
 
       let args = {
         action: "replyToPost",
@@ -210,27 +196,6 @@ function initPlugin(api) {
       return args;
     }
   });
-
-  // api.addPostMenuButton("comment", (attrs) => {
-  //   if (
-  //     attrs.canCreatePost &&
-  //     attrs.qa_enabled &&
-  //     !attrs.reply_to_post_number
-  //   ) {
-  //     let args = {
-  //       action: "openCommentCompose",
-  //       title: "topic.comment.help",
-  //       icon: "comment",
-  //       className: "comment create fade-out",
-  //     };
-  //
-  //     if (!attrs.mobileView) {
-  //       args.label = "topic.comment.title";
-  //     }
-  //
-  //     return args;
-  //   }
-  // });
 
   api.modifyClass("component:composer-actions", {
     pluginId: pluginId,
@@ -295,116 +260,6 @@ function initPlugin(api) {
     },
   });
 
-  api.reopenWidget("post-body", {
-    buildKey: (attrs) => `post-body-${attrs.id}`,
-
-    defaultState(attrs) {
-      let state = this._super(...arguments);
-      if (attrs.qa_enabled) {
-        state = $.extend({}, state, { voters: [] });
-      }
-      return state;
-    },
-
-    html(attrs, state) {
-      let contents = this._super(...arguments);
-
-      const model = this.findAncestorModel();
-      let action = model.actionByName["vote"];
-
-      if (action && attrs.qa_enabled) {
-        let voteLinks = [];
-
-        attrs.actionsSummary = attrs.actionsSummary.filter(
-          (as) => as.action !== "vote"
-        );
-
-        if (action.acted && action.can_undo) {
-          voteLinks.push(
-            this.attach("link", {
-              action: "undoUserVote",
-              rawLabel: I18n.t("post.actions.undo.vote"),
-            })
-          );
-        }
-
-        // if (action.count > 0) {
-        //   voteLinks.push(
-        //     this.attach("link", {
-        //       action: "toggleWhoVoted",
-        //       rawLabel: `${action.count} ${I18n.t("post.actions.people.vote")}`,
-        //     })
-        //   );
-        // }
-        //
-        // if (voteLinks.length) {
-        //   let voteContents = [h("div.vote-links", voteLinks)];
-        //
-        //   if (state.voters.length) {
-        //     voteContents.push(
-        //       this.attach("small-user-list", {
-        //         users: state.voters,
-        //         listClassName: "voters",
-        //       })
-        //     );
-        //   }
-        //
-        //   let actionSummaryIndex = contents
-        //     .map((w) => w && w.name)
-        //     .indexOf("actions-summary");
-        //   let insertAt = actionSummaryIndex + 1;
-        //
-        //   contents.splice(
-        //     insertAt - 1,
-        //     0,
-        //     h("div.vote-container", voteContents)
-        //   );
-        // }
-      }
-
-      return contents;
-    },
-
-    undoUserVote() {
-      const post = this.findAncestorModel();
-      const user = this.currentUser;
-      const vote = {
-        user_id: user.id,
-        post_id: post.id,
-        direction: "up",
-      };
-
-      undoVote({ vote }).then((result) => {
-        if (result.success) {
-          post.set("topic.voted", false);
-        }
-      });
-    },
-
-    toggleWhoVoted() {
-      const state = this.state;
-      if (state.voters.length) {
-        state.voters = [];
-      } else {
-        return this.getWhoVoted();
-      }
-    },
-
-    getWhoVoted() {
-      const { attrs, state } = this;
-      const post = {
-        post_id: attrs.id,
-      };
-
-      whoVoted(post).then((result) => {
-        if (result.voters) {
-          state.voters = result.voters.map(smallUserAtts);
-          this.scheduleRerender();
-        }
-      });
-    },
-  });
-
   api.modifyClass("model:topic", {
     pluginId: pluginId,
 
@@ -444,138 +299,6 @@ function initPlugin(api) {
     },
   });
 
-  function renderParticipants(userFilters, participants) {
-    if (!participants) {
-      return;
-    }
-
-    userFilters = userFilters || [];
-    return participants.map((p) => {
-      return this.attach("topic-participant", p, {
-        state: { toggled: userFilters.includes(p.username) },
-      });
-    });
-  }
-
-  // Disable this function override and figure out how we can extend this in core
-  // api.reopenWidget("topic-map-summary", {
-  //   html(attrs, state) {
-  //     if (attrs.qa_enabled) {
-  //       return this.qaMap(attrs, state);
-  //     } else {
-  //       return this._super(attrs, state);
-  //     }
-  //   },
-  //
-  //   qaMap(attrs, state) {
-  //     const contents = [];
-  //
-  //     contents.push(
-  //       h("li", [
-  //         h("h4", I18n.t("created_lowercase")),
-  //         h("div.topic-map-post.created-at", [
-  //           avatarFor("tiny", {
-  //             username: attrs.createdByUsername,
-  //             template: attrs.createdByAvatarTemplate,
-  //             name: attrs.createdByName,
-  //           }),
-  //           dateNode(attrs.topicCreatedAt),
-  //         ]),
-  //       ])
-  //     );
-  //
-  //     let lastAnswerUrl = attrs.topicUrl + "/" + attrs.last_answer_post_number;
-  //     let postType = attrs.oneToMany ? "one_to_many" : "answer";
-  //
-  //     contents.push(
-  //       h(
-  //         "li",
-  //         h("a", { attributes: { href: lastAnswerUrl } }, [
-  //           h("h4", I18n.t(`last_${postType}_lowercase`)),
-  //           h("div.topic-map-post.last-answer", [
-  //             avatarFor("tiny", {
-  //               username: attrs.last_answerer.username,
-  //               template: attrs.last_answerer.avatar_template,
-  //               name: attrs.last_answerer.name,
-  //             }),
-  //             dateNode(attrs.last_answered_at),
-  //           ]),
-  //         ])
-  //       )
-  //     );
-  //
-  //     contents.push(
-  //       h("li", [
-  //         numberNode(attrs.answer_count),
-  //         h(
-  //           "h4",
-  //           I18n.t(`${postType}_lowercase`, { count: attrs.answer_count })
-  //         ),
-  //       ])
-  //     );
-  //
-  //     contents.push(
-  //       h("li.secondary", [
-  //         numberNode(attrs.topicViews, { className: attrs.topicViewsHeat }),
-  //         h("h4", I18n.t("views_lowercase", { count: attrs.topicViews })),
-  //       ])
-  //     );
-  //
-  //     contents.push(
-  //       h("li.secondary", [
-  //         numberNode(attrs.participantCount),
-  //         h("h4", I18n.t("users_lowercase", { count: attrs.participantCount })),
-  //       ])
-  //     );
-  //
-  //     if (attrs.topicLikeCount) {
-  //       contents.push(
-  //         h("li.secondary", [
-  //           numberNode(attrs.topicLikeCount),
-  //           h("h4", I18n.t("likes_lowercase", { count: attrs.topicLikeCount })),
-  //         ])
-  //       );
-  //     }
-  //
-  //     if (attrs.topicLinkLength > 0) {
-  //       contents.push(
-  //         h("li.secondary", [
-  //           numberNode(attrs.topicLinkLength),
-  //           h(
-  //             "h4",
-  //             I18n.t("links_lowercase", { count: attrs.topicLinkLength })
-  //           ),
-  //         ])
-  //       );
-  //     }
-  //
-  //     if (
-  //       state.collapsed &&
-  //       attrs.topicPostsCount > 2 &&
-  //       attrs.participants.length > 0
-  //     ) {
-  //       const participants = renderParticipants.call(
-  //         this,
-  //         attrs.userFilters,
-  //         attrs.participants.slice(0, 3)
-  //       );
-  //       contents.push(h("li.avatars", participants));
-  //     }
-  //
-  //     const nav = h(
-  //       "nav.buttons",
-  //       this.attach("button", {
-  //         title: "topic.toggle_information",
-  //         icon: state.collapsed ? "chevron-down" : "chevron-up",
-  //         action: "toggleMap",
-  //         className: "btn",
-  //       })
-  //     );
-  //
-  //     return [nav, h("ul.clearfix", contents)];
-  //   },
-  // });
-
   api.reopenWidget("post-admin-menu", {
     html() {
       const result = this._super(...arguments);
@@ -597,7 +320,7 @@ function initPlugin(api) {
     setAsAnswer() {
       const post = this.findAncestorModel();
 
-      setAsAnswer(post).then((result) => {
+      setAsAnswer(post).then(() => {
         location.reload();
       });
     },

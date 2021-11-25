@@ -3,6 +3,8 @@ en:
     qa:
       errors:
         depth: "Only one level of nesting allowed when replying to a post."
+        qa_not_enabled: "QnA is not enabled."
+        voting_not_permitted: "You are not allowed to vote on this post."
 
   site_settings:
     qa_tags: "Tags to enable QnA on topic"

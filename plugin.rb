@@ -15,20 +15,15 @@ enabled_site_setting :qa_enabled
 after_initialize do
   %w(
     ../lib/question_answer/engine.rb
-    ../lib/question_answer/vote.rb
+    ../lib/question_answer/vote_manager.rb
     ../extensions/category_extension.rb
-    ../extensions/guardian_extension.rb
-    ../extensions/post_action_type_extension.rb
-    ../extensions/post_creator_extension.rb
     ../extensions/post_extension.rb
     ../extensions/post_serializer_extension.rb
     ../extensions/topic_extension.rb
     ../extensions/topic_list_item_serializer_extension.rb
-    ../extensions/topic_view_extension.rb
     ../extensions/topic_view_serializer_extension.rb
     ../app/controllers/question_answer/votes_controller.rb
     ../app/models/question_answer_vote.rb
-    ../app/serializers/qa_comment_post_serializer.rb
     ../config/routes.rb
   ).each do |path|
     load File.expand_path(path, __FILE__)
@@ -41,7 +36,6 @@ after_initialize do
 
   %w[
     qa_enabled
-    qa_one_to_many
     qa_disable_like_on_answers
     qa_disable_like_on_questions
     qa_disable_like_on_comments
@@ -54,22 +48,8 @@ after_initialize do
     end
   end
 
-  class ::Guardian
-    attr_accessor :post_opts
-    prepend QuestionAnswer::GuardianExtension
-  end
-
-  class ::PostCreator
-    prepend QuestionAnswer::PostCreatorExtension
-  end
-
   class ::PostSerializer
-    attributes :qa_vote_count,
-               :qa_enabled,
-               :comments,
-               :comments_count
-
-    prepend QuestionAnswer::PostSerializerExtension
+    include QuestionAnswer::PostSerializerExtension
   end
 
   register_post_custom_field_type('vote_history', :json)
@@ -79,21 +59,14 @@ after_initialize do
     include QuestionAnswer::PostExtension
   end
 
-  PostActionType.types[:vote] = 100
-
-  class ::PostActionType
-    singleton_class.prepend QuestionAnswer::PostActionTypeExtension
-  end
-
   class ::Topic
     include QuestionAnswer::TopicExtension
   end
 
   class ::TopicView
     attr_accessor :comments,
-                  :comments_counts
-
-    prepend QuestionAnswer::TopicViewExtension
+                  :comments_counts,
+                  :posts_user_voted
   end
 
   class ::TopicViewSerializer
@@ -117,6 +90,12 @@ after_initialize do
 
   add_to_serializer(:user_card, :vote_count) do
     object.vote_count
+  end
+
+  add_to_class(:topic_view, :qa_enabled) do
+    return @qa_enabled if defined?(@qa_enabled)
+
+    @qa_enabled = @topic.qa_enabled
   end
 
   add_to_class(:topic_view, :user_voted_posts) do |user|
@@ -159,10 +138,21 @@ after_initialize do
     end
   end
 
+  TopicList.on_preload do |topics|
+    Category.preload_custom_fields(topics.map(&:category), %w[
+      qa_enabled
+      qa_disable_like_on_answers
+      qa_disable_like_on_questions
+      qa_disable_like_on_comments
+    ])
+  end
+
+
   TopicView.on_preload do |topic_view|
     topic_view.comments = {}
 
     post_ids = topic_view.posts.pluck(:id)
+    post_ids_sql = post_ids.join(",")
 
     comment_post_ids_sql = <<~SQL
     SELECT
@@ -182,7 +172,7 @@ after_initialize do
       ) X
       WHERE X.post_id = post_replies.reply_post_id
     ) Y ON true
-    WHERE post_replies.post_id IN (#{post_ids.join(",")})
+    WHERE post_replies.post_id IN (#{post_ids_sql})
     SQL
 
     Post.where("id IN (#{comment_post_ids_sql})").order(post_number: :asc).each do |post|
@@ -195,7 +185,7 @@ after_initialize do
       post_replies.post_id,
       COUNT(*) AS comments_count
     FROM post_replies
-    WHERE post_replies.post_id IN (#{post_ids.join(",")})
+    WHERE post_replies.post_id IN (#{post_ids_sql})
     GROUP BY post_replies.post_id
     SQL
 
@@ -203,6 +193,18 @@ after_initialize do
 
     DB.query(comments_counts_sql).each do |result|
       topic_view.comments_counts[result.post_id] = result.comments_count
+    end
+
+    topic_view.posts_user_voted = {}
+
+    if topic_view.guardian.user
+      QuestionAnswerVote
+        .where(user: topic_view.guardian.user, post_id: post_ids)
+        .pluck(:post_id, :direction)
+        .each do |post_id, direction|
+
+        topic_view.posts_user_voted[post_id] = direction
+      end
     end
   end
 

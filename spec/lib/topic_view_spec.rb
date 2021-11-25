@@ -9,16 +9,28 @@ describe TopicView do
   fab!(:post) { create_post(topic: topic) }
 
   fab!(:answer) { create_post(topic: topic) }
+  fab!(:answer_2) { create_post(topic: topic) }
   fab!(:comment) { create_post(topic: topic, reply_to_post_number: answer.post_number) }
   fab!(:comment_2) { create_post(topic: topic, reply_to_post_number: answer.post_number) }
   fab!(:comment_3) { create_post(topic: topic, reply_to_post_number: 1) }
+  let(:vote) { Fabricate(:qa_vote, post: answer, user: user) }
+
+  let(:vote_2) do
+    Fabricate(:qa_vote,
+      post: answer_2,
+      user: user,
+      direction: QuestionAnswerVote.directions[:down]
+    )
+  end
 
   before do
     SiteSetting.qa_enabled = true
-    SiteSetting.qa_tags = "#{tag.name}"
+    SiteSetting.qa_tags = tag.name
+    vote
+    vote_2
   end
 
-  it "should preload comments and comments count correctly" do
+  it "should preload comments, comments count and user voted status correctly" do
     topic_view = TopicView.new(topic, user)
 
     expect(topic_view.comments[answer.post_number].map(&:id))
@@ -29,5 +41,10 @@ describe TopicView do
 
     expect(topic_view.comments_counts[answer.id]).to eq(2)
     expect(topic_view.comments_counts[post.id]).to eq(1)
+
+    expect(topic_view.posts_user_voted).to eq({
+      answer.id => QuestionAnswerVote.directions[:up],
+      answer_2.id => QuestionAnswerVote.directions[:down]
+    })
   end
 end

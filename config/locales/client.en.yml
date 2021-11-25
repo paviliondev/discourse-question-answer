@@ -3,7 +3,6 @@ en:
     category:
       qa_settings_label: "Question Answer"
       enable_qa: "Make all topics in this category QnA."
-      qa_one_to_many: "QnA one-to-many format."
       qa_disable_like_on_answers: "Disable likes on answers in this QnA category"
       qa_disable_like_on_questions: "Disable likes on questions in this QnA category"
       qa_disable_like_on_comments: "Disable likes on comments in this QnA category"
@@ -16,9 +15,6 @@ en:
         comment_on_answer:
           label: Comment on answer of %{postUsername}
           desc: Comment on an answer
-        one_to_many_entry:
-          label: Make a new entry
-          desc: Make a new entry
         comment_on_entry:
           label: Comment on entry of ${postUsername}
           desc: Comment on an entry
@@ -33,9 +29,6 @@ en:
           vote: "You upvoted this post."
 
     topic:
-      one_to_many:
-        title: "New Entry"
-        help: "begin composing a new entry"
       answer:
         title: 'Answer'
         help: 'begin composing an answer to the question'
@@ -57,9 +50,6 @@ en:
                     <li>Trust level 4 is allowed {{tl4Limit}} vote.</li>
                     <li>Responses are ordered by vote count.</li>
                     </ul>"
-        qa_one_to_many:
-          title: "One to many"
-          details: "Only the topic author can post entries. All users can post comments."
 
     vote:
       already_voted: "You can only vote once per question."
@@ -69,13 +59,9 @@ en:
     user_vote_count: "<strong>{{voteCount}}</strong> Upvotes"
 
     last_answer_lowercase: last answer
-    last_one_to_many_lowercase: last entry
     answer_lowercase:
       one: answer
       other: answers
-    one_to_many_lowercase:
-      one: entry
-      other: entries
     qa:
       post:
         add_comment: "Add a comment"

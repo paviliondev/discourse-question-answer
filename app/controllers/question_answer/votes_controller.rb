@@ -25,11 +25,8 @@ module QuestionAnswer
         )
       end
 
-      if QuestionAnswer::Vote.vote(@post, current_user, direction: 'up', action: 'create')
-        render json: success_json.merge(
-          qa_votes: Topic.qa_votes(@post.topic, current_user).pluck(:post_id),
-          qa_can_vote: Topic.qa_can_vote(@post.topic, current_user)
-        )
+      if QuestionAnswer::VoteManager.vote(@post, current_user, direction: vote_params[:direction])
+        render json: success_json
       else
         render json: failed_json, status: 422
       end
@@ -44,7 +41,7 @@ module QuestionAnswer
         )
       end
 
-      if !QuestionAnswer::Vote.can_undo(@post, current_user)
+      if !QuestionAnswer::VoteManager.can_undo(@post, current_user)
         window = SiteSetting.qa_undo_vote_action_window
         msg = I18n.t('vote.error.undo_vote_action_window', minutes: window)
 
@@ -53,11 +50,8 @@ module QuestionAnswer
         return
       end
 
-      if QuestionAnswer::Vote.vote(@post, current_user, direction: 'up', action: 'destroy')
-        render json: success_json.merge(
-          qa_votes: Topic.qa_votes(@post.topic, current_user),
-          qa_can_vote: Topic.qa_can_vote(@post.topic, current_user)
-        )
+      if QuestionAnswer::VoteManager.remove_vote(@post, current_user)
+        render json: success_json
       else
         render json: failed_json, status: 422
       end
@@ -72,12 +66,15 @@ module QuestionAnswer
       render json: success_json
     end
 
+    VOTERS_LIMIT = 20
+
     def voters
-      # TODO: Need to paginate
       # TODO: Probably a site setting to hide/show voters
       voters = User
         .joins(:question_answer_votes)
         .where(question_answer_votes: { post_id: @post.id })
+        .order("question_answer_votes.created_at DESC")
+        .limit(VOTERS_LIMIT)
 
       render_json_dump(
         voters: serialize_data(voters, BasicUserSerializer)
@@ -87,14 +84,7 @@ module QuestionAnswer
     private
 
     def vote_params
-      params.require(:vote).permit(:post_id, :user_id, :direction)
-    end
-
-    def vote_args
-      {
-        direction: vote_params[:direction],
-        action: action_name
-      }
+      params.permit(:post_id, :direction)
     end
 
     def find_vote_post

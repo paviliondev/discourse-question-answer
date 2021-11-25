@@ -17,16 +17,17 @@ module QuestionAnswer
       @answers ||= begin
         posts
           .where(reply_to_post_number: nil)
+          .where.not(post_number: 1)
           .order(post_number: :asc)
       end
     end
 
     def answer_count
-      answers.count - 1 ## minus first post
+      answers.count
     end
 
     def last_answered_at
-      return unless answers.any?
+      return unless answers.present?
 
       answers.last[:created_at]
     end
@@ -41,7 +42,7 @@ module QuestionAnswer
 
 
     def last_commented_on
-      return unless comments.any?
+      return unless comments.present?
 
       comments.last[:created_at]
     end
@@ -95,8 +96,7 @@ module QuestionAnswer
 
       def qa_enabled(topic)
         return false unless SiteSetting.qa_enabled
-
-        return false if !topic || topic&.is_category_topic?
+        return false if !topic || topic.id == topic.category.topic_id
 
         tags = topic.tags.map(&:name)
 

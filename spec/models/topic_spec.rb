@@ -10,9 +10,12 @@ describe Topic do
   fab!(:user) { Fabricate(:user) }
   fab!(:category) { Fabricate(:category) }
   fab!(:topic) { Fabricate(:topic, category: category) }
+  fab!(:topic_post) { Fabricate(:post, topic: topic) }
+
   fab!(:answers) do
     5.times.map { Fabricate(:post, topic: topic) }.sort_by(&:created_at)
   end
+
   fab!(:comments) do
     5.times.map do
       Fabricate(
@@ -22,14 +25,15 @@ describe Topic do
       )
     end.sort_by(&:created_at)
   end
-  let(:up) { QuestionAnswer::Vote::UP }
-  let(:create) { QuestionAnswer::Vote::CREATE }
-  let(:destroy) { QuestionAnswer::Vote::DESTROY }
-  let(:vote) do
-    -> (post, u) do
-      QuestionAnswer::Vote.vote(post, u, direction: up, action: create)
-    end
+
+  fab!(:tag) { Fabricate(:tag) }
+
+  before do
+    SiteSetting.qa_tags = tag.name
+    topic.tags << tag
   end
+
+  let(:up) { QuestionAnswerVote.directions[:up] }
 
   it 'should return correct comments' do
     comment_ids = comments.map(&:id)
@@ -91,7 +95,7 @@ describe Topic do
 
         post = answers.first
 
-        vote.call(post, user)
+        QuestionAnswer::VoteManager.vote(post, user, direction: up)
 
         expect(Topic.qa_can_vote(topic, user)).to eq(false)
 
@@ -103,8 +107,7 @@ describe Topic do
       it 'return false if trust level zero' do
         expect(Topic.qa_can_vote(topic, user)).to eq(true)
 
-        user.trust_level = 0
-        user.save!
+        user.update!(trust_level: 0)
 
         expect(Topic.qa_can_vote(topic, user)).to eq(false)
       end
@@ -116,7 +119,7 @@ describe Topic do
 
         SiteSetting.send("qa_tl#{user.trust_level}_vote_limit=", 1)
 
-        vote.call(answers[0], user)
+        QuestionAnswer::VoteManager.vote(answers[0], user, direction: up)
 
         expect(Topic.qa_can_vote(topic, user)).to eq(false)
 
@@ -139,7 +142,7 @@ describe Topic do
 
       it 'should return voted post IDs' do
         expected = answers.first(3).map do |a|
-          vote.call(a, user)
+          QuestionAnswer::VoteManager.vote(a, user, direction: up)
 
           a.id
         end.sort
@@ -150,48 +153,22 @@ describe Topic do
     end
 
     describe '#qa_enabled' do
-      let(:set_tags) do
-        lambda do
-          tags = 2.times.map { Fabricate(:tag) }
-          topic.tags = tags
-          SiteSetting.qa_tags = tags.map(&:name).join('|')
-
-          topic.save!
-          topic.reload
-        end
-      end
-
       it 'should return false if topic is blank' do
         expect(Topic.qa_enabled(nil)).to eq(false)
       end
 
       it 'should return false if disabled' do
-        set_tags.call
         SiteSetting.qa_enabled = false
 
         expect(Topic.qa_enabled(topic)).to eq(false)
       end
 
       it 'should return false if category topic' do
-        set_tags.call
-
         category.topic_id = topic.id
         category.save!
         category.reload
 
         expect(Topic.qa_enabled(topic)).to eq(false)
-      end
-
-      it 'should return false by default' do
-        expect(Topic.qa_enabled(topic)).to eq(false)
-      end
-
-      it 'should return true if has enabled tags' do
-        tags = 2.times.map { Fabricate(:tag) }
-        topic.tags = tags
-        SiteSetting.qa_tags = tags.map(&:name).join('|')
-
-        expect(Topic.qa_enabled(topic)).to eq(true)
       end
 
       it 'should return true if has blacklist tags' do

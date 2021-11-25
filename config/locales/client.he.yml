@@ -3,7 +3,6 @@ he:
     category:
       qa_settings_label: "פלאגין תשובה-שאלה"
       enable_qa: "הפוך את כל הנושאים בקטגוריה זו להיות בפורמט Q&A."
-      qa_one_to_many: "פורמט Q&A אחד לרבים."
       qa_disable_like_on_answers: "השבת את כפתור הלייק בתשובות של קטגוריה זו Q&A"
       qa_disable_like_on_main_post: "השבת את כפתור הלייק בשאלות של קטגוריה זו Q&A"
       qa_disable_like_on_comments: "השבת את כפתור הלייק בתגובות של קטגוריה זו Q&A"
@@ -16,9 +15,6 @@ he:
         comment_on_answer:
           label: "תגובה לתשובה של %{postUsername}"
           desc: תגובה לתשובה
-        one_to_many_entry:
-          label: הוסף פוסט חדש
-          desc: הוסף פוסט חדש
         comment_on_entry:
           label: "הגב על הפוסט של ${postUsername}"
           desc: הגב על הפוסט
@@ -26,16 +22,13 @@ he:
     post:
       actions:
         undo:
-          vote: "בטל הצבעה." 
+          vote: "בטל הצבעה."
         people:
           vote: "הצביעו לפוסט."
         by_you:
           vote: "הצבעת לפוסט זה."
 
     topic:
-      one_to_many:
-        title: "פוסט חדש"
-        help: "צור פוסט חדש"
       answer:
         title: 'תשובה'
         help: 'הוסף תשובה לשאלה'
@@ -57,9 +50,6 @@ he:
                     <li>משתמש בעל רמת אמון 4 יכול לבצע {{tl1Limit}} הצבעות.</li>
                     <li>סדר התגובות נקבע לפי כמות ההצבעות</li>
                     </ul>"
-        qa_one_to_many:
-          title: "אחד להרבה"
-          details: "רק מחבר הנושא יכול לפרסם רשומות. כל המשתמשים יכולים לפרסם תגובות."
 
     vote:
       already_voted: "ניתן להצביע רק פעם אחת לשאלה."
@@ -67,10 +57,6 @@ he:
       one_vote_per_post: "ניתן להצביע רק פעם אחת לפוסט."
 
     last_answer_lowercase: תשובה אחרונה
-    last_one_to_many_lowercase: פוסט אחרון
     answer_lowercase:
       one: תשובה
       other: תשובות
-    one_to_many_lowercase:
-      one: פוסט
-      other: פוסטים

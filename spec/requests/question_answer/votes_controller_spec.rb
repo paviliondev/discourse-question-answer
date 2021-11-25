@@ -5,14 +5,16 @@ require 'rails_helper'
 RSpec.describe QuestionAnswer::VotesController do
   fab!(:tag) { Fabricate(:tag) }
   fab!(:topic) { Fabricate(:topic, tags: [tag]) }
-  fab!(:qa_post) { Fabricate(:post, topic: topic) } # don't set this as :post
+  fab!(:topic_post) { Fabricate(:post, topic: topic) }
+  fab!(:answer) { Fabricate(:post, topic: topic) }
+  fab!(:answer_2) { Fabricate(:post, topic: topic) }
   fab!(:qa_user) { Fabricate(:user) }
 
   fab!(:qa_answer) do
     create_post(
       raw: "some raw here",
       topic_id: topic.id,
-      reply_to_post_number: qa_post.post_number
+      reply_to_post_number: answer.post_number
     )
   end
 
@@ -31,7 +33,7 @@ RSpec.describe QuestionAnswer::VotesController do
       topic.update!(category: category)
       category.update!(read_restricted: true)
 
-      post '/qa/vote.json', params: { post_id: qa_post.id }
+      post '/qa/vote.json', params: { post_id: answer.id }
 
       expect(response.status).to eq(403)
     end
@@ -39,28 +41,28 @@ RSpec.describe QuestionAnswer::VotesController do
     it 'should return the right response if plugin is disabled' do
       SiteSetting.qa_enabled = false
 
-      post '/qa/vote.json', params: { post_id: qa_post.id }
+      post '/qa/vote.json', params: { post_id: answer.id }
 
       expect(response.status).to eq(403)
     end
 
     it 'should success if never voted' do
-      post '/qa/vote.json', params: { post_id: qa_post.id }
+      post '/qa/vote.json', params: { post_id: answer.id }
 
       expect(response.status).to eq(200)
 
-      vote = qa_post.question_answer_votes.first
+      vote = answer.question_answer_votes.first
 
-      expect(vote.post_id).to eq(qa_post.id)
+      expect(vote.post_id).to eq(answer.id)
       expect(vote.user_id).to eq(qa_user.id)
     end
 
     it 'should error if already voted' do
-      post '/qa/vote.json', params: { post_id: qa_post.id }
+      post '/qa/vote.json', params: { post_id: answer.id }
 
       expect(response.status).to eq(200)
 
-      post '/qa/vote.json', params: { post_id: qa_post.id }
+      post '/qa/vote.json', params: { post_id: answer.id }
 
       expect(response.status).to eq(403)
     end
@@ -70,23 +72,23 @@ RSpec.describe QuestionAnswer::VotesController do
     before { sign_in(qa_user) }
 
     it 'should success if has voted' do
-      post '/qa/vote.json', params: { post_id: qa_post.id }
+      post '/qa/vote.json', params: { post_id: answer.id }
 
       expect(response.status).to eq(200)
 
-      vote = qa_post.question_answer_votes.first
+      vote = answer.question_answer_votes.first
 
-      expect(vote.post_id).to eq(qa_post.id)
+      expect(vote.post_id).to eq(answer.id)
       expect(vote.user_id).to eq(qa_user.id)
 
-      delete '/qa/vote.json', params: { post_id: qa_post.id }
+      delete '/qa/vote.json', params: { post_id: answer.id }
 
       expect(response.status).to eq(200)
       expect(QuestionAnswerVote.exists?(id: vote.id)).to eq(false)
     end
 
     it 'should return the right response if user has never voted on post' do
-      delete '/qa/vote.json', params: { post_id: qa_post.id }
+      delete '/qa/vote.json', params: { post_id: answer.id }
 
       expect(response.status).to eq(403)
     end
@@ -94,12 +96,12 @@ RSpec.describe QuestionAnswer::VotesController do
     it 'should cant undo vote' do
       SiteSetting.qa_undo_vote_action_window = 1
 
-      post "/qa/vote.json", params: { post_id: qa_post.id }
+      post "/qa/vote.json", params: { post_id: answer.id }
 
       expect(response.status).to eq(200)
 
       freeze_time 2.minutes.from_now do
-        delete '/qa/vote.json', params: { post_id: qa_post.id }
+        delete '/qa/vote.json', params: { post_id: answer.id }
 
         expect(response.status).to eq(403)
 
@@ -111,27 +113,38 @@ RSpec.describe QuestionAnswer::VotesController do
   end
 
   describe '#voters' do
-    before { sign_in(qa_user) }
+    fab!(:user) { Fabricate(:user) }
+
+    it 'should return the right response for an anon user' do
+      get '/qa/voters.json', params: { post_id: answer.id }
+
+      expect(response.status).to eq(403)
+    end
 
     it 'should return the right response if post does not exist' do
+      sign_in(qa_user)
+
       get '/qa/voters.json', params: { post_id: -1 }
 
       expect(response.status).to eq(404)
     end
 
-    it 'should return correct users' do
-      post '/qa/vote.json', params: { post_id: qa_post.id }
+    it 'should return correct users respecting limits' do
+      sign_in(qa_user)
 
-      expect(response.status).to eq(200)
+      Fabricate(:qa_vote, post: answer, user: user)
+      Fabricate(:qa_vote, post: answer, user: qa_user)
+      Fabricate(:qa_vote, post: answer_2, user: user)
 
-      get '/qa/voters.json', params: { post_id: qa_post.id }
+      stub_const(QuestionAnswer::VotesController, "VOTERS_LIMIT", 1) do
+        get '/qa/voters.json', params: { post_id: answer.id }
+      end
 
       expect(response.status).to eq(200)
 
       parsed = JSON.parse(response.body)
 
-      expect(parsed['voters'].map { |u| u['id'] })
-        .to contain_exactly(qa_user.id)
+      expect(parsed['voters'].map { |u| u['id'] }).to contain_exactly(qa_user.id)
     end
   end
 

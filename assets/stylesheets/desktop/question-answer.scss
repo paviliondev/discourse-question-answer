@@ -30,6 +30,10 @@
         display: flex;
         margin-right: auto;
       }
+
+      .qa-comment-post-avatar {
+        margin-right: 0.25em;
+      }
     }
   }
 }
@@ -54,25 +58,58 @@
   }
 }
 
-.qa-button {
-  .d-icon {
-    margin-right: 0;
-  }
-}
-
 .qa-post {
-  float: left;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1em;
 
-  .btn {
-    background: white;
+  .qa-post-list {
+    box-shadow: shadow("card");
+    background-color: var(--secondary);
+    display: flex;
+    flex-direction: row;
+    padding: 0.5em;
+    border: 1px solid var(--primary-low);
+  }
 
-    &:hover {
-      background: dark-light-diff($primary, $secondary, 65%, -75%);
-      color: $secondary;
+  .qa-post-list-voters {
+    display: flex;
+
+    a {
+      margin-left: 0.5em;
     }
   }
 
-  .count {
-    text-align: center;
+  .qa-post-list-count,
+  .qa-post-list-icon {
+    margin: 0.15em 0.25em 0 0.25em;
+    font-size: var(--font-up-1);
+    color: var(--primary-low-mid);
+  }
+
+  .qa-button {
+    .d-icon {
+      margin-right: 0;
+      font-size: var(--font-up-3);
+    }
+
+    &.qa-button-voted {
+      .d-icon {
+        color: var(--success);
+      }
+    }
+  }
+
+  .qa-button,
+  .qa-post-toggle-voters {
+    background: var(--secondary);
+    padding: 0.25em 0.5em;
+
+    &:hover {
+      background: dark-light-diff($primary, $secondary, 65%, -75%);
+      color: var(--secondary);
+    }
   }
 }

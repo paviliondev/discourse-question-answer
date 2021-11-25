@@ -2,45 +2,27 @@
 
 module QuestionAnswer
   module PostSerializerExtension
-    def actions_summary
-      summaries = super.reject { |s| s[:id] == PostActionType.types[:vote] }
+    def self.included(base)
+      base.attributes(
+        :qa_vote_count,
+        :qa_enabled,
+        :qa_user_voted_direction,
+        :comments,
+        :comments_count
+      )
+    end
 
-      return summaries unless self.qa_enabled
+    def qa_vote_count
+      object.qa_vote_count
+    end
 
-      user = scope.current_user
-      summary = {
-        id: PostActionType.types[:vote],
-        count: object.qa_vote_count
-      }
-
-      if user
-        voted =
-          if @topic_view
-            @topic_view.user_voted_posts(user).include?(object.id)
-          else
-            QuestionAnswerVote.exists?(post_id: object.id, user_id: user.id)
-          end
-
-        if voted
-          summary[:acted] = true
-          summary[:can_undo] = QuestionAnswer::Vote.can_undo(object, user)
-        else
-          summary[:can_act] = true
-        end
-      end
-
-      summary.delete(:count) if summary[:count].zero?
-
-      if summary[:can_act] || summary[:count]
-        summaries + [summary]
-      else
-        summaries
-      end
+    def include_qa_vote_count?
+      qa_enabled
     end
 
     def comments
       (@topic_view.comments[object.post_number] || []).map do |post|
-        QaCommentPostSerializer.new(post, scope: scope, root:false).as_json
+        BasicPostSerializer.new(post, scope: scope, root:false).as_json
       end
     end
 
@@ -54,6 +36,14 @@ module QuestionAnswer
 
     def include_comments_count?
       @topic_view && qa_enabled
+    end
+
+    def qa_user_voted_direction
+      @topic_view.posts_user_voted[object.id]
+    end
+
+    def include_qa_user_voted_direction?
+      @topic_view && qa_enabled && @topic_view.posts_user_voted.present?
     end
 
     def qa_disable_like

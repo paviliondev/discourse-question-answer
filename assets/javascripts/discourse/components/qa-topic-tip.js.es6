@@ -1,3 +1,4 @@
+import I18n from "I18n";
 import { cookAsync } from "discourse/lib/text";
 
 export default Ember.Component.extend({

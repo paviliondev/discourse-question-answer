@@ -3,7 +3,6 @@ de:
     category:
       qa_settings_label: "Frage Antwort"
       enable_qa: "Alle Themen in dieser Kategorie sind QnA."
-      qa_one_to_many: "QnA 1:N Format."
       qa_disable_like_on_answers: "Deaktiviere Likes auf Antworten in dieser QnA Kategorie"
       qa_disable_like_on_questions: "Deaktiviere Likes auf Fragen in dieser QnA Kategorie"
       qa_disable_like_on_comments: "Deaktiviere Likes auf Kommentare in dieser QnA Kategorie"
@@ -16,9 +15,6 @@ de:
         comment_on_answer:
           label: Kommentiere die Antwort von %{postUsername}
           desc: Kommentiere eine Antwort
-        one_to_many_entry:
-          label: Erstelle einen neuen Beitrag
-          desc: Erstelle einen neuen Beitrag
         comment_on_entry:
           label: Kommentiere den Beitrag von ${postUsername}
           desc: Kommentiere einen Beitrag
@@ -33,9 +29,6 @@ de:
           vote: "Du hast für diesen Beitrag gestimmt."
 
     topic:
-      one_to_many:
-        title: "Neues Thema"
-        help: "beginne damit ein neues Thema zu verfassen"
       answer:
         title: 'Antworten'
         help: 'beginne damit eine Antwort auf diese Frage zu verfassen'
@@ -57,9 +50,6 @@ de:
                     <li>Vertrauensstufe 4 hat {{tl4Limit}} Stimmen.</li>
                     <li>Antworten werden nach der Anzahl der Stimmen sortiert.</li>
                     </ul>"
-        qa_one_to_many:
-          title: "1:N"
-          details: "Nur der Autor des Themas kann Beiträge erstellen. Alle Benutzer können Kommentare verfassen."
 
     vote:
       already_voted: "Du kannst nur einmal pro Frage abstimmen."
@@ -69,12 +59,8 @@ de:
     user_vote_count: "<strong>{{voteCount}}</strong> Stimmen"
 
     last_answer_lowercase: letzte Antwort
-    last_one_to_many_lowercase: letzter Beitrag
     answer_lowercase:
       one: Antwort
       other: Antworten
-    one_to_many_lowercase:
-      one: Beitrag
-      other: Beiträge
     qa:
       answer_count: "{{answerCount}} Antwort(en)"
