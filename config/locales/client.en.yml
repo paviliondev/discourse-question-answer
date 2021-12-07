@@ -68,6 +68,10 @@ en:
         show_comment:
           one: Show %{count} more comment
           other: Show %{count} more comments
-      answer_count: "{{answerCount}} Answers"
-      comments_count: "{{commentsCount}} Comments"
+      answer_count:
+        one: "{{count}} Answer"
+        other: "{{count}} Answers"
+      comments_count:
+        one: "{{count}} Comment"
+        other: "{{count}} Comments"
       set_as_answer: "Move to Answers"

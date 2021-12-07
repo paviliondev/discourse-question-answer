@@ -44,7 +44,7 @@ function initPlugin(api) {
             result.push(
               helper.h(
                 "div.qa-comments-count.small-action",
-                I18n.t("qa.comments_count", { commentsCount })
+                I18n.t("qa.comments_count", { count: commentsCount })
               )
             );
           }
@@ -55,7 +55,7 @@ function initPlugin(api) {
             result.push(
               helper.h(
                 "div.qa-answer-count.small-action",
-                I18n.t("qa.answer_count", { answerCount })
+                I18n.t("qa.answer_count", { count: answerCount })
               )
             );
           }
