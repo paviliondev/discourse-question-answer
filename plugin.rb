@@ -147,7 +147,6 @@ after_initialize do
     ])
   end
 
-
   TopicView.on_preload do |topic_view|
     topic_view.comments = {}
 

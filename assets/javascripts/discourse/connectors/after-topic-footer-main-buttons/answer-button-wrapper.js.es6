@@ -2,7 +2,6 @@ import { getOwner } from "discourse-common/lib/get-owner";
 
 export default {
   setupComponent(attrs, component) {
-    const currentUser = component.get("currentUser");
     const topic = attrs.topic;
     const qaEnabled = topic.qa_enabled;
     const canCreatePost = topic.get("details.can_create_post");

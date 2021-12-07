@@ -40,7 +40,6 @@ module QuestionAnswer
       end
     end
 
-
     def last_commented_on
       return unless comments.present?
 

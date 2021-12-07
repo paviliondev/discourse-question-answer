@@ -56,7 +56,7 @@ describe Topic do
   it 'should return correct last_answered_at' do
     expected = answers.last.created_at
 
-    expect(topic.last_answered_at).to eq(expected)
+    expect(topic.last_answered_at).to eq_time(expected)
   end
 
   it 'should return correct last_commented_on' do

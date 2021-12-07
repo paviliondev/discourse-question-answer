@@ -9,7 +9,6 @@ import { setAsAnswer } from "../lib/qa-utilities";
 import { next } from "@ember/runloop";
 
 function initPlugin(api) {
-  const currentUser = api.getCurrentUser();
   const pluginId = "discourse-question-answer";
 
   api.removePostMenuButton("reply", (attrs) => {
@@ -198,7 +197,7 @@ function initPlugin(api) {
   });
 
   api.modifyClass("component:composer-actions", {
-    pluginId: pluginId,
+    pluginId,
 
     @on("init")
     setupPost() {
@@ -261,7 +260,7 @@ function initPlugin(api) {
   });
 
   api.modifyClass("model:topic", {
-    pluginId: pluginId,
+    pluginId,
 
     @discourseComputed("qa_enabled")
     showQaTip(qaEnabled) {
@@ -270,7 +269,7 @@ function initPlugin(api) {
   });
 
   api.modifyClass("component:topic-footer-buttons", {
-    pluginId: pluginId,
+    pluginId,
 
     @on("didInsertElement")
     @observes("topic.qa_enabled")

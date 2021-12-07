@@ -26,7 +26,7 @@ module QuestionAnswer
         direction = vote.direction
         vote.destroy!
         count_change = QuestionAnswerVote.directions[:up] == direction ? -1 : 1
-        post.update!(qa_vote_count: (post.qa_vote_count) + count_change )
+        post.update!(qa_vote_count: (post.qa_vote_count) + count_change)
       end
     end
 
