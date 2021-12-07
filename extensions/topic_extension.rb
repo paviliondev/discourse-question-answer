@@ -95,7 +95,8 @@ module QuestionAnswer
 
       def qa_enabled(topic)
         return false unless SiteSetting.qa_enabled
-        return false if !topic || topic.id == topic.category.topic_id
+        return false if !topic
+        return false if topic.category && topic.category.topic_id == topic.id
 
         tags = topic.tags.map(&:name)
 
