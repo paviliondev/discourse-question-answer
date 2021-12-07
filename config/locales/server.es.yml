@@ -5,7 +5,6 @@ es:
     qa_enabled: "Activar el plugin de Preguntas y Respuestas (Q&A - PyR)"
     qa_disable_like_on_answers: "Desactiva el botón de me gusta en las respuestas de temas PyR"
     qa_undo_vote_action_window: "Número de minutos en los cuales los usuarios tienen permitido deshacer sus votos en temas PyR (introducir 0 para no poner límite)"
-    qa_comments_default: "Número máximo de comentarios a mostrar por defecto."
 
   post_action_types:
     vote:

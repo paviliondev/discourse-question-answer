@@ -55,9 +55,5 @@ describe Post do
     QuestionAnswer::VoteManager.vote(post, user1)
 
     expect(post.qa_can_vote(user1.id)).to eq(false)
-
-    SiteSetting.qa_tl_allow_multiple_votes_per_post = true
-
-    expect(post.qa_can_vote(user1.id)).to eq(true)
   end
 end

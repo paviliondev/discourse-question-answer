@@ -22,8 +22,7 @@ module QuestionAnswer
     end
 
     def qa_can_vote(user_id)
-      SiteSetting.qa_tl_allow_multiple_votes_per_post ||
-        !QuestionAnswerVote.exists?(post_id: self.id, user_id: user_id)
+      !QuestionAnswerVote.exists?(post_id: self.id, user_id: user_id)
     end
 
     def comments

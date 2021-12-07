@@ -5,7 +5,6 @@ fr:
     qa_enabled: "Activer le plugin QA"
     qa_disable_like_on_answers: "Désactiver le bouton de type de réponse sur les sujets de questions et réponses"
     qa_undo_vote_action_window: "Nombre de minutes où les utilisateurs sont autorisés à annuler les votes dans les sujets QnA (entrez 0 pour aucune limite)"
-    qa_comments_default: "Nombre maximum de commentaires à afficher par défaut."
 
   post_action_types:
     vote:

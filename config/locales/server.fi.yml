@@ -5,7 +5,6 @@ fi:
     qa_enabled: ""
     qa_disable_like_on_answers: ""
     qa_undo_vote_action_window: ""
-    qa_comments_default: ""
 
   post_action_types:
     vote:

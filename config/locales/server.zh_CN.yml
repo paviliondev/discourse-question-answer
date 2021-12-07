@@ -5,7 +5,6 @@ zh_CN:
     qa_enabled: "启用问答插件"
     qa_disable_like_on_answers: "在问答贴中禁用“喜欢”按钮"
     qa_undo_vote_action_window: "允许用户撤销投票的分钟数（0 为不限制）"
-    qa_comments_default: "默认显示评论的最大数量"
 
   post_action_types:
     vote:
