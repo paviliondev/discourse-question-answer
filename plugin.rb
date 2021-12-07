@@ -141,7 +141,7 @@ after_initialize do
   end
 
   TopicList.on_preload do |topics|
-    Category.preload_custom_fields(topics.map(&:category), %w[
+    Category.preload_custom_fields(topics.map(&:category).compact, %w[
       qa_enabled
       qa_disable_like_on_answers
       qa_disable_like_on_questions
