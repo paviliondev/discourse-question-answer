@@ -88,22 +88,24 @@ describe Topic do
       expect(Topic.qa_can_vote(topic, user)).to eq(false)
     end
 
-    it 'return false if user has voted and qa_trust_level_vote_limits is false' do
+    it 'should return true if qa_trust_level_vote_limits is not enabled' do
       SiteSetting.qa_trust_level_vote_limits = false
-      SiteSetting.send("qa_tl#{user.trust_level}_vote_limit=", 10)
+      SiteSetting.send("qa_tl#{user.trust_level}_vote_limit=", 1)
 
       post = answers.first
 
       QuestionAnswer::VoteManager.vote(post, user, direction: up)
 
-      expect(Topic.qa_can_vote(topic, user)).to eq(false)
+      expect(Topic.qa_can_vote(topic, user)).to eq(true)
 
       SiteSetting.qa_trust_level_vote_limits = true
 
-      expect(Topic.qa_can_vote(topic, user)).to eq(true)
+      expect(Topic.qa_can_vote(topic, user)).to eq(false)
     end
 
     it 'return false if trust level zero' do
+      SiteSetting.qa_trust_level_vote_limits = true
+
       expect(Topic.qa_can_vote(topic, user)).to eq(true)
 
       user.update!(trust_level: 0)
