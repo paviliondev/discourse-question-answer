@@ -6,13 +6,27 @@ module QuestionAnswer
       direction ||= QuestionAnswerVote.directions[:up]
 
       ActiveRecord::Base.transaction do
+        existing_vote = QuestionAnswerVote.find_by(
+          user: user,
+          post: post,
+          direction: QuestionAnswerVote.reverse_direction(direction)
+        )
+
+        count_change =
+          if existing_vote
+            QuestionAnswerVote.directions[:up] == direction ? 2 : -2
+          else
+            QuestionAnswerVote.directions[:up] == direction ? 1 : -1
+          end
+
+        existing_vote.destroy! if existing_vote
+
         vote = QuestionAnswerVote.create!(
           user: user,
           post: post,
           direction: direction
         )
 
-        count_change = QuestionAnswerVote.directions[:up] == direction ? 1 : -1
         post.update!(qa_vote_count: (post.qa_vote_count || 0) + count_change)
         post.publish_change_to_clients!(:acted)
 

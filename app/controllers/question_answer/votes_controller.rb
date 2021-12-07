@@ -17,7 +17,7 @@ module QuestionAnswer
         )
       end
 
-      unless @post.qa_can_vote(current_user.id)
+      unless @post.qa_can_vote(current_user.id, vote_params[:direction])
         raise Discourse::InvalidAccess.new(
           nil,
           nil,
@@ -74,10 +74,11 @@ module QuestionAnswer
         .joins(:question_answer_votes)
         .where(question_answer_votes: { post_id: @post.id })
         .order("question_answer_votes.created_at DESC")
+        .select("users.*", "question_answer_votes.direction")
         .limit(VOTERS_LIMIT)
 
       render_json_dump(
-        voters: serialize_data(voters, BasicUserSerializer)
+        voters: serialize_data(voters, BasicVoterSerializer)
       )
     end
 

@@ -7,8 +7,9 @@ module QuestionAnswer
         :qa_vote_count,
         :qa_enabled,
         :qa_user_voted_direction,
+        :qa_has_votes,
         :comments,
-        :comments_count
+        :comments_count,
       )
     end
 
@@ -44,6 +45,14 @@ module QuestionAnswer
 
     def include_qa_user_voted_direction?
       @topic_view && qa_enabled && @topic_view.posts_user_voted.present?
+    end
+
+    def qa_has_votes
+      @topic_view.posts_voted_on.include?(object.id)
+    end
+
+    def include_qa_has_votes?
+      @topic_view && qa_enabled
     end
 
     def qa_disable_like

@@ -168,7 +168,8 @@ function initPlugin(api) {
     "topicUserId",
     "comments",
     "qa_disable_like",
-    "qa_user_voted_direction"
+    "qa_user_voted_direction",
+    "qa_has_votes"
   );
 
   api.addPostClassesCallback((attrs) => {

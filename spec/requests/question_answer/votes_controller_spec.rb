@@ -132,19 +132,41 @@ RSpec.describe QuestionAnswer::VotesController do
     it 'should return correct users respecting limits' do
       sign_in(qa_user)
 
+      Fabricate(:qa_vote,
+        post: answer,
+        user: Fabricate(:user),
+        direction: QuestionAnswerVote.directions[:down]
+      )
+
       Fabricate(:qa_vote, post: answer, user: user)
-      Fabricate(:qa_vote, post: answer, user: qa_user)
+
+      Fabricate(:qa_vote,
+        post: answer,
+        user: qa_user,
+        direction: QuestionAnswerVote.directions[:down]
+      )
+
       Fabricate(:qa_vote, post: answer_2, user: user)
 
-      stub_const(QuestionAnswer::VotesController, "VOTERS_LIMIT", 1) do
+      stub_const(QuestionAnswer::VotesController, "VOTERS_LIMIT", 2) do
         get '/qa/voters.json', params: { post_id: answer.id }
       end
 
       expect(response.status).to eq(200)
 
       parsed = JSON.parse(response.body)
+      voters = parsed['voters']
 
-      expect(parsed['voters'].map { |u| u['id'] }).to contain_exactly(qa_user.id)
+      expect(voters.map { |v| v['id'] }).to contain_exactly(qa_user.id, user.id)
+
+      expect(voters[0]['id']).to eq(qa_user.id)
+      expect(voters[0]['username']).to eq(qa_user.username)
+      expect(voters[0]['name']).to eq(qa_user.name)
+      expect(voters[0]['avatar_template']).to eq(qa_user.avatar_template)
+      expect(voters[0]['direction']).to eq(QuestionAnswerVote.directions[:down])
+
+      expect(voters[1]['id']).to eq(user.id)
+      expect(voters[1]['direction']).to eq(QuestionAnswerVote.directions[:up])
     end
   end
 

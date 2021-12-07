@@ -69,9 +69,14 @@
     box-shadow: shadow("card");
     background-color: var(--secondary);
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     padding: 0.5em;
     border: 1px solid var(--primary-low);
+
+    .qa-post-list-voters-wrapper {
+      display: flex;
+      flex-direction: row;
+    }
   }
 
   .qa-post-list-voters {

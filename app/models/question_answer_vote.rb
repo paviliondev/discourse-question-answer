@@ -16,6 +16,16 @@ class QuestionAnswerVote < ActiveRecord::Base
     }
   end
 
+  def self.reverse_direction(direction)
+    if direction == directions[:up]
+      directions[:down]
+    elsif direction == directions[:down]
+      directions[:up]
+    else
+      raise "Invalid direction: #{direction}"
+    end
+  end
+
   private
 
   def ensure_valid_post

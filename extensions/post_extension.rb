@@ -21,8 +21,9 @@ module QuestionAnswer
         .pluck_first(:created_at)
     end
 
-    def qa_can_vote(user_id)
-      !QuestionAnswerVote.exists?(post_id: self.id, user_id: user_id)
+    def qa_can_vote(user_id, direction = nil)
+      direction ||= QuestionAnswerVote.directions[:up]
+      !QuestionAnswerVote.exists?(post_id: self.id, user_id: user_id, direction: direction)
     end
 
     def comments

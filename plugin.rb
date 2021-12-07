@@ -24,6 +24,7 @@ after_initialize do
     ../extensions/topic_view_serializer_extension.rb
     ../app/controllers/question_answer/votes_controller.rb
     ../app/models/question_answer_vote.rb
+    ../app/serializers/basic_voter_serializer.rb
     ../config/routes.rb
   ).each do |path|
     load File.expand_path(path, __FILE__)
@@ -66,7 +67,8 @@ after_initialize do
   class ::TopicView
     attr_accessor :comments,
                   :comments_counts,
-                  :posts_user_voted
+                  :posts_user_voted,
+                  :posts_voted_on
   end
 
   class ::TopicViewSerializer
@@ -205,6 +207,9 @@ after_initialize do
         topic_view.posts_user_voted[post_id] = direction
       end
     end
+
+    topic_view.posts_voted_on =
+      QuestionAnswerVote.where(post_id: post_ids).distinct.pluck(:post_id)
   end
 
   SiteSetting.enable_filtered_replies_view = true

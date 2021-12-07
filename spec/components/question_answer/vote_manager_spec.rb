@@ -4,6 +4,8 @@ require 'rails_helper'
 
 describe QuestionAnswer::VoteManager do
   fab!(:user)  { Fabricate(:user) }
+  fab!(:user_2)  { Fabricate(:user) }
+  fab!(:user_3)  { Fabricate(:user) }
   fab!(:post)  { Fabricate(:post, post_number: 2) }
   fab!(:tag)  { Fabricate(:tag) }
   fab!(:up) { QuestionAnswerVote.directions[:up] }
@@ -30,6 +32,23 @@ describe QuestionAnswer::VoteManager do
 
       expect(QuestionAnswerVote.exists?(post: post, user: user, direction: down))
         .to eq(true)
+
+      expect(post.qa_vote_count).to eq(-1)
+    end
+
+    it 'can change an upvote to a downvote' do
+      QuestionAnswer::VoteManager.vote(post, user, direction: up)
+      QuestionAnswer::VoteManager.vote(post, user_2, direction: up)
+      QuestionAnswer::VoteManager.vote(post, user, direction: down)
+
+      expect(post.qa_vote_count).to eq(0)
+    end
+
+    it 'can change a downvote to upvote' do
+      QuestionAnswer::VoteManager.vote(post, user, direction: down)
+      QuestionAnswer::VoteManager.vote(post, user_2, direction: down)
+      QuestionAnswer::VoteManager.vote(post, user_3, direction: down)
+      QuestionAnswer::VoteManager.vote(post, user, direction: up)
 
       expect(post.qa_vote_count).to eq(-1)
     end

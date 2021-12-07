@@ -27,30 +27,46 @@ export default createWidget("qa-post", {
         voted: attrs.post.qa_user_voted_direction === "up",
       }),
     ];
-    const voteCount = attrs.post.qa_vote_count;
 
-    if (voteCount > 0) {
+    if (attrs.post.qa_has_votes) {
       contents.push(
         this.attach("button", {
           action: "toggleWhoVoted",
-          contents: attrs.count,
+          contents: `${attrs.post.qa_vote_count}`,
           className: "qa-post-toggle-voters",
         })
       );
 
       if (state.voters.length > 0) {
-        contents.push(
-          h(".qa-post-list", [
-            h("span.qa-post-list-icon", iconNode("caret-up")),
-            h("span.qa-post-list-count", `${voteCount}`),
-            this.attach("small-user-list", {
-              users: state.voters,
-              listClassName: "qa-post-list-voters",
-            }),
-          ])
-        );
+        const upVoters = [];
+        const downVoters = [];
 
-        const countDiff = voteCount - state.voters.length;
+        state.voters.forEach((voter) => {
+          if (voter.direction === "up") {
+            upVoters.push(voter);
+          } else {
+            downVoters.push(voter);
+          }
+        });
+
+        const qaPostVotersList = [];
+        const upVotersList = this._postVotersList("up", upVoters);
+
+        if (upVotersList) {
+          qaPostVotersList.push(upVotersList);
+        }
+
+        const downVotersList = this._postVotersList("down", downVoters);
+
+        if (downVotersList) {
+          qaPostVotersList.push(downVotersList);
+        }
+
+        if (qaPostVotersList.length > 0) {
+          contents.push(h(".qa-post-list", qaPostVotersList));
+        }
+
+        const countDiff = attrs.post.qa_vote_count - state.voters.length;
 
         if (countDiff > 0) {
           contents.push(this.attach("span", "and ${countDiff} more users..."));
@@ -72,6 +88,21 @@ export default createWidget("qa-post", {
     return contents;
   },
 
+  _postVotersList(direction, voters) {
+    if (voters.length > 0) {
+      const icon = direction === "up" ? "caret-up" : "caret-down";
+
+      return h("div.qa-post-list-voters-wrapper", [
+        h("span.qa-post-list-icon", iconNode(icon)),
+        h("span.qa-post-list-count", `${voters.length}`),
+        this.attach("small-user-list", {
+          users: voters,
+          listClassName: "qa-post-list-voters",
+        }),
+      ]);
+    }
+  },
+
   toggleWhoVoted() {
     const state = this.state;
 
@@ -91,10 +122,14 @@ export default createWidget("qa-post", {
 
   getWhoVoted() {
     const { attrs, state } = this;
-
     whoVoted({ post_id: attrs.post.id }).then((result) => {
       if (result.voters) {
-        state.voters = result.voters.map(smallUserAtts);
+        state.voters = result.voters.map((voter) => {
+          const attrs = smallUserAtts(voter);
+          attrs.direction = voter.direction;
+          return attrs;
+        });
+
         this.scheduleRerender();
       }
     });
