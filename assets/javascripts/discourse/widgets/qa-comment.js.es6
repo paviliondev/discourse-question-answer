@@ -1,8 +1,9 @@
 import { createWidget } from "discourse/widgets/widget";
 import { h } from "virtual-dom";
 import { dateNode } from "discourse/helpers/node";
-import RawHtml from "discourse/widgets/raw-html";
 import { avatarFor } from "discourse/widgets/post";
+import PostCooked from "discourse/widgets/post-cooked";
+import DecoratorHelper from "discourse/widgets/decorator-helper";
 
 export default createWidget("qa-comment", {
   tagName: "div.qa-comment",
@@ -25,9 +26,7 @@ export default createWidget("qa-comment", {
         ]),
         h(
           "div.qa-comment-post-body",
-          new RawHtml({
-            html: attrs.cooked,
-          })
+          new PostCooked(attrs, new DecoratorHelper(this), this.currentUser)
         ),
       ]),
     ];
