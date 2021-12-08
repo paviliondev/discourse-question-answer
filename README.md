@@ -1,3 +1,5 @@
+:warning: This plugin is still in active development and is not production ready.
+
 # Question Answer Plugin
 
 This is a [Discourse](https://meta.discourse.org) plugin built by [Pavilion](https://thepavilion.io).
@@ -28,4 +30,3 @@ If you want to get more involved in open source Discourse work, you may want to 
 ## Licence
 
 [GNU General Public Licence, Version 2](./LICENSE.txt)
-
