@@ -4,6 +4,16 @@ import { iconNode } from "discourse-common/lib/icon-library";
 export default createWidget("qa-button", {
   tagName: "button.btn.qa-button",
 
+  buildAttributes(attrs) {
+    const attributes = {};
+
+    if (attrs.loading) {
+      attributes.disabled = "true";
+    }
+
+    return attributes;
+  },
+
   buildClasses(attrs) {
     const result = [];
 

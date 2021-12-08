@@ -17,6 +17,7 @@ export default createWidget("qa-post", {
   defaultState() {
     return {
       voters: [],
+      loading: false,
     };
   },
 
@@ -24,6 +25,7 @@ export default createWidget("qa-post", {
     const contents = [
       this.attach("qa-button", {
         direction: "up",
+        loading: state.loading,
         voted: attrs.post.qa_user_voted_direction === "up",
       }),
     ];
@@ -81,6 +83,7 @@ export default createWidget("qa-post", {
     contents.push(
       this.attach("qa-button", {
         direction: "down",
+        loading: state.loading,
         voted: attrs.post.qa_user_voted_direction === "down",
       })
     );
@@ -146,16 +149,20 @@ export default createWidget("qa-post", {
 
     const voteCount = post.qa_vote_count;
 
-    removeVote({ post_id: post.id }).catch((error) => {
-      post.setProperties({
-        qa_user_voted_direction: direction,
-        qa_vote_count: voteCount - countChange,
-      });
+    this.state.loading = true;
 
-      this.scheduleRerender();
+    return removeVote({ post_id: post.id })
+      .catch((error) => {
+        post.setProperties({
+          qa_user_voted_direction: direction,
+          qa_vote_count: voteCount - countChange,
+        });
 
-      popupAjaxError(error);
-    });
+        this.scheduleRerender();
+
+        popupAjaxError(error);
+      })
+      .finally(() => (this.state.loading = false));
   },
 
   vote(direction) {
@@ -170,7 +177,14 @@ export default createWidget("qa-post", {
       direction,
     };
 
-    const countChange = direction === "up" ? 1 : -1;
+    const isUpVote = direction === "up";
+    let countChange;
+
+    if (post.qa_user_voted_direction) {
+      countChange = isUpVote ? 2 : -2;
+    } else {
+      countChange = isUpVote ? 1 : -1;
+    }
 
     this.attrs.post.setProperties({
       qa_user_voted_direction: direction,
@@ -179,15 +193,19 @@ export default createWidget("qa-post", {
 
     const voteCount = post.qa_vote_count;
 
-    castVote(vote).catch((error) => {
-      post.setProperties({
-        qa_user_voted_direction: null,
-        qa_vote_count: voteCount - countChange,
-      });
+    this.state.loading = true;
 
-      this.scheduleRerender();
+    return castVote(vote)
+      .catch((error) => {
+        post.setProperties({
+          qa_user_voted_direction: null,
+          qa_vote_count: voteCount - countChange,
+        });
 
-      popupAjaxError(error);
-    });
+        this.scheduleRerender();
+
+        popupAjaxError(error);
+      })
+      .finally(() => (this.state.loading = false));
   },
 });
