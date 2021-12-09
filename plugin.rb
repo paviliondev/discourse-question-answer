@@ -150,6 +150,8 @@ after_initialize do
   end
 
   TopicView.on_preload do |topic_view|
+    next if !topic_view.qa_enabled
+
     topic_view.comments = {}
 
     post_ids = topic_view.posts.pluck(:id)

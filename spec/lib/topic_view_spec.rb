@@ -30,6 +30,18 @@ describe TopicView do
     vote_2
   end
 
+  it 'does not preload Q&A related records for non-Q&A topics' do
+    topic_2 = Fabricate(:topic)
+    topic_2_post = Fabricate(:post, topic: topic_2)
+    Fabricate(:post, topic: topic_2, reply_to_post_number: topic_2_post.post_number)
+
+    topic_view = TopicView.new(topic_2, user)
+
+    expect(topic_view.comments).to eq(nil)
+    expect(topic_view.comments_counts).to eq(nil)
+    expect(topic_view.posts_user_voted).to eq(nil)
+  end
+
   it "should preload comments, comments count and user voted status correctly" do
     topic_view = TopicView.new(topic, user)
 
