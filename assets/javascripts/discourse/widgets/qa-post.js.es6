@@ -128,9 +128,9 @@ export default createWidget("qa-post", {
     whoVoted({ post_id: attrs.post.id }).then((result) => {
       if (result.voters) {
         state.voters = result.voters.map((voter) => {
-          const attrs = smallUserAtts(voter);
-          attrs.direction = voter.direction;
-          return attrs;
+          const userAttrs = smallUserAtts(voter);
+          userAttrs.direction = voter.direction;
+          return userAttrs;
         });
 
         this.scheduleRerender();
