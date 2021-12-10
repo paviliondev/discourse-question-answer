@@ -6,13 +6,13 @@ export default createWidget("qa-comments", {
 
   defaultState(attrs) {
     return {
-      comments: attrs.comments,
+      comments: attrs.comments || [],
     };
   },
 
   html(attrs, state) {
-    const result = [];
-    const postCommentsLength = state.comments.length || 0;
+    const result = [],
+      postCommentsLength = state.comments.length;
 
     if (postCommentsLength > 0) {
       for (let i = 0; i < postCommentsLength; i++) {
