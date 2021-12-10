@@ -135,5 +135,22 @@ RSpec.describe QuestionAnswer::CommentsController do
       expect(payload["avatar_template"]).to eq(user.avatar_template)
       expect(payload["cooked"]).to eq(comment.cooked)
     end
+
+    it 'returns the right response when raw is invalid' do
+      sign_in(user)
+
+      watched_word = Fabricate(:watched_word)
+
+      expect do
+        post "/qa/comments.json", params: {
+          post_id: answer.id,
+          raw: "this is a #{watched_word.word} content",
+          typing_duration: 0
+        }
+      end.to change { Post.count }.by(0)
+
+      expect(response.status).to eq(403)
+      expect(response.parsed_body["errors"].first).to match(watched_word.word)
+    end
   end
 end

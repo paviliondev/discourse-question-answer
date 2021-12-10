@@ -38,7 +38,13 @@ module QuestionAnswer
         typing_duration_msecs: comments_params[:typing_duration]
       )
 
-      render_serialized(new_post_manager.perform.post, QuestionAnswer::CommentSerializer, root: false)
+      result = new_post_manager.perform
+
+      if result.success?
+        render_serialized(result.post, QuestionAnswer::CommentSerializer, root: false)
+      else
+        render_json_error(result.errors.full_messages, status: 403)
+      end
     end
 
     private
