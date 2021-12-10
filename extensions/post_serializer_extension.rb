@@ -23,7 +23,7 @@ module QuestionAnswer
 
     def comments
       (@topic_view.comments[object.post_number] || []).map do |post|
-        BasicPostSerializer.new(post, scope: scope, root: false).as_json
+        QuestionAnswer::CommentSerializer.new(post, scope: scope, root: false).as_json
       end
     end
 

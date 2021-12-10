@@ -12,6 +12,12 @@
   .qa-comment-post {
     padding: 0.7em 0;
 
+    .qa-comment-post-body {
+      .cooked {
+        padding: 0;
+      }
+    }
+
     .qa-comment-post-info {
       display: flex;
       margin-bottom: 1em;
@@ -38,22 +44,33 @@
   }
 }
 
-.qa-comment-link {
+.qa-comments-menu {
   margin: 1em 0;
 
-  .qa-comment-seperator {
+  .qa-comments-menu-composer {
+    width: $topic-body-width;
+
+    .qa-comments-menu-composer-textarea {
+      width: 100%;
+      margin-bottom: 0;
+    }
+
+    .qa-comments-menu-composer-cancel {
+      margin-left: 0.5em;
+    }
+  }
+
+  .qa-comments-menu-seperator {
     margin: 0 0.8em;
+    display: inline;
 
     &::after {
       content: "|";
     }
   }
 
-  .qa-comment-show-more {
-    display: inline;
-  }
-
-  .qa-comment-add {
+  .qa-comments-menu-show-more,
+  .qa-comments-menu-add-link {
     display: inline;
   }
 }

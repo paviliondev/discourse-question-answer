@@ -66,77 +66,16 @@ function initPlugin(api) {
     return result;
   });
 
-  api.reopenWidget("post-menu", {
-    openCommentComposer() {
-      const post = this.findAncestorModel();
-
-      this.sendWidgetAction("toggleFilteredRepliesView").then(() => {
-        this.sendWidgetAction("replyToPost", post).then(() => {
-          next(this, () => {
-            // FIXME: We have to do this because core on the client side does not allow
-            // a post to be a reply to the first post. We need to do this to
-            // support comments on the first post.
-            const composer = api.container.lookup("controller:composer");
-
-            if (!composer.model.post) {
-              composer.model.set("post", post);
-            }
-          });
-        });
-      });
-    },
-  });
-
   api.decorateWidget("post-menu:after", (helper) => {
     const result = [];
-    const post = helper.getModel();
+    const attrs = helper.widget.attrs;
 
     if (
-      post &&
-      post.qa_enabled &&
-      !post.reply_to_post_number &&
+      attrs.qa_enabled &&
+      !attrs.reply_to_post_number &&
       !helper.widget.state.filteredRepliesShown
     ) {
-      const commentLinks = [];
-
-      if (helper.widget.attrs.canCreatePost) {
-        commentLinks.push(
-          helper.h("div.qa-comment-add", [
-            helper.attach("link", {
-              className: "qa-comment-add-link",
-              action: "openCommentComposer",
-              contents: () => I18n.t("qa.post.add_comment"),
-            }),
-          ])
-        );
-      }
-
-      const postCommentsLength = post.comments?.length || 0;
-
-      if (postCommentsLength > 0) {
-        for (let i = 0; i < postCommentsLength; i++) {
-          result.push(helper.attach("qa-comment", post.comments[i]));
-        }
-
-        const mostPostCount = post.comments_count - postCommentsLength;
-
-        if (mostPostCount > 0) {
-          commentLinks.push(helper.h("span.qa-comment-seperator"));
-
-          commentLinks.push(
-            helper.h("div.qa-comment-show-more", [
-              helper.attach("link", {
-                className: "qa-comment-show-more-link",
-                action: "toggleFilteredRepliesView",
-                contents: () =>
-                  I18n.t("qa.post.show_comment", { count: mostPostCount }),
-              }),
-            ])
-          );
-        }
-      }
-
-      result.push(helper.h("div.qa-comment-link", commentLinks));
+      result.push(helper.attach("qa-comments", attrs));
     }
 
     return result;
@@ -167,6 +106,7 @@ function initPlugin(api) {
     "qa_enabled",
     "topicUserId",
     "comments",
+    "comments_count",
     "qa_disable_like",
     "qa_user_voted_direction",
     "qa_has_votes"

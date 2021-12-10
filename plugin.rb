@@ -23,8 +23,10 @@ after_initialize do
     ../extensions/topic_list_item_serializer_extension.rb
     ../extensions/topic_view_serializer_extension.rb
     ../app/controllers/question_answer/votes_controller.rb
+    ../app/controllers/question_answer/comments_controller.rb
     ../app/models/question_answer_vote.rb
     ../app/serializers/basic_voter_serializer.rb
+    ../app/serializers/question_answer/comment_serializer.rb
     ../config/routes.rb
   ).each do |path|
     load File.expand_path(path, __FILE__)
