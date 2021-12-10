@@ -36,7 +36,7 @@ createWidget("qa-comments-menu-composer", {
   tagName: "div.qa-comments-menu-composer",
   buildKey: (attrs) => `qa-comments-menu-composer-${attrs.id}`,
 
-  buildState() {
+  defaultState() {
     return { value: "", typingDuration: 0, creatingPost: false };
   },
 
@@ -81,13 +81,14 @@ createWidget("qa-comments-menu-composer", {
   },
 
   updateTypingDuration() {
-    this.state.typingDuration + THROTTLE_UPDATE_TYPING_DURATION_MS;
+    this.state.typingDuration =
+      this.state.typingDuration + THROTTLE_UPDATE_TYPING_DURATION_MS;
   },
 
   submitComment(data) {
     this.state.creatingPost = true;
 
-    ajax("/qa/comments", {
+    return ajax("/qa/comments", {
       type: "POST",
       data,
     })
