@@ -1,2 +1,4 @@
 coverage/*
 !coverage/.last_run.json
+node_modules
+
