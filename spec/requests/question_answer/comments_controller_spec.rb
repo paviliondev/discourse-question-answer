@@ -69,7 +69,6 @@ RSpec.describe QuestionAnswer::CommentsController do
       expect(comment["post_number"]).to eq(comment_2.post_number)
       expect(comment["name"]).to eq(comment_2.user.name)
       expect(comment["username"]).to eq(comment_2.user.username)
-      expect(comment["avatar_template"]).to eq(comment_2.user.avatar_template)
       expect(comment["created_at"].present?).to eq(true)
       expect(comment["cooked"]).to eq(comment_2.cooked)
 
@@ -132,7 +131,6 @@ RSpec.describe QuestionAnswer::CommentsController do
       expect(payload["id"]).to eq(comment.id)
       expect(payload["name"]).to eq(user.name)
       expect(payload["username"]).to eq(user.username)
-      expect(payload["avatar_template"]).to eq(user.avatar_template)
       expect(payload["cooked"]).to eq(comment.cooked)
     end
 
