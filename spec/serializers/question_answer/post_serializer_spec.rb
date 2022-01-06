@@ -8,7 +8,7 @@ describe QuestionAnswer::PostSerializerExtension do
   fab!(:topic) { Fabricate(:topic, category: category) }
   fab!(:post) { Fabricate(:post, topic: topic, post_number: 1) }
   fab!(:answer) { Fabricate(:post, topic: topic, post_number: 2) }
-  fab!(:comment) { create_post(topic: topic, reply_to_post_number: answer.post_number) }
+  let(:comment) { Fabricate(:qa_comment, post: answer) }
   let(:topic_view) { TopicView.new(topic, user) }
   let(:up) { QuestionAnswerVote.directions[:up] }
   let(:guardian) { Guardian.new(user) }
@@ -24,6 +24,7 @@ describe QuestionAnswer::PostSerializerExtension do
       category.custom_fields['qa_enabled'] = true
       category.save!
       category.reload
+      comment
     end
 
     it 'should return the right attributes' do

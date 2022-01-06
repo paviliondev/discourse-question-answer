@@ -11,7 +11,6 @@ describe QuestionAnswerVote do
     SiteSetting.qa_enabled = true
     SiteSetting.qa_tags = tag.name
     post.topic.tags << tag
-
   end
 
   context 'validations' do

@@ -3,10 +3,8 @@ import { createWidget } from "discourse/widgets/widget";
 import { h } from "virtual-dom";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 import { ajax } from "discourse/lib/ajax";
-import { schedule, throttle } from "@ember/runloop";
+import { schedule } from "@ember/runloop";
 import I18n from "I18n";
-
-const THROTTLE_UPDATE_TYPING_DURATION_MS = 100;
 
 createWidget("qa-comments-menu-composer-textarea", {
   tagName: "textarea",
@@ -20,15 +18,6 @@ createWidget("qa-comments-menu-composer-textarea", {
 
   input(e) {
     this.sendWidgetAction("updateValue", e.target.value);
-
-    throttle(
-      this,
-      function () {
-        this.sendWidgetAction("updateTypingDuration");
-      },
-      THROTTLE_UPDATE_TYPING_DURATION_MS,
-      false
-    );
   },
 });
 
@@ -37,7 +26,7 @@ createWidget("qa-comments-menu-composer", {
   buildKey: (attrs) => `qa-comments-menu-composer-${attrs.id}`,
 
   defaultState() {
-    return { value: "", typingDuration: 0, creatingPost: false };
+    return { value: "", creatingPost: false };
   },
 
   html(attrs, state) {
@@ -56,7 +45,6 @@ createWidget("qa-comments-menu-composer", {
         actionParam: {
           raw: state.value,
           post_id: attrs.id,
-          typing_duration: state.typingDuration,
         },
         disabled: state.creatingPost,
         contents: I18n.t("qa.post.submit_comment"),
@@ -78,11 +66,6 @@ createWidget("qa-comments-menu-composer", {
 
   updateValue(value) {
     this.state.value = value;
-  },
-
-  updateTypingDuration() {
-    this.state.typingDuration =
-      this.state.typingDuration + THROTTLE_UPDATE_TYPING_DURATION_MS;
   },
 
   submitComment(data) {
@@ -124,7 +107,7 @@ export default createWidget("qa-comments-menu", {
           action: "expandComposer",
           actionParam: {
             post_id: attrs.id,
-            post_number: attrs.lastPostNumber,
+            last_comment_id: attrs.lastCommentId,
           },
           contents: () => I18n.t("qa.post.add_comment"),
         })
@@ -143,7 +126,7 @@ export default createWidget("qa-comments-menu", {
             action: "fetchComments",
             actionParam: {
               post_id: attrs.id,
-              post_number: attrs.lastPostNumber,
+              last_comment_id: attrs.lastCommentId,
             },
             contents: () =>
               I18n.t("qa.post.show_comment", { count: attrs.moreCommentCount }),
@@ -175,7 +158,7 @@ export default createWidget("qa-comments-menu", {
   },
 
   fetchComments(data) {
-    if (!data.post_number) {
+    if (!data.post_id) {
       return Promise.resolve();
     }
 

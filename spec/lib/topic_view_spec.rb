@@ -10,9 +10,9 @@ describe TopicView do
 
   fab!(:answer) { create_post(topic: topic) }
   fab!(:answer_2) { create_post(topic: topic) }
-  fab!(:comment) { create_post(topic: topic, reply_to_post_number: answer.post_number) }
-  fab!(:comment_2) { create_post(topic: topic, reply_to_post_number: answer.post_number) }
-  fab!(:comment_3) { create_post(topic: topic, reply_to_post_number: 1) }
+  let(:comment) { Fabricate(:qa_comment, post: answer) }
+  let(:comment_2) { Fabricate(:qa_comment, post: answer) }
+  let(:comment_3) { Fabricate(:qa_comment, post: post) }
   let(:vote) { Fabricate(:qa_vote, post: answer, user: user) }
 
   let(:vote_2) do
@@ -28,6 +28,9 @@ describe TopicView do
     SiteSetting.qa_tags = tag.name
     vote
     vote_2
+    comment
+    comment_2
+    comment_3
   end
 
   it 'does not preload Q&A related records for non-Q&A topics' do
@@ -42,14 +45,11 @@ describe TopicView do
     expect(topic_view.posts_user_voted).to eq(nil)
   end
 
-  it "should preload comments, comments count and user voted status correctly" do
+  it "should preload comments, comments count and user voted status for a given topic" do
     topic_view = TopicView.new(topic, user)
 
-    expect(topic_view.comments[answer.post_number].map(&:id))
-      .to contain_exactly(comment.id, comment_2.id)
-
-    expect(topic_view.comments[1].map(&:id))
-      .to contain_exactly(comment_3.id)
+    expect(topic_view.comments[answer.id].map(&:id)).to contain_exactly(comment.id, comment_2.id)
+    expect(topic_view.comments[post.id].map(&:id)).to contain_exactly(comment_3.id)
 
     expect(topic_view.comments_counts[answer.id]).to eq(2)
     expect(topic_view.comments_counts[post.id]).to eq(1)
@@ -58,5 +58,14 @@ describe TopicView do
       answer.id => QuestionAnswerVote.directions[:up],
       answer_2.id => QuestionAnswerVote.directions[:down]
     })
+  end
+
+  it "should respect Topic::PRELOAD_COMMENTS_COUNT when loading initial comments" do
+    stub_const(TopicView, "PRELOAD_COMMENTS_COUNT", 1) do
+      topic_view = TopicView.new(topic, user)
+
+      expect(topic_view.comments[answer.id].map(&:id)).to contain_exactly(comment.id)
+      expect(topic_view.comments_counts[answer.id]).to eq(2)
+    end
   end
 end

@@ -5,7 +5,7 @@ QuestionAnswer::Engine.routes.draw do
   get 'voters' => 'votes#voters'
   post 'set_as_answer' => 'votes#set_as_answer'
 
-  get "comments" => 'comments#load_comments'
+  get "comments" => 'comments#load_more_comments'
   post "comments" => 'comments#create'
 end
 

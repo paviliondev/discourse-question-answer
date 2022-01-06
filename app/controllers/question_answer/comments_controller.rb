@@ -5,45 +5,37 @@ module QuestionAnswer
     before_action :find_post
     before_action :ensure_qa_enabled
 
-    def load_comments
+    def load_more_comments
       @guardian.ensure_can_see!(@post)
-      params.require(:post_number)
+      params.require(:last_comment_id)
 
       if @post.reply_to_post_number.present? && @post.post_number != 1
         raise Discourse::InvalidParameters
       end
 
-      posts =
-        Post
-          .where(
-            topic_id: @post.topic_id,
-            reply_to_post_number: @post.post_number,
-            post_type: Post.types[:regular],
-          )
-          .where("post_number > ?", params[:post_number])
-          .order(post_number: :asc)
+      comments =
+        QuestionAnswerComment
+          .where("id > ? AND post_id = ?", comments_params[:last_comment_id], @post.id)
+          .order(id: :asc)
 
-      render_serialized(posts, QuestionAnswer::CommentSerializer, root: "comments")
+      render_serialized(comments, QuestionAnswerCommentSerializer, root: "comments")
     end
 
     def create
-      if !@guardian.can_create_post?(@post.topic)
+      if !@guardian.can_create_post_on_topic?(@post.topic)
         raise Discourse::InvalidAccess
       end
 
-      new_post_manager = NewPostManager.new(current_user,
-        raw: comments_params[:raw],
-        reply_to_post_number: @post.post_number,
-        topic_id: @post.topic_id,
-        typing_duration_msecs: comments_params[:typing_duration]
+      qa_comment = QuestionAnswerComment.new(
+        user: current_user,
+        post_id: @post.id,
+        raw: comments_params[:raw]
       )
 
-      result = new_post_manager.perform
-
-      if result.success?
-        render_serialized(result.post, QuestionAnswer::CommentSerializer, root: false)
+      if qa_comment.save
+        render_serialized(qa_comment, QuestionAnswerCommentSerializer, root: false)
       else
-        render_json_error(result.errors.full_messages, status: 403)
+        render_json_error(qa_comment.errors.full_messages, status: 403)
       end
     end
 
@@ -51,7 +43,7 @@ module QuestionAnswer
 
     def comments_params
       params.require(:post_id)
-      params.permit(:post_id, :post_number, :raw, :typing_duration)
+      params.permit(:post_id, :last_comment_id, :raw)
     end
 
     def find_post

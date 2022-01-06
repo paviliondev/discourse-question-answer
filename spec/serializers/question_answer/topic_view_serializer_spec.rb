@@ -13,13 +13,14 @@ describe QuestionAnswer::TopicViewSerializerExtension do
   fab!(:topic) { Fabricate(:topic, category: category) }
   fab!(:topic_post) { Fabricate(:post, topic: topic) }
   fab!(:answer) { Fabricate(:post, topic: topic, reply_to_post_number: nil) }
-  fab!(:comment) { Fabricate(:post, reply_to_post_number: answer.post_number, topic: topic) }
+  let(:comment) { Fabricate(:qa_comment, post: answer) }
   fab!(:user) { Fabricate(:user) }
   fab!(:guardian) { Guardian.new(user) }
   let(:topic_view) { TopicView.new(topic, user) }
 
   before do
     SiteSetting.qa_enabled = true
+    comment
   end
 
   it 'should return correct values' do

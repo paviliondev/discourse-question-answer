@@ -25,8 +25,8 @@ export default createWidget("qa-comments", {
         this.attach("qa-comments-menu", {
           id: attrs.id,
           moreCommentCount: attrs.comments_count - postCommentsLength,
-          lastPostNumber: state.comments
-            ? state.comments[state.comments.length - 1]?.post_number || 0
+          lastCommentId: state.comments
+            ? state.comments[state.comments.length - 1]?.id || 0
             : 0,
         })
       );

@@ -6,8 +6,7 @@ module QuestionAnswer
       base.ignored_columns = %w[vote_count]
 
       base.has_many :question_answer_votes
-
-      base.validate :ensure_valid_qa_comment
+      base.validate :ensure_only_answer
     end
 
     def qa_enabled
@@ -35,13 +34,13 @@ module QuestionAnswer
 
     private
 
-    def ensure_valid_qa_comment
+    def ensure_only_answer
       if will_save_change_to_reply_to_post_number? &&
           reply_to_post_number &&
-          !Post.exists?(topic_id: topic_id, reply_to_post_number: nil, post_number: reply_to_post_number) &&
+          reply_to_post_number != 1 &&
           qa_enabled
 
-        errors.add(:base, I18n.t("post.qa.errors.depth"))
+        errors.add(:base, I18n.t("post.qa.errors.replying_to_post_not_permited"))
       end
     end
   end

@@ -18,19 +18,13 @@ describe Post do
   end
 
   context "validation" do
-    it "ensures that comments are only nested one level deep" do
-      post_2 = Fabricate(:post, reply_to_post_number: post.post_number, topic: post.topic)
+    it "ensures that post cannot be created with reply_to_post_number set" do
+      post.reply_to_post_number = 3
 
-      post_3 = Fabricate.build(:post,
-        reply_to_post_number: post_2.post_number,
-        topic: post.topic,
-        user: post_2.user
-      )
+      expect(post.valid?).to eq(false)
 
-      expect(post_3.valid?).to eq(false)
-
-      expect(post_3.errors.full_messages).to contain_exactly(
-        I18n.t("post.qa.errors.depth")
+      expect(post.errors.full_messages).to contain_exactly(
+        I18n.t("post.qa.errors.replying_to_post_not_permited")
       )
     end
   end

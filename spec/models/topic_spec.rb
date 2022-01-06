@@ -2,10 +2,6 @@
 
 require 'rails_helper'
 
-Fabricator(:comment, from: :post) do
-  reply_to_post_number
-end
-
 describe Topic do
   fab!(:user) { Fabricate(:user) }
   fab!(:category) { Fabricate(:category) }
@@ -16,13 +12,11 @@ describe Topic do
     5.times.map { Fabricate(:post, topic: topic) }.sort_by(&:created_at)
   end
 
-  fab!(:comments) do
+  let(:comments) do
+    answer = answers.first
+
     5.times.map do
-      Fabricate(
-        :comment,
-        topic: topic,
-        reply_to_post_number: 2
-      )
+      Fabricate(:qa_comment, post: answer)
     end.sort_by(&:created_at)
   end
 
@@ -31,6 +25,7 @@ describe Topic do
   before do
     SiteSetting.qa_tags = tag.name
     topic.tags << tag
+    comments
   end
 
   let(:up) { QuestionAnswerVote.directions[:up] }

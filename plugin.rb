@@ -23,11 +23,14 @@ after_initialize do
     ../extensions/topic_extension.rb
     ../extensions/topic_list_item_serializer_extension.rb
     ../extensions/topic_view_serializer_extension.rb
+    ../extensions/topic_view_extension.rb
+    ../extensions/user_extension.rb
     ../app/controllers/question_answer/votes_controller.rb
     ../app/controllers/question_answer/comments_controller.rb
     ../app/models/question_answer_vote.rb
+    ../app/models/question_answer_comment.rb
     ../app/serializers/basic_voter_serializer.rb
-    ../app/serializers/question_answer/comment_serializer.rb
+    ../app/serializers/question_answer_comment_serializer.rb
     ../config/routes.rb
   ).each do |path|
     load File.expand_path(path, __FILE__)
@@ -68,10 +71,7 @@ after_initialize do
   end
 
   class ::TopicView
-    attr_accessor :comments,
-                  :comments_counts,
-                  :posts_user_voted,
-                  :posts_voted_on
+    include QuestionAnswer::TopicViewExtension
   end
 
   class ::TopicViewSerializer
@@ -84,6 +84,10 @@ after_initialize do
 
   class ::Category
     include QuestionAnswer::CategoryExtension
+  end
+
+  class ::User
+    include QuestionAnswer::UserExtension
   end
 
   # TODO: Performance of the query degrades as the number of posts a user has voted
@@ -122,10 +126,6 @@ after_initialize do
     end
   end
 
-  class ::User
-    has_many :question_answer_votes
-  end
-
   TopicView.apply_custom_default_scope do |scope, topic_view|
     if topic_view.topic.qa_enabled &&
       !topic_view.instance_variable_get(:@replies_to_post_number) &&
@@ -160,46 +160,31 @@ after_initialize do
     post_ids = topic_view.posts.pluck(:id)
     post_ids_sql = post_ids.join(",")
 
-    comment_post_ids_sql = <<~SQL
+    comment_ids_sql = <<~SQL
     SELECT
-      post_replies.reply_post_id
-    FROM post_replies
+      question_answer_comments.id
+    FROM question_answer_comments
     INNER JOIN LATERAL (
       SELECT 1
       FROM (
         SELECT
-          posts.id AS post_id
-        FROM posts
-        INNER JOIN post_replies pr2 ON posts.id = pr2.reply_post_id
-        WHERE pr2.post_id = post_replies.post_id
-        AND posts.post_type = #{Post.types[:regular].to_i}
-        ORDER BY posts.post_number ASC
-        LIMIT 2
+          qa_comments.id
+        FROM question_answer_comments qa_comments
+        WHERE qa_comments.post_id = question_answer_comments.post_id
+        ORDER BY qa_comments.id ASC
+        LIMIT #{TopicView::PRELOAD_COMMENTS_COUNT}
       ) X
-      WHERE X.post_id = post_replies.reply_post_id
+      WHERE X.id = question_answer_comments.id
     ) Y ON true
-    WHERE post_replies.post_id IN (#{post_ids_sql})
+    WHERE question_answer_comments.post_id IN (#{post_ids_sql})
     SQL
 
-    Post.where("id IN (#{comment_post_ids_sql})").order(post_number: :asc).each do |post|
-      topic_view.comments[post.reply_to_post_number] ||= []
-      topic_view.comments[post.reply_to_post_number] << post
+    QuestionAnswerComment.where("id IN (#{comment_ids_sql})").each do |qa_comment|
+      topic_view.comments[qa_comment.post_id] ||= []
+      topic_view.comments[qa_comment.post_id] << qa_comment
     end
 
-    comments_counts_sql = <<~SQL
-    SELECT
-      post_replies.post_id,
-      COUNT(*) AS comments_count
-    FROM post_replies
-    WHERE post_replies.post_id IN (#{post_ids_sql})
-    GROUP BY post_replies.post_id
-    SQL
-
-    topic_view.comments_counts = {}
-
-    DB.query(comments_counts_sql).each do |result|
-      topic_view.comments_counts[result.post_id] = result.comments_count
-    end
+    topic_view.comments_counts = QuestionAnswerComment.where(post_id: post_ids).group(:post_id).count
 
     topic_view.posts_user_voted = {}
 

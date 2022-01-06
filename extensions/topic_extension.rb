@@ -34,22 +34,20 @@ module QuestionAnswer
 
     def comments
       @comments ||= begin
-        posts
-          .where.not(reply_to_post_number: nil)
-          .order(post_number: :asc)
+        QuestionAnswerComment.joins(:post).where("posts.topic_id = ?", self.id)
       end
     end
 
     def last_commented_on
       return unless comments.present?
 
-      comments.last[:created_at]
+      comments.last.created_at
     end
 
     def last_answer_post_number
       return unless answers.any?
 
-      answers.last[:post_number]
+      answers.last.post_number
     end
 
     def last_answerer
