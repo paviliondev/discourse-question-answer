@@ -29,7 +29,7 @@ RSpec.describe QuestionAnswer::CommentsController do
   end
 
   describe '#load_comments' do
-    it 'returns the right response when Q&A is not enabled' do
+    it 'returns the right response when QnA is not enabled' do
       SiteSetting.qa_enabled = false
 
       get "/qa/comments.json", params: {
@@ -135,6 +135,59 @@ RSpec.describe QuestionAnswer::CommentsController do
       expect(payload["name"]).to eq(user.name)
       expect(payload["username"]).to eq(user.username)
       expect(payload["cooked"]).to eq(comment.cooked)
+    end
+  end
+
+  describe '#destroy' do
+    it 'should return 403 for an anon user' do
+      delete "/qa/comments.json", params: { comment_id: comment.id }
+
+      expect(response.status).to eq(403)
+    end
+
+    it 'should return 404 when comment_id param given does not exist' do
+      sign_in(comment.user)
+
+      delete "/qa/comments.json", params: { comment_id: -99999 }
+
+      expect(response.status).to eq(404)
+    end
+
+    it 'should return 403 when trying to delete a comment on a post the user cannot see' do
+      sign_in(comment.user)
+
+      category.set_permissions(group => :readonly)
+      category.save!
+
+      delete "/qa/comments.json", params: { comment_id: comment.id }
+
+      expect(response.status).to eq(403)
+    end
+
+    it "should return 403 when a user is trying to delete another user's comment" do
+      sign_in(Fabricate(:user))
+
+      delete "/qa/comments.json", params: { comment_id: comment.id }
+
+      expect(response.status).to eq(403)
+    end
+
+    it "should allow an admin to delete a comment of another user" do
+      sign_in(Fabricate(:admin))
+
+      delete "/qa/comments.json", params: { comment_id: comment.id }
+
+      expect(response.status).to eq(200)
+      expect(QuestionAnswerComment.exists?(id: comment.id)).to eq(false)
+    end
+
+    it "should allow users to delete their own comment" do
+      sign_in(comment.user)
+
+      delete "/qa/comments.json", params: { comment_id: comment.id }
+
+      expect(response.status).to eq(200)
+      expect(QuestionAnswerComment.exists?(id: comment.id)).to eq(false)
     end
   end
 end

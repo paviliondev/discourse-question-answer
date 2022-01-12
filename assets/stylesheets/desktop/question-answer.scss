@@ -17,7 +17,7 @@
     display: flex;
     flex-wrap: wrap;
 
-    .qa-comment-post-body {
+    .qa-comment-cooked {
       .cooked {
         padding: 0;
 
@@ -27,11 +27,11 @@
       }
     }
 
-    .qa-comment-post-info-separator {
+    .qa-comment-info-separator {
       margin: 0 0.3em;
     }
 
-    .qa-comment-post-info-username {
+    .qa-comment-info-username {
       .username {
         font-weight: 100;
         margin-right: 0.2em;
@@ -42,8 +42,20 @@
       }
     }
 
-    .qa-comment-post-info-created {
+    .qa-comment-info-created {
       color: var(--primary-med-or-secondary-med);
+    }
+
+    .qa-comment-actions {
+      margin-left: auto;
+
+      .qa-comment-actions-delete-link {
+        color: var(--primary-med-or-secondary-med);
+      }
+
+      .qa-comment-actions-delete-link:hover {
+        color: var(--danger);
+      }
     }
   }
 }

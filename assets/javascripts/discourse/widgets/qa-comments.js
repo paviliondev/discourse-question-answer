@@ -7,12 +7,13 @@ export default createWidget("qa-comments", {
   defaultState(attrs) {
     return {
       comments: attrs.comments || [],
+      commentCount: attrs.comments_count || 0,
     };
   },
 
   html(attrs, state) {
-    const result = [],
-      postCommentsLength = state.comments.length;
+    const result = [];
+    const postCommentsLength = state.comments.length;
 
     if (postCommentsLength > 0) {
       for (let i = 0; i < postCommentsLength; i++) {
@@ -24,7 +25,7 @@ export default createWidget("qa-comments", {
       result.push(
         this.attach("qa-comments-menu", {
           id: attrs.id,
-          moreCommentCount: attrs.comments_count - postCommentsLength,
+          moreCommentCount: state.commentCount - postCommentsLength,
           lastCommentId: state.comments
             ? state.comments[state.comments.length - 1]?.id || 0
             : 0,
@@ -37,5 +38,22 @@ export default createWidget("qa-comments", {
 
   appendComments(comments) {
     this.state.comments = this.state.comments.concat(comments);
+  },
+
+  removeComment(commentId) {
+    let removed = false;
+
+    this.state.comments = this.state.comments.filter((comment) => {
+      if (comment.id === commentId) {
+        removed = true;
+        return false;
+      } else {
+        return true;
+      }
+    });
+
+    if (removed) {
+      this.state.commentCount--;
+    }
   },
 });

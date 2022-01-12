@@ -2,6 +2,7 @@
 
 class QuestionAnswerCommentSerializer < ApplicationSerializer
   attributes :id,
+             :user_id,
              :name,
              :username,
              :created_at,

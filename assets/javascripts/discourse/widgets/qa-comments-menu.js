@@ -104,7 +104,7 @@ export default createWidget("qa-comments-menu", {
       result.push(
         this.attach("link", {
           className: "qa-comment-add-link",
-          action: "expandComposer",
+          action: this.currentUser ? "expandComposer" : "showLogin",
           actionParam: {
             post_id: attrs.id,
             last_comment_id: attrs.lastCommentId,

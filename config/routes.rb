@@ -7,6 +7,7 @@ QuestionAnswer::Engine.routes.draw do
 
   get "comments" => 'comments#load_more_comments'
   post "comments" => 'comments#create'
+  delete "comments" => 'comments#destroy'
 end
 
 Discourse::Application.routes.append do

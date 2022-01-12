@@ -2,8 +2,9 @@
 
 module QuestionAnswer
   class CommentsController < ::ApplicationController
-    before_action :find_post
-    before_action :ensure_qa_enabled
+    before_action :find_post, only: [:load_more_comments, :create]
+    before_action :ensure_qa_enabled, only: [:load_more_comments, :create]
+    before_action :ensure_logged_in, only: [:create, :destroy]
 
     def load_more_comments
       @guardian.ensure_can_see!(@post)
@@ -37,6 +38,23 @@ module QuestionAnswer
       else
         render_json_error(qa_comment.errors.full_messages, status: 403)
       end
+    end
+
+    def destroy
+      params.require(:comment_id)
+
+      qa_comment = QuestionAnswerComment.find_by(id: params[:comment_id])
+      raise Discourse::NotFound if qa_comment.blank?
+
+      @guardian.ensure_can_see!(qa_comment.post)
+
+      if qa_comment.user_id != current_user.id && !@guardian.is_admin?
+        raise Discourse::InvalidAccess
+      end
+
+      qa_comment.trash!
+
+      render json: success_json
     end
 
     private
