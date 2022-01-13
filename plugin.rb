@@ -5,6 +5,7 @@
 # version: 1.6.0
 # authors: Angus McLeod, Muhlis Cahyono (muhlisbc@gmail.com)
 # url: https://github.com/paviliondev/discourse-question-answer
+# transpile_js: true
 
 %i[common desktop mobile].each do |type|
   register_asset "stylesheets/#{type}/question-answer.scss", type
