@@ -16,6 +16,7 @@ module QuestionAnswer
 
       comments =
         QuestionAnswerComment
+          .includes(:user)
           .where("id > ? AND post_id = ?", comments_params[:last_comment_id], @post.id)
           .order(id: :asc)
 

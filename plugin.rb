@@ -179,7 +179,7 @@ after_initialize do
     WHERE question_answer_comments.post_id IN (#{post_ids_sql})
     SQL
 
-    QuestionAnswerComment.where("id IN (#{comment_ids_sql})").each do |qa_comment|
+    QuestionAnswerComment.includes(:user).where("id IN (#{comment_ids_sql})").each do |qa_comment|
       topic_view.comments[qa_comment.post_id] ||= []
       topic_view.comments[qa_comment.post_id] << qa_comment
     end
