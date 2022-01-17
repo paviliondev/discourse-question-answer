@@ -17,6 +17,7 @@ after_initialize do
   %w(
     ../lib/question_answer/engine.rb
     ../lib/question_answer/vote_manager.rb
+    ../lib/question_answer/guardian.rb
     ../extensions/category_extension.rb
     ../extensions/post_extension.rb
     ../extensions/post_serializer_extension.rb
@@ -88,6 +89,10 @@ after_initialize do
 
   class ::User
     include QuestionAnswer::UserExtension
+  end
+
+  class ::Guardian
+    include QuestionAnswer::Guardian
   end
 
   # TODO: Performance of the query degrades as the number of posts a user has voted
@@ -177,9 +182,10 @@ after_initialize do
       WHERE X.id = question_answer_comments.id
     ) Y ON true
     WHERE question_answer_comments.post_id IN (#{post_ids_sql})
+    ORDER BY question_answer_comments.id ASC
     SQL
 
-    QuestionAnswerComment.where("id IN (#{comment_ids_sql})").each do |qa_comment|
+    QuestionAnswerComment.where("id IN (#{comment_ids_sql})").order(id: :asc).each do |qa_comment|
       topic_view.comments[qa_comment.post_id] ||= []
       topic_view.comments[qa_comment.post_id] << qa_comment
     end

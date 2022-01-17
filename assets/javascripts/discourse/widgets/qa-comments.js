@@ -56,4 +56,12 @@ export default createWidget("qa-comments", {
       this.state.commentCount--;
     }
   },
+
+  updateComment(comment) {
+    const index = this.state.comments.findIndex(
+      (oldComment) => oldComment.id === comment.id
+    );
+    this.state.comments[index] = comment;
+    this.scheduleRerender();
+  },
 });
