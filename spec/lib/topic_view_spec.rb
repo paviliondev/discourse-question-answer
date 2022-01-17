@@ -68,4 +68,16 @@ describe TopicView do
       expect(topic_view.comments_counts[answer.id]).to eq(2)
     end
   end
+
+  it "should preload the right comments even if comments have been deleted" do
+    comment_4 = Fabricate(:qa_comment, post: answer)
+    comment.trash!
+
+    stub_const(TopicView, "PRELOAD_COMMENTS_COUNT", 2) do
+      topic_view = TopicView.new(topic, user)
+
+      expect(topic_view.comments[answer.id].map(&:id)).to contain_exactly(comment_2.id, comment_4.id)
+      expect(topic_view.comments_counts[answer.id]).to eq(2)
+    end
+  end
 end

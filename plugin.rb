@@ -176,12 +176,14 @@ after_initialize do
           qa_comments.id
         FROM question_answer_comments qa_comments
         WHERE qa_comments.post_id = question_answer_comments.post_id
+        AND qa_comments.deleted_at IS NULL
         ORDER BY qa_comments.id ASC
         LIMIT #{TopicView::PRELOAD_COMMENTS_COUNT}
       ) X
       WHERE X.id = question_answer_comments.id
     ) Y ON true
     WHERE question_answer_comments.post_id IN (#{post_ids_sql})
+    AND question_answer_comments.deleted_at IS NULL
     SQL
 
     QuestionAnswerComment.includes(:user).where("id IN (#{comment_ids_sql})").order(id: :asc).each do |qa_comment|
