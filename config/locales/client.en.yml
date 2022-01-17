@@ -65,6 +65,7 @@ en:
     qa:
       post:
         submit_comment: "comment"
+        edit_comment: "edit"
         cancel_comment: "cancel"
         add_comment: "Add a comment"
         show_comment:

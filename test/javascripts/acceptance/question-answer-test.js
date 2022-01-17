@@ -2,6 +2,7 @@ import { click, fillIn, visit } from "@ember/test-helpers";
 import {
   acceptance,
   exists,
+  query,
   queryAll,
   updateCurrentUser,
 } from "discourse/tests/helpers/qunit-helpers";
@@ -117,6 +118,17 @@ function setupQA(needs) {
     server.delete("/qa/comments", () => {
       return helper.response({});
     });
+
+    server.put("/qa/comments", () => {
+      return helper.response({
+        id: 1,
+        user_id: 12345,
+        name: "Some Name",
+        username: "someusername",
+        created_at: "2022-01-12T08:21:54.175Z",
+        cooked: "<p>I edited this comment</p>",
+      });
+    });
   });
 }
 
@@ -190,8 +202,38 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     );
   });
 
+  test("editing a comment", async function (assert) {
+    updateCurrentUser({ id: 12345 }); // userId of comments in fixtures
+
+    await visit("/t/12345");
+
+    assert.strictEqual(
+      query("#post_1 .qa-comment-cooked").textContent,
+      "Test comment 1",
+      "displays the right content for the given comment"
+    );
+
+    await click("#post_1 .qa-comment-actions-edit-link");
+    await fillIn(
+      "#post_1 .qa-comment-editor-1 textarea",
+      "I edited this comment"
+    );
+    await click("#post_1 .qa-comment-editor-1 .qa-comment-editor-submit");
+
+    assert.strictEqual(
+      query("#post_1 .qa-comment-cooked").textContent,
+      "I edited this comment",
+      "displays the right content after comment has been edited"
+    );
+
+    assert.ok(
+      !exists("#post_1 .qa-comment-editor-1"),
+      "hides editor after comment has been edited"
+    );
+  });
+
   test("deleting a comment", async function (assert) {
-    updateCurrentUser({ id: 12345 });
+    updateCurrentUser({ id: 12345 }); // userId of comments in fixtures
 
     await visit("/t/12345");
 

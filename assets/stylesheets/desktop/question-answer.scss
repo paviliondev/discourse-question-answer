@@ -47,7 +47,13 @@
     }
 
     .qa-comment-actions {
+      display: none;
       margin-left: auto;
+
+      .qa-comment-actions-edit-link {
+        color: var(--primary-med-or-secondary-med);
+        margin-right: 0.25em;
+      }
 
       .qa-comment-actions-delete-link {
         color: var(--primary-med-or-secondary-med);
@@ -57,6 +63,25 @@
         color: var(--danger);
       }
     }
+  }
+
+  .qa-comment-editor {
+    margin: 0.5em 0;
+
+    textarea {
+      width: 100%;
+      margin-bottom: 0;
+    }
+
+    .qa-comment-editor-cancel {
+      margin-left: 0.5em;
+    }
+  }
+}
+
+.qa-comment:hover {
+  .qa-comment-actions {
+    display: inline-block;
   }
 }
 

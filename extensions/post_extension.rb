@@ -6,6 +6,7 @@ module QuestionAnswer
       base.ignored_columns = %w[vote_count]
 
       base.has_many :question_answer_votes
+      base.has_many :question_answer_comments
       base.validate :ensure_only_answer
     end
 

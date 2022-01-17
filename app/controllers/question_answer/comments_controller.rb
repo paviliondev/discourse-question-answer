@@ -4,7 +4,7 @@ module QuestionAnswer
   class CommentsController < ::ApplicationController
     before_action :find_post, only: [:load_more_comments, :create]
     before_action :ensure_qa_enabled, only: [:load_more_comments, :create]
-    before_action :ensure_logged_in, only: [:create, :destroy]
+    before_action :ensure_logged_in, only: [:create, :destroy, :update]
 
     def load_more_comments
       @guardian.ensure_can_see!(@post)
@@ -28,32 +28,43 @@ module QuestionAnswer
         raise Discourse::InvalidAccess
       end
 
-      qa_comment = QuestionAnswerComment.new(
+      comment = QuestionAnswerComment.new(
         user: current_user,
         post_id: @post.id,
         raw: comments_params[:raw]
       )
 
-      if qa_comment.save
-        render_serialized(qa_comment, QuestionAnswerCommentSerializer, root: false)
+      if comment.save
+        render_serialized(comment, QuestionAnswerCommentSerializer, root: false)
       else
-        render_json_error(qa_comment.errors.full_messages, status: 403)
+        render_json_error(comment.errors.full_messages, status: 403)
+      end
+    end
+
+    def update
+      params.require(:comment_id)
+      params.require(:raw)
+
+      comment = find_comment(params[:comment_id])
+      @guardian.ensure_can_see!(comment.post)
+
+      raise Discourse::InvalidAccess if !@guardian.can_edit_comment?(comment)
+
+      if comment.update(raw: params[:raw])
+        render_serialized(comment, QuestionAnswerCommentSerializer, root: false)
+      else
+        render_json_error(comment.errors.full_messages, status: 403)
       end
     end
 
     def destroy
       params.require(:comment_id)
+      comment = find_comment(params[:comment_id])
 
-      qa_comment = QuestionAnswerComment.find_by(id: params[:comment_id])
-      raise Discourse::NotFound if qa_comment.blank?
+      @guardian.ensure_can_see!(comment.post)
+      raise Discourse::InvalidAccess if !@guardian.can_delete_comment?(comment)
 
-      @guardian.ensure_can_see!(qa_comment.post)
-
-      if qa_comment.user_id != current_user.id && !@guardian.is_admin?
-        raise Discourse::InvalidAccess
-      end
-
-      qa_comment.trash!
+      comment.trash!
 
       render json: success_json
     end
@@ -63,6 +74,12 @@ module QuestionAnswer
     def comments_params
       params.require(:post_id)
       params.permit(:post_id, :last_comment_id, :raw)
+    end
+
+    def find_comment(comment_id)
+      comment = QuestionAnswerComment.find_by(id: comment_id)
+      raise Discourse::NotFound if comment.blank?
+      comment
     end
 
     def find_post

@@ -17,6 +17,7 @@ after_initialize do
   %w(
     ../lib/question_answer/engine.rb
     ../lib/question_answer/vote_manager.rb
+    ../lib/question_answer/guardian.rb
     ../extensions/category_extension.rb
     ../extensions/post_extension.rb
     ../extensions/post_serializer_extension.rb
@@ -88,6 +89,10 @@ after_initialize do
 
   class ::User
     include QuestionAnswer::UserExtension
+  end
+
+  class ::Guardian
+    include QuestionAnswer::Guardian
   end
 
   # TODO: Performance of the query degrades as the number of posts a user has voted

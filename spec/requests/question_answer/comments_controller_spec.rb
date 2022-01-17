@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe QuestionAnswer::CommentsController do
   fab!(:user) { Fabricate(:user) }
+  fab!(:admin) { Fabricate(:admin) }
   fab!(:category) { Fabricate(:category) }
   fab!(:tag) { Fabricate(:tag) }
   fab!(:group) { Fabricate(:group) }
@@ -138,6 +139,85 @@ RSpec.describe QuestionAnswer::CommentsController do
     end
   end
 
+  describe '#update' do
+    it 'should return 403 for an anon user' do
+      put "/qa/comments.json", params: {
+        comment_id: comment.id,
+        raw: 'this is some new raw'
+      }
+
+      expect(response.status).to eq(403)
+    end
+
+    it 'should return 404 when comment_id is not associated to a valid record' do
+      sign_in(comment.user)
+
+      put "/qa/comments.json", params: {
+        comment_id: -999999,
+        raw: 'this is some new raw'
+      }
+
+      expect(response.status).to eq(404)
+    end
+
+    it 'should return 403 when trying to update a comment on a post the user cannot see' do
+      sign_in(comment.user)
+
+      category.set_permissions(group => :readonly)
+      category.save!
+
+      put "/qa/comments.json", params: {
+        comment_id: comment.id,
+        raw: 'this is some new raw'
+      }
+
+      expect(response.status).to eq(403)
+    end
+
+    it 'should return 403 when a user is trying to update the comment of another user' do
+      sign_in(Fabricate(:user))
+
+      put "/qa/comments.json", params: {
+        comment_id: comment.id,
+        raw: 'this is some new raw'
+      }
+
+      expect(response.status).to eq(403)
+    end
+
+    it 'should allow an admin to update the comment' do
+      sign_in(admin)
+
+      put "/qa/comments.json", params: {
+        comment_id: comment.id,
+        raw: 'this is some new raw'
+      }
+
+      expect(response.status).to eq(200)
+
+      body = response.parsed_body
+
+      expect(body["raw"]).to eq("this is some new raw")
+      expect(body["cooked"]).to eq("<p>this is some new raw</p>")
+    end
+
+    it 'should allow users to update their own comment' do
+      sign_in(comment.user)
+
+      put "/qa/comments.json", params: {
+        comment_id: comment.id,
+        raw: 'this is some new raw'
+      }
+
+      expect(response.status).to eq(200)
+
+      body = response.parsed_body
+
+      expect(body["raw"]).to eq("this is some new raw")
+      expect(body["cooked"]).to eq("<p>this is some new raw</p>")
+    end
+  end
+
   describe '#destroy' do
     it 'should return 403 for an anon user' do
       delete "/qa/comments.json", params: { comment_id: comment.id }
@@ -173,7 +253,7 @@ RSpec.describe QuestionAnswer::CommentsController do
     end
 
     it "should allow an admin to delete a comment of another user" do
-      sign_in(Fabricate(:admin))
+      sign_in(admin)
 
       delete "/qa/comments.json", params: { comment_id: comment.id }
 

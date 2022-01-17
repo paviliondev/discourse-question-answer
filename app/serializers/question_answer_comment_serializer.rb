@@ -6,6 +6,7 @@ class QuestionAnswerCommentSerializer < ApplicationSerializer
              :name,
              :username,
              :created_at,
+             :raw,
              :cooked
 
   def name
