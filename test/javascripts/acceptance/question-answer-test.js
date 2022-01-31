@@ -1,4 +1,4 @@
-import { click, fillIn, visit } from "@ember/test-helpers";
+import { click, fillIn, triggerEvent, visit } from "@ember/test-helpers";
 import {
   acceptance,
   exists,
@@ -194,6 +194,33 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     );
 
     await click(".qa-comments-menu-composer-submit");
+
+    assert.strictEqual(
+      queryAll("#post_1 .qa-comment").length,
+      3,
+      "should add the new comment"
+    );
+  });
+
+  test("adding a comment with keyboard shortcut", async function (assert) {
+    await visit("/t/12345");
+    await click("#post_1 .qa-comment-add-link");
+
+    assert.strictEqual(
+      queryAll("#post_1 .qa-comment").length,
+      2,
+      "loads all comments when composer is expanded"
+    );
+
+    await fillIn(
+      ".qa-comments-menu-composer-textarea",
+      "this is a new test comment"
+    );
+
+    await triggerEvent(".qa-comments-menu-composer-submit", "keydown", {
+      key: "Enter",
+      ctrlKey: true,
+    });
 
     assert.strictEqual(
       queryAll("#post_1 .qa-comment").length,

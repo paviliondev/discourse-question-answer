@@ -24,10 +24,6 @@ createWidget("qa-comments-menu-composer", {
     result.push(
       this.attach("button", {
         action: "submitComment",
-        actionParam: {
-          raw: state.value,
-          post_id: attrs.id,
-        },
         disabled: state.creatingPost,
         contents: I18n.t("qa.post.submit_comment"),
         icon: "reply",
@@ -50,12 +46,18 @@ createWidget("qa-comments-menu-composer", {
     this.state.value = value;
   },
 
-  submitComment(data) {
+  keyDown(e) {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      this.submitComment();
+    }
+  },
+
+  submitComment() {
     this.state.creatingPost = true;
 
     return ajax("/qa/comments", {
       type: "POST",
-      data,
+      data: { raw: this.state.value, post_id: this.attrs.id },
     })
       .then((response) => {
         this.sendWidgetAction("appendComments", [response]);
