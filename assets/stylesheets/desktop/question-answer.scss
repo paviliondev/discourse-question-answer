@@ -1,119 +1,10 @@
 .qa-answer-count,
 .qa-comments-count {
   padding: 1.5em;
-  font-size: var(--font-up-1);
-  box-sizing: border-box;
 }
 
 .qa-comments {
   width: $topic-body-width;
-}
-
-.qa-comment {
-  border-top: 1px solid var(--primary-low);
-
-  .qa-comment-post {
-    padding: 0.7em 0;
-    display: flex;
-    flex-wrap: wrap;
-
-    .qa-comment-cooked {
-      .cooked {
-        padding: 0;
-
-        p {
-          margin: 0;
-        }
-      }
-    }
-
-    .qa-comment-info-separator {
-      margin: 0 0.3em;
-    }
-
-    .qa-comment-info-username {
-      .username {
-        font-weight: 100;
-        margin-right: 0.2em;
-      }
-
-      a {
-        color: var(--tertiary);
-      }
-    }
-
-    .qa-comment-info-created {
-      color: var(--primary-med-or-secondary-med);
-    }
-
-    .qa-comment-actions {
-      display: none;
-      margin-left: auto;
-
-      .qa-comment-actions-edit-link {
-        color: var(--primary-med-or-secondary-med);
-        margin-right: 0.25em;
-      }
-
-      .qa-comment-actions-delete-link {
-        color: var(--primary-med-or-secondary-med);
-      }
-
-      .qa-comment-actions-delete-link:hover {
-        color: var(--danger);
-      }
-    }
-  }
-
-  .qa-comment-editor {
-    margin: 0.5em 0;
-
-    textarea {
-      width: 100%;
-      margin-bottom: 0;
-    }
-
-    .qa-comment-editor-cancel {
-      margin-left: 0.5em;
-    }
-  }
-}
-
-.qa-comment:hover {
-  .qa-comment-actions {
-    display: inline-block;
-  }
-}
-
-.qa-comments-menu {
-  margin: 1em 0;
-
-  .qa-comments-menu-composer {
-    width: $topic-body-width;
-
-    .qa-comments-menu-composer-textarea {
-      width: 100%;
-      margin-bottom: 0;
-    }
-
-    .qa-comments-menu-composer-cancel {
-      margin-left: 0.5em;
-    }
-  }
-
-  .qa-comments-menu-seperator {
-    margin: 0 0.8em;
-    display: inline;
-
-    &::after {
-      content: "|";
-    }
-  }
-
-  .qa-comments-menu-show-more,
-  .qa-comments-menu-add-link {
-    display: inline;
-  }
 }
 
 .qa-post {
@@ -121,58 +12,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 1em;
-
-  .qa-post-list {
-    box-shadow: shadow("card");
-    background-color: var(--secondary);
-    display: flex;
-    flex-direction: column;
-    padding: 0.5em;
-    border: 1px solid var(--primary-low);
-
-    .qa-post-list-voters-wrapper {
-      display: flex;
-      flex-direction: row;
-    }
-  }
-
-  .qa-post-list-voters {
-    display: flex;
-
-    a {
-      margin-left: 0.5em;
-    }
-  }
-
-  .qa-post-list-count,
-  .qa-post-list-icon {
-    margin: 0.15em 0.25em 0 0.25em;
-    font-size: var(--font-up-1);
-    color: var(--primary-low-mid);
-  }
+  margin-top: 0.5em;
 
   .qa-button {
     .d-icon {
-      margin-right: 0;
       font-size: var(--font-up-6);
     }
-
-    &.qa-button-voted {
-      .d-icon {
-        color: var(--success);
-      }
-    }
   }
+}
 
-  .qa-button,
-  .qa-post-toggle-voters {
-    background: var(--secondary);
-    padding: 0.25em 0.5em;
-
-    &:hover {
-      background: dark-light-diff($primary, $secondary, 65%, -75%);
-      color: var(--secondary);
-    }
-  }
+.qa-button,
+.qa-post-toggle-voters {
+  padding: 0em;
 }

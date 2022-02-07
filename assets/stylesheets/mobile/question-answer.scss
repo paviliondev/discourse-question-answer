@@ -1,0 +1,24 @@
+.qa-answer-count,
+.qa-comments-count {
+  padding: 1em;
+}
+
+.qa-post {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  .qa-button {
+    padding: 0;
+
+    .d-icon {
+      font-size: $font-up-3;
+    }
+  }
+}
+
+.qa-button,
+.qa-post-toggle-voters {
+  padding: 0.5em;
+}
