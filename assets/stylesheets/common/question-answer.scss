@@ -12,49 +12,39 @@
     padding: 0.7em 0;
 
     .qa-comment-cooked {
-      .cooked {
-        padding: 0;
-
-        p {
-          margin: 0;
-        }
+      p {
+        display: inline;
       }
     }
 
-    .qa-comment-info {
-      display: flex;
-      flex-direction: row;
-      margin-bottom: 0.25em;
+    .qa-comment-info-separator {
+      margin: 0 0.3em;
+    }
 
-      .qa-comment-info-username {
-        .username {
-          font-weight: 100;
-          margin-right: 0.2em;
-        }
+    .qa-comment-info-username {
+      display: inline;
+      margin-right: 0.3em;
+    }
+
+    .qa-comment-info-created {
+      color: var(--primary-med-or-secondary-med);
+    }
+
+    .qa-comment-actions {
+      display: none;
+      margin-left: 0.3em;
+
+      .qa-comment-actions-edit-link {
+        color: var(--primary-med-or-secondary-med);
+        margin-right: 0.25em;
       }
 
-      .qa-comment-info-created {
-        margin-left: auto;
+      .qa-comment-actions-delete-link {
         color: var(--primary-med-or-secondary-med);
       }
 
-      .qa-comment-actions {
-        display: none;
-        margin-left: auto;
-        margin-right: 0.5em;
-
-        .qa-comment-actions-edit-link {
-          color: var(--primary-med-or-secondary-med);
-          margin-right: 0.25em;
-        }
-
-        .qa-comment-actions-delete-link {
-          color: var(--primary-med-or-secondary-med);
-        }
-
-        .qa-comment-actions-delete-link:hover {
-          color: var(--danger);
-        }
+      .qa-comment-actions-delete-link:hover {
+        color: var(--danger);
       }
     }
   }
@@ -74,16 +64,8 @@
 }
 
 .qa-comment:hover {
-  .qa-comment-post {
-    .qa-comment-info {
-      .qa-comment-info-created {
-        margin-left: 0;
-      }
-
-      .qa-comment-actions {
-        display: inline-block;
-      }
-    }
+  .qa-comment-actions {
+    display: inline-block;
   }
 }
 
