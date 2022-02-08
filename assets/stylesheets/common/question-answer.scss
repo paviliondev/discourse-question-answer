@@ -10,8 +10,6 @@
 
   .qa-comment-post {
     padding: 0.7em 0;
-    display: flex;
-    flex-wrap: wrap;
 
     .qa-comment-cooked {
       .cooked {
@@ -23,40 +21,40 @@
       }
     }
 
-    .qa-comment-info-separator {
-      margin: 0 0.3em;
-    }
+    .qa-comment-info {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 0.25em;
 
-    .qa-comment-info-username {
-      .username {
-        font-weight: 100;
-        margin-right: 0.2em;
+      .qa-comment-info-username {
+        .username {
+          font-weight: 100;
+          margin-right: 0.2em;
+        }
       }
 
-      a {
-        color: var(--tertiary);
-      }
-    }
-
-    .qa-comment-info-created {
-      color: var(--primary-med-or-secondary-med);
-    }
-
-    .qa-comment-actions {
-      display: none;
-      margin-left: auto;
-
-      .qa-comment-actions-edit-link {
-        color: var(--primary-med-or-secondary-med);
-        margin-right: 0.25em;
-      }
-
-      .qa-comment-actions-delete-link {
+      .qa-comment-info-created {
+        margin-left: auto;
         color: var(--primary-med-or-secondary-med);
       }
 
-      .qa-comment-actions-delete-link:hover {
-        color: var(--danger);
+      .qa-comment-actions {
+        display: none;
+        margin-left: auto;
+        margin-right: 0.5em;
+
+        .qa-comment-actions-edit-link {
+          color: var(--primary-med-or-secondary-med);
+          margin-right: 0.25em;
+        }
+
+        .qa-comment-actions-delete-link {
+          color: var(--primary-med-or-secondary-med);
+        }
+
+        .qa-comment-actions-delete-link:hover {
+          color: var(--danger);
+        }
       }
     }
   }
@@ -76,8 +74,16 @@
 }
 
 .qa-comment:hover {
-  .qa-comment-actions {
-    display: inline-block;
+  .qa-comment-post {
+    .qa-comment-info {
+      .qa-comment-info-created {
+        margin-left: 0;
+      }
+
+      .qa-comment-actions {
+        display: inline-block;
+      }
+    }
   }
 }
 

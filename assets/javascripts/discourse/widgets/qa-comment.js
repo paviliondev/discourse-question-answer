@@ -2,7 +2,7 @@ import { createWidget } from "discourse/widgets/widget";
 import { h } from "virtual-dom";
 import PostCooked from "discourse/widgets/post-cooked";
 import DecoratorHelper from "discourse/widgets/decorator-helper";
-import { longDateNoYear } from "discourse/lib/formatter";
+import { dateNode } from "discourse/helpers/node";
 
 export default createWidget("qa-comment", {
   tagName: "div.qa-comment",
@@ -16,25 +16,28 @@ export default createWidget("qa-comment", {
     if (state.isEditing) {
       return [this.attach("qa-comment-editor", attrs)];
     } else {
-      const result = [
-        h(
-          "span.qa-comment-cooked",
-          new PostCooked(attrs, new DecoratorHelper(this), this.currentUser)
-        ),
-        h("span.qa-comment-info-separator", "–"),
+      const commentInfo = [
         h("span.qa-comment-info-username", this.attach("poster-name", attrs)),
-        h(
-          "span.qa-comment-info-created",
-          longDateNoYear(new Date(attrs.created_at))
-        ),
       ];
 
       if (
         this.currentUser &&
         (attrs.user_id === this.currentUser.id || this.currentUser.admin)
       ) {
-        result.push(this.attach("qa-comment-actions", attrs));
+        commentInfo.push(this.attach("qa-comment-actions", attrs));
       }
+
+      commentInfo.push(
+        h("span.qa-comment-info-created", dateNode(new Date(attrs.created_at)))
+      );
+
+      const result = [
+        h("div.qa-comment-info", commentInfo),
+        h(
+          "span.qa-comment-cooked",
+          new PostCooked(attrs, new DecoratorHelper(this), this.currentUser)
+        ),
+      ];
 
       return [h("div.qa-comment-post", result)];
     }
