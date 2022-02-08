@@ -57,7 +57,7 @@ describe Topic do
   it 'should return correct last_commented_on' do
     expected = comments.last.created_at
 
-    expect(topic.last_commented_on).to eq(expected)
+    expect(topic.last_commented_on).to eq_time(expected)
   end
 
   it 'should return correct last_answer_post_number' do
