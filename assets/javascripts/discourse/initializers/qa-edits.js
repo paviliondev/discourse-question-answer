@@ -92,7 +92,6 @@ function initPlugin(api) {
     if (
       model &&
       model.get("qa_enabled") &&
-      model.get("post_number") !== 1 &&
       !model.get("reply_to_post_number")
     ) {
       const qaPost = helper.attach("qa-post", {

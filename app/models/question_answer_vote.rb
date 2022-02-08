@@ -31,7 +31,7 @@ class QuestionAnswerVote < ActiveRecord::Base
   def ensure_valid_post
     if !post.qa_enabled
       errors.add(:base, I18n.t("post.qa.errors.qa_not_enabled"))
-    elsif post.post_number == 1 || post.reply_to_post_number.present?
+    elsif post.reply_to_post_number.present?
       errors.add(:base, I18n.t("post.qa.errors.voting_not_permitted"))
     end
   end

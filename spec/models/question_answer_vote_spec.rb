@@ -26,18 +26,10 @@ describe QuestionAnswerVote do
       )
     end
 
-    it 'ensures that only valid posts can be voted on' do
-      post.update!(post_number: 1)
+    it 'ensures that only posts in reply to other posts cannot be voted on' do
+      post.update!(post_number: 2, reply_to_post_number: 1)
 
       qa_vote = QuestionAnswerVote.new(post: post, user: user, direction: QuestionAnswerVote.directions[:up])
-
-      expect(qa_vote.valid?).to eq(false)
-
-      expect(qa_vote.errors.full_messages).to contain_exactly(
-        I18n.t("post.qa.errors.voting_not_permitted")
-      )
-
-      post.update!(post_number: 2, reply_to_post_number: 1)
 
       expect(qa_vote.valid?).to eq(false)
 
