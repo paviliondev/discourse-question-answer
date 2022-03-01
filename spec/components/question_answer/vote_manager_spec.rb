@@ -21,7 +21,7 @@ describe QuestionAnswer::VoteManager do
     it 'can create an upvote' do
       QuestionAnswer::VoteManager.vote(post, user, direction: up)
 
-      expect(QuestionAnswerVote.exists?(post: post, user: user, direction: up))
+      expect(QuestionAnswerVote.exists?(votable: post, user: user, direction: up))
         .to eq(true)
 
       expect(post.qa_vote_count).to eq(1)
@@ -30,7 +30,7 @@ describe QuestionAnswer::VoteManager do
     it 'can create a downvote' do
       QuestionAnswer::VoteManager.vote(post, user, direction: down)
 
-      expect(QuestionAnswerVote.exists?(post: post, user: user, direction: down))
+      expect(QuestionAnswerVote.exists?(votable: post, user: user, direction: down))
         .to eq(true)
 
       expect(post.qa_vote_count).to eq(-1)
@@ -58,10 +58,10 @@ describe QuestionAnswer::VoteManager do
     it "should remove a user's upvote" do
       vote = QuestionAnswer::VoteManager.vote(post, user, direction: up)
 
-      QuestionAnswer::VoteManager.remove_vote(vote.post, vote.user)
+      QuestionAnswer::VoteManager.remove_vote(vote.votable, vote.user)
 
       expect(QuestionAnswerVote.exists?(id: vote.id)).to eq(false)
-      expect(vote.post.qa_vote_count).to eq(0)
+      expect(vote.votable.qa_vote_count).to eq(0)
     end
 
     it "should remove a user's upvote" do
@@ -71,7 +71,7 @@ describe QuestionAnswer::VoteManager do
 
       expect do
         QuestionAnswer::VoteManager.remove_vote(post, user)
-      end.to change { vote.post.reload.qa_vote_count }.from(1).to(2)
+      end.to change { vote.votable.reload.qa_vote_count }.from(1).to(2)
 
       expect(QuestionAnswerVote.exists?(id: vote_3.id)).to eq(false)
     end

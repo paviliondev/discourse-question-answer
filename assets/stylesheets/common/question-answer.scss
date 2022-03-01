@@ -7,10 +7,41 @@
 .qa-comment {
   font-size: $font-down-1;
   border-top: 1px solid var(--primary-low);
+  display: flex;
+  flex-direction: row;
+  padding: 0.7em 0;
+
+  .qa-comment-actions-vote {
+    margin-right: 0.5em;
+    display: inline-grid;
+    grid-auto-flow: column;
+    align-items: center;
+
+    .qa-comment-actions-vote-count {
+      text-align: center;
+      width: auto;
+      min-width: 16px;
+      color: var(--primary-low-mid-or-secondary-high);
+    }
+
+    .btn {
+      font-size: var(--font-up-3);
+      background: none;
+
+      &.qa-button-voted {
+        .d-icon {
+          color: var(--success);
+        }
+      }
+
+      .d-icon {
+        color: var(--primary-low-mid-or-secondary-high);
+        margin: 0;
+      }
+    }
+  }
 
   .qa-comment-post {
-    padding: 0.7em 0;
-
     .qa-comment-cooked {
       p {
         display: inline;

@@ -3,13 +3,24 @@ import { h } from "virtual-dom";
 import RawHtml from "discourse/widgets/raw-html";
 import { dateNode } from "discourse/helpers/node";
 import { formatUsername } from "discourse/lib/utilities";
+import { ajax } from "discourse/lib/ajax";
+import { popupAjaxError } from "discourse/lib/ajax-error";
 
 export default createWidget("qa-comment", {
   tagName: "div.qa-comment",
   buildKey: (attrs) => `qa-comment-${attrs.id}`,
 
+  buildClasses(attrs) {
+    return [`qa-comment-${attrs.id}`];
+  },
+
+  sendShowLogin() {
+    const appRoute = this.register.lookup("route:application");
+    appRoute.send("showLogin");
+  },
+
   defaultState() {
-    return { isEditing: false };
+    return { isEditing: false, isVoting: false };
   },
 
   html(attrs, state) {
@@ -43,8 +54,69 @@ export default createWidget("qa-comment", {
         result.push(this.attach("qa-comment-actions", attrs));
       }
 
-      return [h("div.qa-comment-post", result)];
+      return [
+        h("div.qa-comment-actions-vote", [
+          h(
+            "span.qa-comment-actions-vote-count",
+            `${attrs.qa_vote_count > 0 ? attrs.qa_vote_count : ""}`
+          ),
+          this.attach("qa-button", {
+            direction: "up",
+            loading: state.isVoting,
+            voted: attrs.user_voted,
+          }),
+        ]),
+        h("div.qa-comment-post", result),
+      ];
     }
+  },
+
+  removeVote() {
+    this.state.isVoting = true;
+
+    this.attrs.qa_vote_count--;
+    this.attrs.user_voted = false;
+
+    return ajax("/qa/vote/comment", {
+      type: "DELETE",
+      data: { comment_id: this.attrs.id },
+    })
+      .catch((e) => {
+        this.attrs.qa_vote_count++;
+        this.attrs.user_voted = true;
+        popupAjaxError(e);
+      })
+      .finally(() => {
+        this.state.isVoting = false;
+      });
+  },
+
+  vote(direction) {
+    if (!this.currentUser) {
+      return this.sendShowLogin();
+    }
+
+    if (direction !== "up") {
+      return;
+    }
+
+    this.state.isVoting = true;
+
+    this.attrs.qa_vote_count++;
+    this.attrs.user_voted = true;
+
+    return ajax("/qa/vote/comment", {
+      type: "POST",
+      data: { comment_id: this.attrs.id },
+    })
+      .catch((e) => {
+        this.attrs.qa_vote_count--;
+        this.attrs.user_voted = false;
+        popupAjaxError(e);
+      })
+      .finally(() => {
+        this.state.isVoting = false;
+      });
   },
 
   expandEditor() {

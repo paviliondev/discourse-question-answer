@@ -3,8 +3,8 @@
 module QuestionAnswer
   class VotesController < ::ApplicationController
     before_action :ensure_logged_in
-    before_action :find_vote_post
-    before_action :ensure_can_see_post
+    before_action :find_vote_post, only: [:create, :destroy, :set_as_answer, :voters]
+    before_action :ensure_can_see_post, only: [:create, :destroy, :set_as_answer, :voters]
     before_action :ensure_qa_enabled, only: [:create, :destroy]
     before_action :ensure_staff, only: [:set_as_answer]
 
@@ -26,6 +26,25 @@ module QuestionAnswer
       end
 
       if QuestionAnswer::VoteManager.vote(@post, current_user, direction: vote_params[:direction])
+        render json: success_json
+      else
+        render json: failed_json, status: 422
+      end
+    end
+
+    def create_comment_vote
+      comment = find_comment
+      ensure_can_see_comment!(comment)
+
+      if QuestionAnswerVote.exists?(votable: comment, user: current_user)
+        raise Discourse::InvalidAccess.new(
+          nil,
+          nil,
+          custom_message: 'vote.error.one_vote_per_comment'
+        )
+      end
+
+      if QuestionAnswer::VoteManager.vote(comment, current_user, direction: QuestionAnswerVote.directions[:up])
         render json: success_json
       else
         render json: failed_json, status: 422
@@ -57,6 +76,25 @@ module QuestionAnswer
       end
     end
 
+    def destroy_comment_vote
+      comment = find_comment
+      ensure_can_see_comment!(comment)
+
+      if !QuestionAnswerVote.exists?(votable: comment, user: current_user)
+        raise Discourse::InvalidAccess.new(
+          nil,
+          nil,
+          custom_message: 'vote.error.user_has_not_voted'
+        )
+      end
+
+      if QuestionAnswer::VoteManager.remove_vote(comment, current_user)
+        render json: success_json
+      else
+        render json: failed_json, status: 422
+      end
+    end
+
     def set_as_answer
       Post.transaction do
         @post.update!(reply_to_post_number: nil)
@@ -72,7 +110,7 @@ module QuestionAnswer
       # TODO: Probably a site setting to hide/show voters
       voters = User
         .joins(:question_answer_votes)
-        .where(question_answer_votes: { post_id: @post.id })
+        .where(question_answer_votes: { votable_id: @post.id, votable_type: 'Post' })
         .order("question_answer_votes.created_at DESC")
         .select("users.*", "question_answer_votes.direction")
         .limit(VOTERS_LIMIT)
@@ -85,7 +123,7 @@ module QuestionAnswer
     private
 
     def vote_params
-      params.permit(:post_id, :direction)
+      params.permit(:post_id, :comment_id, :direction)
     end
 
     def find_vote_post
@@ -107,6 +145,16 @@ module QuestionAnswer
 
     def ensure_qa_enabled
       raise Discourse::InvalidAccess.new unless Topic.qa_enabled(@post.topic)
+    end
+
+    def find_comment
+      comment = QuestionAnswerComment.find_by(id: vote_params[:comment_id])
+      raise Discourse::NotFound if comment.blank?
+      comment
+    end
+
+    def ensure_can_see_comment!(comment)
+      @guardian.ensure_can_see!(comment.post)
     end
   end
 end

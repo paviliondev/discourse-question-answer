@@ -23,7 +23,9 @@ module QuestionAnswer
 
     def comments
       (@topic_view.comments[object.id] || []).map do |comment|
-        QuestionAnswerCommentSerializer.new(comment, scope: scope, root: false).as_json
+        serializer = QuestionAnswerCommentSerializer.new(comment, scope: scope, root: false)
+        serializer.comments_user_voted = @topic_view.comments_user_voted
+        serializer.as_json
       end
     end
 

@@ -86,7 +86,7 @@ describe QuestionAnswerComment do
     it 'supports emoji markdown engine' do
       qa_comment = Fabricate(:qa_comment, post: post, raw: ':grin:')
 
-      expect(qa_comment.cooked).to eq("<p><img src=\"/images/emoji/twitter/grin.png?v=#{Emoji::EMOJI_VERSION}\" title=\":grin:\" class=\"emoji only-emoji\" alt=\":grin:\"></p>")
+      expect(qa_comment.cooked).to eq("<p><img src=\"/images/emoji/twitter/grin.png?v=#{Emoji::EMOJI_VERSION}\" title=\":grin:\" class=\"emoji only-emoji\" alt=\":grin:\" loading=\"lazy\" width=\"20\" height=\"20\"></p>")
     end
 
     it 'supports censored markdown engine' do

@@ -22,3 +22,11 @@
 .qa-post-toggle-voters {
   padding: 0.5em;
 }
+
+.qa-comment {
+  .qa-comment-actions-vote {
+    .qa-button-upvote {
+      padding: 0;
+    }
+  }
+}

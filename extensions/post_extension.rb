@@ -5,8 +5,8 @@ module QuestionAnswer
     def self.included(base)
       base.ignored_columns = %w[vote_count]
 
-      base.has_many :question_answer_votes
-      base.has_many :question_answer_comments
+      base.has_many :question_answer_votes, as: :votable, dependent: :delete_all
+      base.has_many :question_answer_comments, dependent: :destroy
       base.validate :ensure_only_answer
     end
 
@@ -16,14 +16,14 @@ module QuestionAnswer
 
     def qa_last_voted(user_id)
       QuestionAnswerVote
-        .where(post_id: self.id, user_id: user_id)
+        .where(votable: self, user_id: user_id)
         .order(created_at: :desc)
         .pluck_first(:created_at)
     end
 
     def qa_can_vote(user_id, direction = nil)
       direction ||= QuestionAnswerVote.directions[:up]
-      !QuestionAnswerVote.exists?(post_id: self.id, user_id: user_id, direction: direction)
+      !QuestionAnswerVote.exists?(votable: self, user_id: user_id, direction: direction)
     end
 
     def comments

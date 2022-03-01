@@ -46,14 +46,15 @@ RSpec.describe QuestionAnswer::VotesController do
       expect(response.status).to eq(403)
     end
 
-    it 'should success if never voted' do
+    it 'should be successful if post has never been voted' do
       post '/qa/vote.json', params: { post_id: answer.id }
 
       expect(response.status).to eq(200)
 
       vote = answer.question_answer_votes.first
 
-      expect(vote.post_id).to eq(answer.id)
+      expect(vote.votable_type).to eq('Post')
+      expect(vote.votable_id).to eq(answer.id)
       expect(vote.user_id).to eq(qa_user.id)
     end
 
@@ -78,7 +79,7 @@ RSpec.describe QuestionAnswer::VotesController do
 
       vote = answer.question_answer_votes.first
 
-      expect(vote.post_id).to eq(answer.id)
+      expect(vote.votable).to eq(answer)
       expect(vote.user_id).to eq(qa_user.id)
 
       delete '/qa/vote.json', params: { post_id: answer.id }
@@ -133,20 +134,20 @@ RSpec.describe QuestionAnswer::VotesController do
       sign_in(qa_user)
 
       Fabricate(:qa_vote,
-        post: answer,
+        votable: answer,
         user: Fabricate(:user),
         direction: QuestionAnswerVote.directions[:down]
       )
 
-      Fabricate(:qa_vote, post: answer, user: user)
+      Fabricate(:qa_vote, votable: answer, user: user)
 
       Fabricate(:qa_vote,
-        post: answer,
+        votable: answer,
         user: qa_user,
         direction: QuestionAnswerVote.directions[:down]
       )
 
-      Fabricate(:qa_vote, post: answer_2, user: user)
+      Fabricate(:qa_vote, votable: answer_2, user: user)
 
       stub_const(QuestionAnswer::VotesController, "VOTERS_LIMIT", 2) do
         get '/qa/voters.json', params: { post_id: answer.id }
@@ -191,6 +192,85 @@ RSpec.describe QuestionAnswer::VotesController do
 
         expect(response.status).to eq(403)
       end
+    end
+  end
+
+  describe '#create_comment_vote' do
+    let(:qa_comment) { Fabricate(:qa_comment, post: answer) }
+
+    it 'should return 403 for an anon user' do
+      post '/qa/vote/comment.json', params: { comment_id: qa_comment.id }
+
+      expect(response.status).to eq(403)
+    end
+
+    it 'should return 404 if comment_id param is not valid' do
+      sign_in(qa_user)
+
+      post '/qa/vote/comment.json', params: { comment_id: -999 }
+
+      expect(response.status).to eq(404)
+    end
+
+    it 'should return 403 if user is not allowed to see comment' do
+      sign_in(qa_user)
+
+      topic.update!(category: category)
+      category.update!(read_restricted: true)
+
+      post '/qa/vote/comment.json', params: { comment_id: qa_comment.id }
+
+      expect(response.status).to eq(403)
+    end
+
+    it 'allows user to vote on a comment' do
+      sign_in(qa_user)
+
+      expect do
+        post '/qa/vote/comment.json', params: { comment_id: qa_comment.id }
+
+        expect(response.status).to eq(200)
+      end.to change { qa_comment.reload.votes.length }.from(0).to(1)
+
+      expect(qa_comment.qa_vote_count).to eq(1)
+    end
+  end
+
+  describe '#destroy_comment_vote' do
+    let(:qa_comment) { Fabricate(:qa_comment, post: answer) }
+
+    it 'should return 403 for an anon user' do
+      delete '/qa/vote/comment.json', params: { comment_id: qa_comment.id }
+
+      expect(response.status).to eq(403)
+    end
+
+    it 'should return 404 if comment_id param is not valid' do
+      sign_in(qa_user)
+
+      delete '/qa/vote/comment.json', params: { comment_id: -999 }
+
+      expect(response.status).to eq(404)
+    end
+
+    it 'should return 403 if user has not voted on comment' do
+      sign_in(qa_user)
+
+      delete '/qa/vote/comment.json', params: { comment_id: qa_comment.id }
+
+      expect(response.status).to eq(403)
+    end
+
+    it "should be able to remove a user's vote from a comment" do
+      QuestionAnswer::VoteManager.vote(qa_comment, qa_user, direction: QuestionAnswerVote.directions[:up])
+
+      sign_in(qa_user)
+
+      expect do
+        delete '/qa/vote/comment.json', params: { comment_id: qa_comment.id }
+
+        expect(response.status).to eq(200)
+      end.to change { qa_comment.reload.votes.length }.from(1).to(0)
     end
   end
 end

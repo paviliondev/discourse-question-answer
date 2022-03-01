@@ -2,13 +2,13 @@
 
 module QuestionAnswer
   class VoteManager
-    def self.vote(post, user, direction: nil)
+    def self.vote(obj, user, direction: nil)
       direction ||= QuestionAnswerVote.directions[:up]
 
       ActiveRecord::Base.transaction do
         existing_vote = QuestionAnswerVote.find_by(
           user: user,
-          post: post,
+          votable: obj,
           direction: QuestionAnswerVote.reverse_direction(direction)
         )
 
@@ -23,24 +23,23 @@ module QuestionAnswer
 
         vote = QuestionAnswerVote.create!(
           user: user,
-          post: post,
+          votable: obj,
           direction: direction
         )
 
-        post.update!(qa_vote_count: (post.qa_vote_count || 0) + count_change)
-        post.publish_change_to_clients!(:acted)
+        obj.update!(qa_vote_count: (obj.qa_vote_count || 0) + count_change)
 
         vote
       end
     end
 
-    def self.remove_vote(post, user)
+    def self.remove_vote(obj, user)
       ActiveRecord::Base.transaction do
-        vote = QuestionAnswerVote.find_by(post: post, user: user)
+        vote = QuestionAnswerVote.find_by(votable: obj, user: user)
         direction = vote.direction
         vote.destroy!
         count_change = QuestionAnswerVote.directions[:up] == direction ? -1 : 1
-        post.update!(qa_vote_count: (post.qa_vote_count) + count_change)
+        obj.update!(qa_vote_count: obj.qa_vote_count + count_change)
       end
     end
 

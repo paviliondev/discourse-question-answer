@@ -41,6 +41,8 @@ function qaEnabledTopicResponse() {
       username: "someusername",
       created_at: "2022-01-12T08:21:54.175Z",
       cooked: "<p>Test comment 2</p>",
+      qa_vote_count: 0,
+      user_voted: false,
     },
     {
       id: 3,
@@ -49,6 +51,8 @@ function qaEnabledTopicResponse() {
       username: "someusername",
       created_at: "2022-01-12T08:21:54.175Z",
       cooked: "<p>Test comment 3</p>",
+      qa_vote_count: 3,
+      user_voted: false,
     },
     {
       id: 4,
@@ -57,6 +61,8 @@ function qaEnabledTopicResponse() {
       username: "someusername2",
       created_at: "2022-01-12T08:21:54.175Z",
       cooked: "<p>Test comment 4</p>",
+      qa_vote_count: 0,
+      user_voted: false,
     },
     {
       id: 5,
@@ -65,6 +71,8 @@ function qaEnabledTopicResponse() {
       username: "someusername3",
       created_at: "2022-01-12T08:21:54.175Z",
       cooked: "<p>Test comment 5</p>",
+      qa_vote_count: 0,
+      user_voted: false,
     },
     {
       id: 6,
@@ -73,6 +81,8 @@ function qaEnabledTopicResponse() {
       username: "someusername4",
       created_at: "2022-01-12T08:21:54.175Z",
       cooked: "<p>Test comment 6</p>",
+      qa_vote_count: 0,
+      user_voted: false,
     },
   ];
 
@@ -99,6 +109,8 @@ function setupQA(needs) {
             username: "someusername4",
             created_at: "2022-01-12T08:21:54.175Z",
             cooked: "<p>Test comment 7</p>",
+            qa_vote_count: 0,
+            user_voted: false,
           },
         ],
       });
@@ -112,6 +124,8 @@ function setupQA(needs) {
         username: "someusername5",
         created_at: "2022-01-12T08:21:54.175Z",
         cooked: "<p>Test comment 9</p>",
+        qa_vote_count: 0,
+        user_voted: false,
       });
     });
 
@@ -127,7 +141,17 @@ function setupQA(needs) {
         username: "someusername",
         created_at: "2022-01-12T08:21:54.175Z",
         cooked: "<p>I edited this comment</p>",
+        qa_vote_count: 0,
+        user_voted: false,
       });
+    });
+
+    server.post("/qa/vote/comment", () => {
+      return helper.response({});
+    });
+
+    server.delete("/qa/vote/comment", () => {
+      return helper.response({});
     });
   });
 }
@@ -162,6 +186,13 @@ acceptance("Discourse Question Answer - anon user", function (needs) {
   test("adding a comment", async function (assert) {
     await visit("/t/12345");
     await click(".qa-comment-add-link");
+
+    assert.ok(exists(".login-modal"), "displays the login modal");
+  });
+
+  test("voting a comment", async function (assert) {
+    await visit("/t/12345");
+    await click("#post_2 .qa-comment-2 .qa-button-upvote");
 
     assert.ok(exists(".login-modal"), "displays the login modal");
   });
@@ -313,6 +344,42 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
       queryAll("#post_2 .qa-comment").length,
       5,
       "removes deleted comment"
+    );
+  });
+
+  test("vote count display", async function (assert) {
+    await visit("/t/12345");
+
+    assert.strictEqual(
+      query("#post_2 .qa-comment-2 .qa-comment-actions-vote-count").textContent,
+      "",
+      "does not display any text if vote count is zero"
+    );
+
+    assert.strictEqual(
+      query("#post_2 .qa-comment-3 .qa-comment-actions-vote-count").textContent,
+      "3",
+      "displays the right vote count"
+    );
+  });
+
+  test("voting on a comment and removing vote", async function (assert) {
+    await visit("/t/12345");
+
+    await click("#post_2 .qa-comment-2 .qa-button-upvote");
+
+    assert.strictEqual(
+      query("#post_2 .qa-comment-2 .qa-comment-actions-vote-count").textContent,
+      "1",
+      "updates the comment vote count correctly"
+    );
+
+    await click("#post_2 .qa-comment-2 .qa-button-upvote");
+
+    assert.strictEqual(
+      query("#post_2 .qa-comment-2 .qa-comment-actions-vote-count").textContent,
+      "",
+      "updates the comment vote count correctly"
     );
   });
 });

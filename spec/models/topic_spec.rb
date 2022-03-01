@@ -143,7 +143,7 @@ describe Topic do
         a.id
       end.sort
 
-      expect(Topic.qa_votes(topic, user).pluck(:post_id))
+      expect(Topic.qa_votes(topic, user).pluck(:votable_id))
         .to contain_exactly(*expected)
     end
   end

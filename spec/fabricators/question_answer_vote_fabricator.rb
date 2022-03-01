@@ -2,6 +2,6 @@
 
 Fabricator(:qa_vote, class_name: :question_answer_vote) do
   user
-  post
+  votable(fabricator: :post)
   direction 'up'
 end

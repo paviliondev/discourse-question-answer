@@ -5,6 +5,7 @@ en:
         replying_to_post_not_permited: "You are not allowed to create a post in reply to another post."
         qa_not_enabled: "QnA is not enabled."
         voting_not_permitted: "You are not allowed to vote on this post."
+        comment_cannot_be_downvoted: "You can only upvote comments."
 
   site_settings:
     qa_tags: "Tags to enable QnA on topic"
@@ -34,6 +35,7 @@ en:
       already_voted: "You can only vote once per question."
       undo_vote_action_window: "You can only undo votes %{minutes} after voting."
       one_vote_per_post: "You can only vote once for each post."
+      one_vote_per_comment: "You can only vote once for each comment."
 
   qa:
     comment:

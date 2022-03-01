@@ -18,6 +18,8 @@ class QuestionAnswerComment < ActiveRecord::Base
   validate :ensure_can_comment, on: [:create]
   before_validation :cook_raw, if: :will_save_change_to_raw?
 
+  has_many :votes, class_name: "QuestionAnswerVote", as: :votable, dependent: :delete_all
+
   MARKDOWN_FEATURES = %w{
     censored
     emoji

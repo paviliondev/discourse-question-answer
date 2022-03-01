@@ -7,7 +7,11 @@ class QuestionAnswerCommentSerializer < ApplicationSerializer
              :username,
              :created_at,
              :raw,
-             :cooked
+             :cooked,
+             :qa_vote_count,
+             :user_voted
+
+  attr_accessor :comments_user_voted
 
   def name
     object.user.name
@@ -15,5 +19,13 @@ class QuestionAnswerCommentSerializer < ApplicationSerializer
 
   def username
     object.user.username
+  end
+
+  def user_voted
+    if @comments_user_voted
+      @comments_user_voted[object.id]
+    else
+      object.votes.exists?(user: scope.user)
+    end
   end
 end

@@ -7,6 +7,7 @@ module QuestionAnswer
         :comments,
         :comments_counts,
         :posts_user_voted,
+        :comments_user_voted,
         :posts_voted_on
       )
 

@@ -9,6 +9,8 @@ QuestionAnswer::Engine.routes.draw do
   post "comments" => 'comments#create'
   delete "comments" => 'comments#destroy'
   put "comments" => 'comments#update'
+  post 'vote/comment' => 'votes#create_comment_vote'
+  delete 'vote/comment' => 'votes#destroy_comment_vote'
 end
 
 Discourse::Application.routes.append do
