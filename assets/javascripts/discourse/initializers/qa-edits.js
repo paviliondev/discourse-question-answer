@@ -1,12 +1,8 @@
 import I18n from "I18n";
 import { withPluginApi } from "discourse/lib/plugin-api";
-import discourseComputed, {
-  observes,
-  on,
-} from "discourse-common/utils/decorators";
+import discourseComputed, { on } from "discourse-common/utils/decorators";
 import { REPLY } from "discourse/models/composer";
 import { setAsAnswer } from "../lib/qa-utilities";
-import { next } from "@ember/runloop";
 
 function initPlugin(api) {
   const pluginId = "discourse-question-answer";
@@ -200,45 +196,6 @@ function initPlugin(api) {
       }
 
       return items;
-    },
-  });
-
-  api.modifyClass("model:topic", {
-    pluginId,
-
-    @discourseComputed("qa_enabled")
-    showQaTip(qaEnabled) {
-      return qaEnabled && this.siteSettings.qa_show_topic_tip;
-    },
-  });
-
-  api.modifyClass("component:topic-footer-buttons", {
-    pluginId,
-
-    @on("didInsertElement")
-    @observes("topic.qa_enabled")
-    hideFooterReply() {
-      const qaEnabled = this.get("topic.qa_enabled");
-      Ember.run.scheduleOnce("afterRender", () => {
-        $(
-          ".topic-footer-main-buttons > button.create:not(.answer)",
-          this.element
-        ).toggle(!qaEnabled);
-      });
-    },
-  });
-
-  api.reopenWidget("post", {
-    openCommentCompose() {
-      this.sendWidgetAction("replyToPost", this.model).then(() => {
-        next(this, () => {
-          const composer = api.container.lookup("controller:composer");
-
-          if (!composer.model.post) {
-            composer.model.set("post", this.model);
-          }
-        });
-      });
     },
   });
 
