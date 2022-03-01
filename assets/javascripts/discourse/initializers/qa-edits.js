@@ -1,12 +1,7 @@
 import I18n from "I18n";
 import { withPluginApi } from "discourse/lib/plugin-api";
-import discourseComputed, { on } from "discourse-common/utils/decorators";
-import { REPLY } from "discourse/models/composer";
-import { setAsAnswer } from "../lib/qa-utilities";
 
 function initPlugin(api) {
-  const pluginId = "discourse-question-answer";
-
   api.removePostMenuButton("reply", (attrs) => {
     return attrs.qa_enabled;
   });
@@ -134,96 +129,6 @@ function initPlugin(api) {
 
       return args;
     }
-  });
-
-  api.modifyClass("component:composer-actions", {
-    pluginId,
-
-    @on("init")
-    setupPost() {
-      const composerPost = this.get("composerModel.post");
-      if (composerPost) {
-        this.set("pluginPostSnapshot", composerPost);
-      }
-    },
-
-    @discourseComputed("pluginPostSnapshot")
-    commenting(post) {
-      return post && post.get("topic.qa_enabled") && !post.reply_to_post_number;
-    },
-
-    computeHeaderContent() {
-      let content = this._super();
-
-      if (
-        this.get("commenting") &&
-        this.get("action") === REPLY &&
-        this.get("options.userAvatar")
-      ) {
-        content.icon = "comment";
-      }
-
-      return content;
-    },
-
-    @discourseComputed("options", "canWhisper", "action", "commenting")
-    content(options, canWhisper, action, commenting) {
-      let items = this._super(...arguments);
-
-      if (commenting) {
-        items.forEach((item) => {
-          if (item.id === "reply_to_topic") {
-            item.name = I18n.t(
-              "composer.composer_actions.reply_to_question.label"
-            );
-            item.description = I18n.t(
-              "composer.composer_actions.reply_to_question.desc"
-            );
-          }
-          if (item.id === "reply_to_post") {
-            item.icon = "comment";
-            item.name = I18n.t(
-              "composer.composer_actions.comment_on_answer.label",
-              {
-                postUsername: this.get("pluginPostSnapshot.username"),
-              }
-            );
-            item.description = I18n.t(
-              "composer.composer_actions.comment_on_answer.desc"
-            );
-          }
-        });
-      }
-
-      return items;
-    },
-  });
-
-  api.reopenWidget("post-admin-menu", {
-    html() {
-      const result = this._super(...arguments);
-
-      if (this.attrs.qa_enabled && this.attrs.reply_to_post_number) {
-        const button = {
-          label: "qa.set_as_answer",
-          action: "setAsAnswer",
-          className: "popup-menu-button",
-          secondaryAction: "closeAdminMenu",
-        };
-
-        result.children.push(this.attach("post-admin-menu-button", button));
-      }
-
-      return result;
-    },
-
-    setAsAnswer() {
-      const post = this.findAncestorModel();
-
-      setAsAnswer(post).then(() => {
-        location.reload();
-      });
-    },
   });
 }
 
