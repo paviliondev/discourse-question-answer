@@ -27,7 +27,13 @@ module QuestionAnswer
           direction: direction
         )
 
-        obj.update!(qa_vote_count: (obj.qa_vote_count || 0) + count_change)
+        vote_count = (obj.qa_vote_count || 0) + count_change
+
+        obj.update!(qa_vote_count: vote_count)
+
+        DB.after_commit do
+          publish_changes(obj, user, vote_count, direction)
+        end
 
         vote
       end
@@ -39,13 +45,29 @@ module QuestionAnswer
         direction = vote.direction
         vote.destroy!
         count_change = QuestionAnswerVote.directions[:up] == direction ? -1 : 1
-        obj.update!(qa_vote_count: obj.qa_vote_count + count_change)
+        vote_count = obj.qa_vote_count + count_change
+        obj.update!(qa_vote_count: vote_count)
+
+        DB.after_commit do
+          publish_changes(obj, user, vote_count, nil)
+        end
       end
     end
 
     def self.can_undo(post, user)
       window = SiteSetting.qa_undo_vote_action_window.to_i
       window.zero? || post.qa_last_voted(user.id).to_i > window.minutes.ago.to_i
+    end
+
+    def self.publish_changes(obj, user, vote_count, direction)
+      if obj.is_a?(Post)
+        obj.publish_change_to_clients!(:qa_post_voted,
+          qa_user_voted_id: user.id,
+          qa_vote_count: vote_count,
+          qa_user_voted_direction: direction,
+          qa_has_votes: QuestionAnswerVote.exists?(votable: obj)
+        )
+      end
     end
   end
 end

@@ -2,6 +2,7 @@ import { click, fillIn, triggerEvent, visit } from "@ember/test-helpers";
 import {
   acceptance,
   exists,
+  publishToMessageBus,
   query,
   queryAll,
   updateCurrentUser,
@@ -10,9 +11,9 @@ import { test } from "qunit";
 import topicFixtures from "discourse/tests/fixtures/topic";
 import { cloneJSON } from "discourse-common/lib/object";
 
-function qaEnabledTopicResponse() {
-  const topicResponse = cloneJSON(topicFixtures["/t/280/1.json"]);
+const topicResponse = cloneJSON(topicFixtures["/t/280/1.json"]);
 
+function qaEnabledTopicResponse() {
   topicResponse.post_stream.posts[0]["qa_enabled"] = true;
   topicResponse.post_stream.posts[0]["qa_vote_count"] = 0;
   topicResponse.post_stream.posts[0]["comments_count"] = 1;
@@ -32,6 +33,7 @@ function qaEnabledTopicResponse() {
   topicResponse.post_stream.posts[1]["qa_vote_count"] = 2;
   topicResponse.post_stream.posts[1]["qa_has_votes"] = true;
   topicResponse.post_stream.posts[1]["comments_count"] = 6;
+  topicResponse.post_stream.posts[1]["qa_user_voted_direction"] = "up";
 
   topicResponse.post_stream.posts[1]["comments"] = [
     {
@@ -380,6 +382,104 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
       query("#post_2 .qa-comment-2 .qa-comment-actions-vote-count").textContent,
       "",
       "updates the comment vote count correctly"
+    );
+  });
+
+  test("receiving user post voted message where current user removed their vote", async function (assert) {
+    await visit("/t/12345");
+
+    publishToMessageBus(`/topic/${topicResponse.id}`, {
+      type: "qa_post_voted",
+      id: topicResponse.post_stream.posts[1].id,
+      qa_vote_count: 0,
+      qa_has_votes: false,
+      qa_user_voted_id: 19,
+      qa_user_voted_direction: null,
+    });
+
+    await visit("/t/12345"); // await re-renders
+
+    assert.strictEqual(
+      query("#post_2 span.qa-post-toggle-voters").textContent,
+      "0",
+      "displays the right count"
+    );
+
+    assert.notOk(
+      exists("#post_2 .qa-button-upvote.qa-button-voted"),
+      "does not highlight the upvote button"
+    );
+  });
+
+  test("receiving user post voted message where post no longer has votes", async function (assert) {
+    await visit("/t/12345");
+
+    publishToMessageBus(`/topic/${topicResponse.id}`, {
+      type: "qa_post_voted",
+      id: topicResponse.post_stream.posts[1].id,
+      qa_vote_count: 0,
+      qa_has_votes: false,
+      qa_user_voted_id: 280,
+      qa_user_voted_direction: "down",
+    });
+
+    await visit("/t/12345"); // await re-renders
+
+    assert.strictEqual(
+      query("#post_2 span.qa-post-toggle-voters").textContent,
+      "0",
+      "does not render a button to show post voters"
+    );
+  });
+
+  test("receiving user post voted message where current user is not the one that voted", async function (assert) {
+    await visit("/t/12345");
+
+    publishToMessageBus(`/topic/${topicResponse.id}`, {
+      type: "qa_post_voted",
+      id: topicResponse.post_stream.posts[1].id,
+      qa_vote_count: 5,
+      qa_has_votes: true,
+      qa_user_voted_id: 123456,
+      qa_user_voted_direction: "down",
+    });
+
+    await visit("/t/12345"); // await re-renders
+
+    assert.ok(
+      exists("#post_2 .qa-button-upvote.qa-button-voted"),
+      "highlights the upvote button for the current user"
+    );
+
+    assert.notOk(
+      exists("#post_2 .qa-button-downvote.qa-button-voted"),
+      "does not highlight the downvote button for the current user"
+    );
+  });
+
+  test("receiving user post voted message where current user is the one that voted", async function (assert) {
+    await visit("/t/12345");
+
+    publishToMessageBus(`/topic/${topicResponse.id}`, {
+      type: "qa_post_voted",
+      id: topicResponse.post_stream.posts[1].id,
+      qa_vote_count: 5,
+      qa_has_votes: true,
+      qa_user_voted_id: 19,
+      qa_user_voted_direction: "up",
+    });
+
+    await visit("/t/12345"); // await re-render
+
+    assert.strictEqual(
+      query("#post_2 .qa-post-toggle-voters").textContent,
+      "5",
+      "displays the right post vote count"
+    );
+
+    assert.ok(
+      exists("#post_2 .qa-button-upvote.qa-button-voted"),
+      "highlights the upvote button for the current user"
     );
   });
 });

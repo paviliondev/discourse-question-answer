@@ -2,6 +2,31 @@ import I18n from "I18n";
 import { withPluginApi } from "discourse/lib/plugin-api";
 
 function initPlugin(api) {
+  api.registerCustomPostMessageCallback(
+    "qa_post_voted",
+    (topicController, message) => {
+      const postStream = topicController.get("model.postStream");
+      const post = postStream.findLoadedPost(message.id);
+
+      if (post) {
+        const props = {
+          qa_vote_count: message.qa_vote_count,
+          qa_has_votes: message.qa_has_votes,
+        };
+
+        if (topicController.currentUser.id === message.qa_user_voted_id) {
+          props.qa_user_voted_direction = message.qa_user_voted_direction;
+        }
+
+        post.setProperties(props);
+
+        topicController.appEvents.trigger("post-stream:refresh", {
+          id: post.id,
+        });
+      }
+    }
+  );
+
   api.removePostMenuButton("reply", (attrs) => {
     return attrs.qa_enabled;
   });
