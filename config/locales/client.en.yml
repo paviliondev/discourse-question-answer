@@ -7,18 +7,6 @@ en:
       qa_disable_like_on_questions: "Disable likes on questions in this QnA category"
       qa_disable_like_on_comments: "Disable likes on comments in this QnA category"
 
-    composer:
-      composer_actions:
-        reply_to_question:
-          label: Answer the question
-          desc: Answer the question in the first post
-        comment_on_answer:
-          label: Comment on answer of %{postUsername}
-          desc: Comment on an answer
-        comment_on_entry:
-          label: Comment on entry of ${postUsername}
-          desc: Comment on an entry
-
     post:
       actions:
         undo:
@@ -32,24 +20,6 @@ en:
       answer:
         title: 'Answer'
         help: 'begin composing an answer to the question'
-      comment:
-        title: 'Comment'
-        help: 'begin composing a comment on this answer'
-        show_comments:
-          all: 'show <b>{{count}}</b> comments'
-          more: 'show <b>{{count}}</b> more comments'
-
-      tip:
-        qa:
-          title: "Question"
-          details: "Users can vote for the response that best answers the initial post.
-                    <ul>
-                    <li>Trust level 1 is allowed {{tl1Limit}} vote.</li>
-                    <li>Trust level 2 is allowed {{tl2Limit}} vote.</li>
-                    <li>Trust level 3 is allowed {{tl3Limit}} vote.</li>
-                    <li>Trust level 4 is allowed {{tl4Limit}} vote.</li>
-                    <li>Responses are ordered by vote count.</li>
-                    </ul>"
 
     vote:
       already_voted: "You can only vote once per question."
