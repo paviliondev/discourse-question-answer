@@ -48,4 +48,3 @@ en:
       comments_count:
         one: "{{count}} Comment"
         other: "{{count}} Comments"
-      set_as_answer: "Move to Answers"

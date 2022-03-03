@@ -3,10 +3,9 @@
 module QuestionAnswer
   class VotesController < ::ApplicationController
     before_action :ensure_logged_in
-    before_action :find_vote_post, only: [:create, :destroy, :set_as_answer, :voters]
-    before_action :ensure_can_see_post, only: [:create, :destroy, :set_as_answer, :voters]
+    before_action :find_vote_post, only: [:create, :destroy, :voters]
+    before_action :ensure_can_see_post, only: [:create, :destroy, :voters]
     before_action :ensure_qa_enabled, only: [:create, :destroy]
-    before_action :ensure_staff, only: [:set_as_answer]
 
     def create
       unless Topic.qa_can_vote(@post.topic, current_user)
@@ -93,15 +92,6 @@ module QuestionAnswer
       else
         render json: failed_json, status: 422
       end
-    end
-
-    def set_as_answer
-      Post.transaction do
-        @post.update!(reply_to_post_number: nil)
-        PostReply.where(reply_post_id: @post.id).delete_all
-      end
-
-      render json: success_json
     end
 
     VOTERS_LIMIT = 20

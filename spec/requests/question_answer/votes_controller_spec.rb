@@ -171,30 +171,6 @@ RSpec.describe QuestionAnswer::VotesController do
     end
   end
 
-  describe '#set_as_answer' do
-    context 'admin' do
-      before { sign_in(admin) }
-
-      it "should set comment as an answer" do
-        post '/qa/set_as_answer.json', params: { post_id: qa_answer.id }
-
-        expect(response.status).to eq(200)
-        expect(qa_answer.reload.reply_to_post_number).to eq(nil)
-        expect(PostReply.exists?(reply_post_id: qa_answer.id)).to eq(false)
-      end
-    end
-
-    context 'user' do
-      before { sign_in(qa_user) }
-
-      it 'should return 403' do
-        post '/qa/set_as_answer.json', params: { post_id: qa_answer.id }
-
-        expect(response.status).to eq(403)
-      end
-    end
-  end
-
   describe '#create_comment_vote' do
     let(:qa_comment) { Fabricate(:qa_comment, post: answer) }
 
