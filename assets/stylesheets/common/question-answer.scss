@@ -1,7 +1,42 @@
-.qa-answer-count,
-.qa-comments-count {
-  font-size: $font-up-1;
+.qa-topic {
+  .time-gap,
+  .topic-post-visited-line,
+  .timeline-date-wrapper,
+  .timeline-last-read,
+  .timeline-ago {
+    display: none;
+  }
+
+  .time-gap + .topic-post,
+  .topic-post-visited + .topic-post {
+    .topic-avatar,
+    .topic-body {
+      border-top: 1px solid var(--primary-low);
+    }
+  }
+}
+
+.qa-answers-header {
   box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+
+  .active {
+    font-weight: bold;
+  }
+
+  .qa-answers-headers-count {
+    font-size: $font-up-1;
+  }
+
+  .qa-answers-headers-sort {
+    margin-left: auto;
+
+    .qa-answers-headers-sort-votes,
+    .qa-answers-headers-sort-activity {
+      border: 1px solid var(--primary-low);
+    }
+  }
 }
 
 .qa-comment {

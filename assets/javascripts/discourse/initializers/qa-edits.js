@@ -1,6 +1,9 @@
 import I18n from "I18n";
 import { withPluginApi } from "discourse/lib/plugin-api";
 
+export const ORDER_BY_ACTIVITY_FILTER = "activity";
+const pluginId = "discourse-question-answer";
+
 function initPlugin(api) {
   api.registerCustomPostMessageCallback(
     "qa_post_voted",
@@ -35,49 +38,108 @@ function initPlugin(api) {
     return attrs.qa_disable_like;
   });
 
-  api.decorateWidget("post:before", (helper) => {
+  api.modifyClass("model:post-stream", {
+    pluginId,
+
+    orderStreamByActivity() {
+      this.cancelFilter();
+      this.set("filter", ORDER_BY_ACTIVITY_FILTER);
+      return this.refreshAndJumptoSecondVisible();
+    },
+
+    orderStreamByVotes() {
+      this.cancelFilter();
+      return this.refreshAndJumptoSecondVisible();
+    },
+  });
+
+  api.reopenWidget("post", {
+    orderByVotes() {
+      this._topicController()
+        .model.postStream.orderStreamByVotes()
+        .then(() => {
+          this._refreshController();
+        });
+    },
+
+    orderByActivity() {
+      this._topicController()
+        .model.postStream.orderStreamByActivity()
+        .then(() => {
+          this._refreshController();
+        });
+    },
+
+    _refreshController() {
+      this._topicController().updateQueryParams();
+      this._topicController().appEvents.trigger("qa-topic-updated");
+    },
+
+    _topicController() {
+      return this.register.lookup("controller:topic");
+    },
+  });
+
+  api.decorateWidget("post-article:before", (helper) => {
     const result = [];
     const post = helper.getModel();
 
-    if (post.qa_enabled) {
-      const topicController = helper.widget.register.lookup("controller:topic");
-
-      const positionInStream =
-        topicController.replies_to_post_number &&
-        parseInt(topicController.replies_to_post_number, 10) !== 1
-          ? 2
-          : 1;
-
-      if (post.id === post.topic.postStream.stream[positionInStream]) {
-        if (topicController.replies_to_post_number) {
-          const commentsCount = post.topic
-            .get("postStream")
-            .postForPostNumber(
-              parseInt(topicController.replies_to_post_number, 10)
-            ).comments_count;
-
-          if (commentsCount > 0) {
-            result.push(
-              helper.h(
-                "div.qa-comments-count.small-action",
-                I18n.t("qa.comments_count", { count: commentsCount })
-              )
-            );
-          }
-        } else {
-          const answerCount = post.topic.answer_count;
-
-          if (answerCount > 0) {
-            result.push(
-              helper.h(
-                "div.qa-answer-count.small-action",
-                I18n.t("qa.answer_count", { count: answerCount })
-              )
-            );
-          }
-        }
-      }
+    if (!post.qa_enabled) {
+      return result;
     }
+
+    const topicController = helper.widget.register.lookup("controller:topic");
+    let positionInStream;
+
+    if (
+      topicController.replies_to_post_number &&
+      parseInt(topicController.replies_to_post_number, 10) !== 1
+    ) {
+      positionInStream = 2;
+    } else {
+      positionInStream = 1;
+    }
+
+    const answersCount = post.topic.posts_count - 1;
+
+    if (
+      answersCount <= 0 ||
+      post.id !== post.topic.postStream.stream[positionInStream]
+    ) {
+      return result;
+    }
+
+    result.push(
+      helper.h("div.qa-answers-header.small-action", [
+        helper.h(
+          "span.qa-answers-headers-count",
+          I18n.t("qa.topic.answer_count", { count: answersCount })
+        ),
+        helper.h("span.qa-answers-headers-sort", [
+          helper.h("span", I18n.t("qa.topic.sort_by")),
+          helper.attach("button", {
+            action: "orderByVotes",
+            contents: I18n.t("qa.topic.votes"),
+            disabled: topicController.filter !== ORDER_BY_ACTIVITY_FILTER,
+            className: `qa-answers-headers-sort-votes ${
+              topicController.filter === ORDER_BY_ACTIVITY_FILTER
+                ? ""
+                : "active"
+            }`,
+          }),
+          helper.attach("button", {
+            action: "orderByActivity",
+            contents: I18n.t("qa.topic.activity"),
+            disabled: topicController.filter === ORDER_BY_ACTIVITY_FILTER,
+            className: `qa-answers-headers-sort-activity ${
+              topicController.filter === ORDER_BY_ACTIVITY_FILTER
+                ? "active"
+                : ""
+            }`,
+          }),
+        ]),
+      ])
+    );
 
     return result;
   });
