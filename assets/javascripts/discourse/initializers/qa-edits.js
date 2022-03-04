@@ -31,7 +31,7 @@ function initPlugin(api) {
   );
 
   api.removePostMenuButton("reply", (attrs) => {
-    return attrs.qa_enabled;
+    return attrs.qa_enabled && attrs.post_number !== 1;
   });
 
   api.removePostMenuButton("like", (attrs) => {
@@ -196,25 +196,6 @@ function initPlugin(api) {
   api.addPostClassesCallback((attrs) => {
     if (attrs.qa_enabled) {
       return attrs.reply_to_post_number ? ["qa-is-comment"] : ["qa-is-answer"];
-    }
-  });
-
-  api.addPostMenuButton("answer", (attrs) => {
-    if (attrs.canCreatePost && attrs.qa_enabled && attrs.firstPost) {
-      let postType = "answer";
-
-      let args = {
-        action: "replyToPost",
-        title: `topic.${postType}.help`,
-        icon: "reply",
-        className: "answer create fade-out",
-      };
-
-      if (!attrs.mobileView) {
-        args.label = `topic.${postType}.title`;
-      }
-
-      return args;
     }
   });
 }

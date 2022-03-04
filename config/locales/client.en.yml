@@ -16,11 +16,6 @@ en:
         by_you:
           vote: "You upvoted this post."
 
-    topic:
-      answer:
-        title: 'Answer'
-        help: 'begin composing an answer to the question'
-
     vote:
       already_voted: "You can only vote once per question."
       user_over_limit: "You cannot exceed the number of votes for your trust level."

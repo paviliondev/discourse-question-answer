@@ -264,6 +264,20 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     );
   });
 
+  test("reply buttons are hidden in post stream except for the first post", async function (assert) {
+    await visit("/t/280");
+
+    assert.ok(
+      exists("#post_1 .reply"),
+      "reply button is shown for the first post"
+    );
+
+    assert.notOk(
+      exists("#post_2 .reply"),
+      "reply button is only shown for the first post"
+    );
+  });
+
   test("adding a comment", async function (assert) {
     await visit("/t/280");
 
