@@ -216,6 +216,29 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
   setupQA(needs);
   needs.user();
 
+  test("non Q&A topics do not have Q&A specific class on body tag", async function (assert) {
+    await visit("/t/130");
+
+    assert.notOk(
+      !!document.querySelector("body.qa-topic"),
+      "does not append Q&A specific class on body tag"
+    );
+
+    await visit("/t/280");
+
+    assert.ok(
+      !!document.querySelector("body.qa-topic"),
+      "appends Q&A specific class on body tag"
+    );
+
+    await visit("/t/130");
+
+    assert.notOk(
+      !!document.querySelector("body.qa-topic"),
+      "does not append Q&A specific class on body tag"
+    );
+  });
+
   test("sorting post stream by activity and votes", async function (assert) {
     await visit("/t/280");
 
