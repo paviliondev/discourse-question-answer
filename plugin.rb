@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 # name: discourse-question-answer
-# about: Question / Answer Style Topics
-# version: 1.6.0
-# authors: Angus McLeod, Muhlis Cahyono (muhlisbc@gmail.com)
-# url: https://github.com/paviliondev/discourse-question-answer
+# about: Allows a topic to be created in the Q&A format
+# version: 0.0.1
+# authors: Alan Tan
+# url: https://github.com/discourse/discourse-question-answer
 # transpile_js: true
 
 %i[common desktop mobile].each do |type|

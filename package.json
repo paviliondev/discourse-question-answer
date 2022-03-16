@@ -2,7 +2,7 @@
   "name": "discourse-question-answer",
   "version": "0.1",
   "repository": "https://github.com/discourse/discourse-question-answer",
-  "author": "Angus McLeod, Muhlis Cahyono (muhlisbc@gmail.com), Tan Guo Xiang",
+  "author": "Alan Tan",
   "license": "MIT",
   "devDependencies": {
     "eslint-config-discourse": "^1.1.8"
