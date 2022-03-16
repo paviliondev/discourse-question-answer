@@ -1,20 +1,3 @@
 it:
   site_settings:
     qa_tags: "Etichette per attivare Q&A sugli argomenti"
-    qa_show_topic_tip: "Mostra un suggerimento sulla meccanica degli argomenti Q&A sotto i titoli degli argomenti Q&A"
-    qa_enabled: ""
-    qa_disable_like_on_answers: ""
-    qa_undo_vote_action_window: ""
-
-  post_action_types:
-    vote:
-      title: ''
-      description: ''
-      short_description: ''
-      long_form: ''
-
-  vote:
-    error:
-      user_has_not_voted: ""
-      already_voted: ""
-      undo_vote_action_window: ""

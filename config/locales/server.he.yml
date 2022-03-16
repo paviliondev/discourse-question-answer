@@ -1,15 +1,9 @@
 he:
   site_settings:
     qa_tags: "תגיות כדי לאפשר Q&A בפוסט"
-    qa_show_topic_tip: "הצג טיפ על המכניזם של נושאי Q&A מתחת לכותרת"
     qa_enabled: "אפשר תוסף Q&A"
     qa_disable_like_on_answers: "השבת את כפתור הלייק בפוסטים של Q&A"
     qa_undo_vote_action_window: "מספר הדקות שמשתמשים רשאים לבטל הצבעות בנושאי QnA (הזן 0 ללא הגבלה)"
-    qa_trust_level_vote_limits: "השתמש במגבלות הצבעה ברמת אמון עבור התוסף Q&A"
-    qa_tl1_vote_limit: "כמות ההצבעות המקסימלית לרמת אמון 1 עבור תוסף Q&A"
-    qa_tl2_vote_limit: "כמות ההצבעות המקסימלית לרמת אמון 2 עבור תוסף Q&A"
-    qa_tl3_vote_limit: "כמות ההצבעות המקסימלית לרמת אמון 3 עבור תוסף Q&A"
-    qa_tl4_vote_limit: "כמות ההצבעות המקסימלית לרמת אמון 4 עבור תוסף Q&A"
 
   post_action_types:
     vote:

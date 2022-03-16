@@ -1,8 +1,5 @@
 es:
   js:
-    category:
-      enable_qa: "Hacer todos los temas en esta categoría PyR (Q&A)."
-
     composer:
       composer_actions:
         reply_to_question:

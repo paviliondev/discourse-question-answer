@@ -1,12 +1,5 @@
 en:
   js:
-    category:
-      qa_settings_label: "Question Answer"
-      enable_qa: "Make all topics in this category QnA."
-      qa_disable_like_on_answers: "Disable likes on answers in this QnA category"
-      qa_disable_like_on_questions: "Disable likes on questions in this QnA category"
-      qa_disable_like_on_comments: "Disable likes on comments in this QnA category"
-
     post:
       actions:
         undo:

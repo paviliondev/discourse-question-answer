@@ -1,16 +1,9 @@
 de:
   site_settings:
     qa_tags: "Schlagwörter, die QnA für ein Thema aktivieren"
-    qa_show_topic_tip: "Zeige einen Hinweis über die Funktionsweise von QnA Themen unter dem Titel des QnA Themas"
     qa_enabled: "Aktiviere das QA Plugin"
     qa_disable_like_on_answers: "Deaktiviert die Like Schaltfläche für Antworten in QnA Themen"
     qa_undo_vote_action_window: "Anzahl an Minuten, in denen Nutzer Stimmen in QnA Themen zurücknehmen können (0 bedeutet kein Limit)"
-    qa_trust_level_vote_limits: "Setze maximale Anzahl an Stimmen abhängig von der Vertrauensstufe."
-    qa_tl1_vote_limit: "Maximale Anzahl an Stimmen für Nutzer mit Vertrauensstufe 1"
-    qa_tl2_vote_limit: "Maximale Anzahl an Stimmen für Nutzer mit Vertrauensstufe 2"
-    qa_tl3_vote_limit: "Maximale Anzahl an Stimmen für Nutzer mit Vertrauensstufe 3"
-    qa_tl4_vote_limit: "Maximale Anzahl an Stimmen für Nutzer mit Vertrauensstufe 4"
-    qa_blacklist_tags: "Schlagwörter, die QnA für ein Thema deaktivieren"
 
   post_action_types:
     vote:

@@ -1,12 +1,5 @@
 de:
   js:
-    category:
-      qa_settings_label: "Frage Antwort"
-      enable_qa: "Alle Themen in dieser Kategorie sind QnA."
-      qa_disable_like_on_answers: "Deaktiviere Likes auf Antworten in dieser QnA Kategorie"
-      qa_disable_like_on_questions: "Deaktiviere Likes auf Fragen in dieser QnA Kategorie"
-      qa_disable_like_on_comments: "Deaktiviere Likes auf Kommentare in dieser QnA Kategorie"
-
     composer:
       composer_actions:
         reply_to_question:

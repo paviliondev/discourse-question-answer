@@ -1,12 +1,5 @@
 he:
   js:
-    category:
-      qa_settings_label: "פלאגין תשובה-שאלה"
-      enable_qa: "הפוך את כל הנושאים בקטגוריה זו להיות בפורמט Q&A."
-      qa_disable_like_on_answers: "השבת את כפתור הלייק בתשובות של קטגוריה זו Q&A"
-      qa_disable_like_on_main_post: "השבת את כפתור הלייק בשאלות של קטגוריה זו Q&A"
-      qa_disable_like_on_comments: "השבת את כפתור הלייק בתגובות של קטגוריה זו Q&A"
-
     composer:
       composer_actions:
         reply_to_question:

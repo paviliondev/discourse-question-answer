@@ -72,59 +72,6 @@ describe Topic do
     expect(topic.last_answerer.id).to eq(expected)
   end
 
-  describe '.qa_can_vote' do
-    it 'should return false if user is blank' do
-      expect(Topic.qa_can_vote(topic, nil)).to eq(false)
-    end
-
-    it 'should return false if SiteSetting is disabled' do
-      SiteSetting.qa_enabled = false
-
-      expect(Topic.qa_can_vote(topic, user)).to eq(false)
-    end
-
-    it 'should return true if qa_trust_level_vote_limits is not enabled' do
-      SiteSetting.qa_trust_level_vote_limits = false
-      SiteSetting.send("qa_tl#{user.trust_level}_vote_limit=", 1)
-
-      post = answers.first
-
-      QuestionAnswer::VoteManager.vote(post, user, direction: up)
-
-      expect(Topic.qa_can_vote(topic, user)).to eq(true)
-
-      SiteSetting.qa_trust_level_vote_limits = true
-
-      expect(Topic.qa_can_vote(topic, user)).to eq(false)
-    end
-
-    it 'return false if trust level zero' do
-      SiteSetting.qa_trust_level_vote_limits = true
-
-      expect(Topic.qa_can_vote(topic, user)).to eq(true)
-
-      user.update!(trust_level: 0)
-
-      expect(Topic.qa_can_vote(topic, user)).to eq(false)
-    end
-
-    it 'return false if has voted more than qa_tl*_vote_limit' do
-      SiteSetting.qa_trust_level_vote_limits = true
-
-      expect(Topic.qa_can_vote(topic, user)).to eq(true)
-
-      SiteSetting.send("qa_tl#{user.trust_level}_vote_limit=", 1)
-
-      QuestionAnswer::VoteManager.vote(answers[0], user, direction: up)
-
-      expect(Topic.qa_can_vote(topic, user)).to eq(false)
-
-      SiteSetting.send("qa_tl#{user.trust_level}_vote_limit=", 2)
-
-      expect(Topic.qa_can_vote(topic, user)).to eq(true)
-    end
-  end
-
   describe '.qa_votes' do
     it 'should return nil if user is blank' do
       expect(Topic.qa_votes(topic, nil)).to eq(nil)
@@ -167,33 +114,6 @@ describe Topic do
       category.update!(topic_id: topic.id)
 
       expect(Topic.qa_enabled(topic)).to eq(false)
-    end
-
-    it 'should return true if has blacklist tags' do
-      tags = 3.times.map { Fabricate(:tag) }
-
-      SiteSetting.qa_blacklist_tags = tags.first.name
-      SiteSetting.qa_tags = tags.map(&:name).join('|')
-
-      topic.tags = tags
-
-      expect(Topic.qa_enabled(topic)).to eq(false)
-    end
-
-    it 'should return true on enabled category' do
-      category.custom_fields['qa_enabled'] = true
-      category.save!
-      category.reload
-
-      expect(Topic.qa_enabled(topic)).to eq(true)
-    end
-
-    it 'should return true if question subtype' do
-      topic.subtype = 'question'
-      topic.save!
-      topic.reload
-
-      expect(Topic.qa_enabled(topic)).to eq(true)
     end
   end
 end

@@ -1,8 +1,5 @@
 fr:
   js:
-    category:
-      enable_qa: "Faites tous les sujets de cette catégorie QnA."
-
     composer:
       composer_actions:
         reply_to_question:

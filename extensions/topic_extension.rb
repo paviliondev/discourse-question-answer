@@ -62,18 +62,6 @@ module QuestionAnswer
 
     # class methods
     module ClassMethods
-      def qa_can_vote(topic, user)
-        return false if user.blank? || !SiteSetting.qa_enabled
-        return true if !SiteSetting.qa_trust_level_vote_limits
-        trust_level = user.trust_level
-
-        return false if trust_level.zero?
-
-        topic_vote_limit = SiteSetting.public_send("qa_tl#{trust_level}_vote_limit")
-        topic_vote_count = qa_votes(topic, user).count
-        topic_vote_limit.to_i > topic_vote_count
-      end
-
       # rename to something like qa_user_votes?
       def qa_votes(topic, user)
         return nil if !user || !SiteSetting.qa_enabled
@@ -92,16 +80,7 @@ module QuestionAnswer
         return false if topic.category && topic.category.topic_id == topic.id
 
         tags = topic.tags.map(&:name)
-
-        if !(tags & SiteSetting.qa_blacklist_tags.split('|')).empty?
-          return false
-        end
-
-        has_qa_tag = !(tags & SiteSetting.qa_tags.split('|')).empty?
-        is_qa_category = topic.category.present? && topic.category.qa_enabled
-        is_qa_subtype = topic.subtype == 'question'
-
-        has_qa_tag || is_qa_category || is_qa_subtype
+        !(tags & SiteSetting.qa_tags.split('|')).empty?
       end
     end
   end

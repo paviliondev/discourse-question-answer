@@ -4,8 +4,14 @@ require 'rails_helper'
 
 describe QuestionAnswer::PostSerializerExtension do
   fab!(:user) { Fabricate(:user) }
-  fab!(:category) { Fabricate(:category) }
-  fab!(:topic) { Fabricate(:topic, category: category) }
+  fab!(:tag) { Fabricate(:tag) }
+
+  fab!(:topic) do
+    Fabricate(:topic).tap do |t|
+      t.tags << tag
+    end
+  end
+
   fab!(:post) { Fabricate(:post, topic: topic, post_number: 1) }
   fab!(:answer) { Fabricate(:post, topic: topic, post_number: 2) }
   let(:comment) { Fabricate(:qa_comment, post: answer) }
@@ -21,9 +27,8 @@ describe QuestionAnswer::PostSerializerExtension do
 
   context 'qa enabled' do
     before do
-      category.custom_fields['qa_enabled'] = true
-      category.save!
-      category.reload
+      SiteSetting.qa_enabled = true
+      SiteSetting.qa_tags = tag.name
       comment
     end
 

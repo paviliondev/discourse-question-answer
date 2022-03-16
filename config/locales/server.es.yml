@@ -1,7 +1,6 @@
 es:
   site_settings:
     qa_tags: "Etiquetas para activar PyR en un tema"
-    qa_show_topic_tip: "Mostrar un consejo sobre las mecánicas de los temas PyR debajo de los títulos de temas PyR"
     qa_enabled: "Activar el plugin de Preguntas y Respuestas (Q&A - PyR)"
     qa_disable_like_on_answers: "Desactiva el botón de me gusta en las respuestas de temas PyR"
     qa_undo_vote_action_window: "Número de minutos en los cuales los usuarios tienen permitido deshacer sus votos en temas PyR (introducir 0 para no poner límite)"

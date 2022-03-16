@@ -8,14 +8,6 @@ module QuestionAnswer
     before_action :ensure_qa_enabled, only: [:create, :destroy]
 
     def create
-      unless Topic.qa_can_vote(@post.topic, current_user)
-        raise Discourse::InvalidAccess.new(
-          nil,
-          nil,
-          custom_message: 'vote.error.user_over_limit'
-        )
-      end
-
       unless @post.qa_can_vote(current_user.id, vote_params[:direction])
         raise Discourse::InvalidAccess.new(
           nil,

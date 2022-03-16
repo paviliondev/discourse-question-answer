@@ -1,8 +1,5 @@
 fi:
   js:
-    category:
-      enable_qa: ""
-
     composer:
       composer_actions:
         reply_to_question:

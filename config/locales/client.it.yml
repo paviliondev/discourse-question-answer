@@ -1,8 +1,5 @@
 it:
   js:
-    category:
-      enable_qa: "Abilita lo stile Q&A per gli argomenti di questa categoria."
-
     composer:
       composer_actions:
         reply_to_question:

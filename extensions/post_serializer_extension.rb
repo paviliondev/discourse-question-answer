@@ -59,9 +59,6 @@ module QuestionAnswer
 
     def qa_disable_like
       return true if SiteSetting.qa_disable_like_on_answers
-      return !!category.qa_disable_like_on_questions if object.post_number == 1
-      return !!category.qa_disable_like_on_comments if object.reply_to_post_number
-      retrun !!category.qa_disable_like_on_answers
     end
 
     alias_method :include_qa_disable_like?, :include_comments?
@@ -74,10 +71,6 @@ module QuestionAnswer
 
     def topic
       @topic_view ? @topic_view.topic : object.topic
-    end
-
-    def category
-      topic.category
     end
   end
 end

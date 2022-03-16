@@ -1,8 +1,5 @@
 zh_CN:
   js:
-    category:
-      enable_qa: "此类别中的帖子允许问答。"
-
     composer:
       composer_actions:
         reply_to_question:

@@ -3,14 +3,14 @@
 require 'rails_helper'
 
 describe QuestionAnswer::TopicViewSerializerExtension do
-  fab!(:category) do
-    Fabricate(:category).tap do |c|
-      c.custom_fields["qa_enabled"] = true
-      c.save!
+  fab!(:tag) { Fabricate(:tag) }
+
+  fab!(:topic) do
+    Fabricate(:topic).tap do |t|
+      t.tags << tag
     end
   end
 
-  fab!(:topic) { Fabricate(:topic, category: category) }
   fab!(:topic_post) { Fabricate(:post, topic: topic) }
   fab!(:answer) { Fabricate(:post, topic: topic, reply_to_post_number: nil) }
   let(:comment) { Fabricate(:qa_comment, post: answer) }
@@ -20,6 +20,7 @@ describe QuestionAnswer::TopicViewSerializerExtension do
 
   before do
     SiteSetting.qa_enabled = true
+    SiteSetting.qa_tags = tag.name
     comment
   end
 

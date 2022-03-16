@@ -1,7 +1,6 @@
 fr:
   site_settings:
     qa_tags: "Tags pour activer QnA sur le sujet"
-    qa_show_topic_tip: "Afficher une astuce sur la mécanique des sujets QnA sous les titres de sujets QnA"
     qa_enabled: "Activer le plugin QA"
     qa_disable_like_on_answers: "Désactiver le bouton de type de réponse sur les sujets de questions et réponses"
     qa_undo_vote_action_window: "Nombre de minutes où les utilisateurs sont autorisés à annuler les votes dans les sujets QnA (entrez 0 pour aucune limite)"

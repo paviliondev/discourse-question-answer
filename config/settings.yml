@@ -3,35 +3,11 @@ plugins:
     client: true
     type: list
     default: 'question'
-  qa_show_topic_tip:
-    client: true
-    default: true
   qa_enabled:
     client: true
     default: true
-  qa_disable_like_on_answers:
-    client: true
-    default: false
   qa_undo_vote_action_window:
     default: 10
-  qa_trust_level_vote_limits:
-    default: false
-    client: true
-  qa_tl1_vote_limit:
-    default: 1
-    client: true
-  qa_tl2_vote_limit:
-    default: 2
-    client: true
-  qa_tl3_vote_limit:
-    default: 3
-    client: true
-  qa_tl4_vote_limit:
-    default: 4
-    client: true
-  qa_blacklist_tags:
-    type: list
-    default: ""
   qa_comment_limit_per_post:
     default: 10
     min: 1

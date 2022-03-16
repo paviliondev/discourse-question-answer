@@ -1,7 +1,6 @@
 zh_CN:
   site_settings:
     qa_tags: "可以启用问答功能的标签"
-    qa_show_topic_tip: "在问答话题的标题下显示关于问答机制的提示"
     qa_enabled: "启用问答插件"
     qa_disable_like_on_answers: "在问答贴中禁用“喜欢”按钮"
     qa_undo_vote_action_window: "允许用户撤销投票的分钟数（0 为不限制）"

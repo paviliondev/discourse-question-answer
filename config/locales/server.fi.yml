@@ -1,11 +1,4 @@
 fi:
-  site_settings:
-    qa_tags: ""
-    qa_show_topic_tip: ""
-    qa_enabled: ""
-    qa_disable_like_on_answers: ""
-    qa_undo_vote_action_window: ""
-
   post_action_types:
     vote:
       title: 'Äänestä'

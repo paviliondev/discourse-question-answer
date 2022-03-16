@@ -18,7 +18,6 @@ after_initialize do
     ../lib/question_answer/engine.rb
     ../lib/question_answer/vote_manager.rb
     ../lib/question_answer/guardian.rb
-    ../extensions/category_extension.rb
     ../extensions/post_extension.rb
     ../extensions/post_serializer_extension.rb
     ../extensions/topic_extension.rb
@@ -40,20 +39,6 @@ after_initialize do
   if respond_to?(:register_svg_icon)
     register_svg_icon 'angle-up'
     register_svg_icon 'info'
-  end
-
-  %w[
-    qa_enabled
-    qa_disable_like_on_answers
-    qa_disable_like_on_questions
-    qa_disable_like_on_comments
-  ].each do |key|
-    Category.register_custom_field_type(key, :boolean)
-    add_to_serializer(:basic_category, key.to_sym) { object.send(key) }
-
-    if Site.respond_to?(:preloaded_category_custom_fields)
-      Site.preloaded_category_custom_fields << key
-    end
   end
 
   class ::PostSerializer
@@ -81,10 +66,6 @@ after_initialize do
 
   class ::TopicListItemSerializer
     include QuestionAnswer::TopicListItemSerializerExtension
-  end
-
-  class ::Category
-    include QuestionAnswer::CategoryExtension
   end
 
   class ::User
@@ -151,15 +132,6 @@ after_initialize do
     else
       scope
     end
-  end
-
-  TopicList.on_preload do |topics|
-    Category.preload_custom_fields(topics.map(&:category).compact, %w[
-      qa_enabled
-      qa_disable_like_on_answers
-      qa_disable_like_on_questions
-      qa_disable_like_on_comments
-    ])
   end
 
   TopicView.on_preload do |topic_view|
