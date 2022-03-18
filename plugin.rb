@@ -196,6 +196,4 @@ after_initialize do
     topic_view.posts_voted_on =
       QuestionAnswerVote.where(votable_type: 'Post', votable_id: post_ids).distinct.pluck(:votable_id)
   end
-
-  SiteSetting.enable_filtered_replies_view = true
 end
