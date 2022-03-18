@@ -2,7 +2,7 @@ import { createWidget } from "discourse/widgets/widget";
 import { iconNode } from "discourse-common/lib/icon-library";
 
 export default createWidget("qa-button", {
-  tagName: "button.btn.qa-button",
+  tagName: "button.btn.btn-flat.no-text.qa-button",
 
   buildAttributes(attrs) {
     const attributes = {};

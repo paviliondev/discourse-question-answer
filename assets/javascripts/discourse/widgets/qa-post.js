@@ -35,7 +35,7 @@ export default createWidget("qa-post", {
         this.attach("button", {
           action: "toggleWhoVoted",
           contents: `${attrs.post.qa_vote_count}`,
-          className: "qa-post-toggle-voters",
+          className: "qa-post-toggle-voters btn btn-flat",
         })
       );
 

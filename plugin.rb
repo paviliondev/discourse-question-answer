@@ -7,7 +7,7 @@
 # url: https://github.com/discourse/discourse-question-answer
 # transpile_js: true
 
-%i[common desktop mobile].each do |type|
+%i[common mobile].each do |type|
   register_asset "stylesheets/#{type}/question-answer.scss", type
 end
 

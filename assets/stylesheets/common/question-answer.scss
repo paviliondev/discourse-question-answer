@@ -20,58 +20,76 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
-
-  .active {
-    font-weight: bold;
-  }
+  padding: 0.5em;
+  padding-right: 0;
 
   .qa-answers-headers-count {
-    font-size: $font-up-1;
+    font-size: var(--font-up-1);
   }
 
   .qa-answers-headers-sort {
     margin-left: auto;
 
-    .qa-answers-headers-sort-votes,
-    .qa-answers-headers-sort-activity {
-      border: 1px solid var(--primary-low);
+    .btn {
+      color: var(--primary-high);
+      border: 1px solid var(--primary-low-mid);
+      &:hover {
+        background-color: var(--primary-very-low);
+      }
+
+      + .btn {
+        border-left: none;
+      }
+
+      &:first-of-type {
+        margin-left: 0.5em;
+      }
+    }
+
+    .btn.active[disabled] {
+      background-color: var(--primary-low);
+      color: var(--primary);
+      opacity: 1;
+      cursor: default;
     }
   }
 }
 
+.qa-comments {
+  width: 100%;
+}
+
 .qa-comment {
-  font-size: $font-down-1;
+  font-size: var(--font-down-1);
   border-top: 1px solid var(--primary-low);
   display: flex;
   flex-direction: row;
+  align-items: flex-start;
   padding: 0.7em 0;
 
   .qa-comment-actions-vote {
     margin-right: 0.5em;
     display: inline-grid;
     grid-auto-flow: column;
-    align-items: center;
+    align-items: flex-start;
 
     .qa-comment-actions-vote-count {
       text-align: center;
       width: auto;
       min-width: 16px;
+      padding: 0.1em 0;
       color: var(--primary-low-mid-or-secondary-high);
     }
 
     .btn {
       font-size: var(--font-up-3);
       background: none;
+      padding: 0;
 
       &.qa-button-voted {
         .d-icon {
           color: var(--success);
         }
-      }
-
-      .d-icon {
-        color: var(--primary-low-mid-or-secondary-high);
-        margin: 0;
       }
     }
   }
@@ -117,6 +135,7 @@
 
   .qa-comment-editor {
     margin: 0.5em 0;
+    width: 100%;
 
     textarea {
       width: 100%;
@@ -127,24 +146,23 @@
       margin-left: 0.5em;
     }
   }
-}
 
-.qa-comment:hover {
-  .qa-comment-actions {
-    display: inline-block;
+  &:hover {
+    .qa-comment-actions {
+      display: inline-block;
+    }
   }
 }
 
 .qa-comments-menu {
-  font-size: $font-down-1;
-  margin: 1em 0;
+  font-size: var(--font-down-1);
+  margin: 0;
 
   .qa-comments-menu-composer {
-    width: $topic-body-width;
-
+    width: 100%;
     .qa-comments-menu-composer-textarea {
       width: 100%;
-      margin-bottom: 0;
+      margin-bottom: 0.5em;
     }
 
     .qa-comments-menu-composer-cancel {
@@ -168,13 +186,31 @@
 }
 
 .qa-post {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.5em;
+
+  .qa-button {
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+    font-size: var(--font-up-5);
+  }
+
   .qa-post-list {
-    box-shadow: shadow("card");
+    position: absolute;
+    z-index: 2;
     background-color: var(--secondary);
+    border: 1px solid var(--primary-low);
+    box-shadow: shadow("card");
     display: flex;
     flex-direction: column;
+    top: 4em;
     padding: 0.5em;
-    border: 1px solid var(--primary-low);
+    max-width: 90vw;
+    overflow: auto;
 
     .qa-post-list-voters-wrapper {
       display: flex;
@@ -186,7 +222,8 @@
     display: flex;
 
     a {
-      margin-left: 0.5em;
+      margin-left: 0.25em;
+      margin-bottom: 0.25em;
     }
   }
 
@@ -197,25 +234,14 @@
     color: var(--primary-low-mid);
   }
 
-  .qa-button {
+  .qa-button-voted {
     .d-icon {
-      margin-right: 0;
-    }
-
-    &.qa-button-voted {
-      .d-icon {
-        color: var(--success);
-      }
+      color: var(--success);
     }
   }
 
-  .qa-button,
   .qa-post-toggle-voters {
-    background: var(--secondary);
-
-    &:hover {
-      background: dark-light-diff($primary, $secondary, 65%, -75%);
-      color: var(--secondary);
-    }
+    padding-top: 0;
+    padding-bottom: 0;
   }
 }

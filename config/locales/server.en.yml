@@ -26,7 +26,7 @@ en:
       user_has_not_voted: "User has not voted."
       user_over_limit: "You cannot exceed the number of votes for your trust level."
       already_voted: "You can only vote once per question."
-      undo_vote_action_window: "You can only undo votes %{minutes} after voting."
+      undo_vote_action_window: "You can only undo votes %{minutes} minutes after voting."
       one_vote_per_post: "You can only vote once for each post."
       one_vote_per_comment: "You can only vote once for each comment."
 

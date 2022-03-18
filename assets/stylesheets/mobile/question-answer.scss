@@ -1,34 +1,29 @@
-.qa-answers-header {
-  padding: 1em;
-  border-top: none;
-  border-bottom: 1px solid var(--primary-low);
-  margin-bottom: 1em;
-}
-
-.qa-post {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-
-  .qa-button {
+.qa-is-answer {
+  .qa-answers-header {
     padding: 0;
+    padding-bottom: 1em;
+    border-top: none;
+    border-bottom: 1px solid var(--primary-low);
+    margin-bottom: 1em;
+  }
+  .topic-avatar {
+    position: relative;
+  }
 
-    .d-icon {
-      font-size: $font-up-3;
-    }
+  // TODO: avoid using magic values here
+  // and in .qa-post below
+  .topic-body .cooked {
+    margin-left: 55px;
+    min-height: 55px;
   }
 }
 
-.qa-button,
-.qa-post-toggle-voters {
-  padding: 0.5em;
-}
-
-.qa-comment {
-  .qa-comment-actions-vote {
-    .qa-button-upvote {
-      padding: 0;
-    }
+.qa-post {
+  position: absolute;
+  left: 0px;
+  top: 45px;
+  width: 45px;
+  .qa-post-list {
+    left: -5px;
   }
 }

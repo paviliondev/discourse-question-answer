@@ -449,10 +449,9 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
   test("vote count display", async function (assert) {
     await visit("/t/280");
 
-    assert.strictEqual(
-      query("#post_2 .qa-comment-2 .qa-comment-actions-vote-count").textContent,
-      "",
-      "does not display any text if vote count is zero"
+    assert.ok(
+      !exists("#post_2 .qa-comment-2 .qa-comment-actions-vote-count"),
+      "does not display element if vote count is zero"
     );
 
     assert.strictEqual(
@@ -475,9 +474,8 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
 
     await click("#post_2 .qa-comment-2 .qa-button-upvote");
 
-    assert.strictEqual(
-      query("#post_2 .qa-comment-2 .qa-comment-actions-vote-count").textContent,
-      "",
+    assert.ok(
+      !exists("#post_2 .qa-comment-2 .qa-comment-actions-vote-count"),
       "updates the comment vote count correctly"
     );
   });

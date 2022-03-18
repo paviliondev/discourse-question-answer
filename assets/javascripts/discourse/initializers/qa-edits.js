@@ -159,11 +159,7 @@ function initPlugin(api) {
     return result;
   });
 
-  const widgetToDecorate = api.container.lookup("site:main").mobileView
-    ? "post-article:before"
-    : "post-avatar:after";
-
-  api.decorateWidget(widgetToDecorate, function (helper) {
+  api.decorateWidget("post-avatar:after", function (helper) {
     const result = [];
     const model = helper.getModel();
 

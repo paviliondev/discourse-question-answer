@@ -54,12 +54,16 @@ export default createWidget("qa-comment", {
         result.push(this.attach("qa-comment-actions", attrs));
       }
 
+      let vote_counter = null;
+      if (attrs.qa_vote_count) {
+        vote_counter = h(
+          "span.qa-comment-actions-vote-count",
+          `${attrs.qa_vote_count}`
+        );
+      }
       return [
         h("div.qa-comment-actions-vote", [
-          h(
-            "span.qa-comment-actions-vote-count",
-            `${attrs.qa_vote_count > 0 ? attrs.qa_vote_count : ""}`
-          ),
+          vote_counter,
           this.attach("qa-button", {
             direction: "up",
             loading: state.isVoting,
