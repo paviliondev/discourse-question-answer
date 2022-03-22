@@ -5,22 +5,16 @@ module QuestionAnswer
     # For Q&A topics, we always want to link to the first post because timeline
     # ordering is not consistent with last unread.
     def last_read_post_number
-      return nil if qa_enabled?
+      return nil if object.is_qa?
       super
     end
 
     def include_last_read_post_number?
-      if qa_enabled?
+      if object.is_qa?
         true
       else
         super
       end
-    end
-
-    private
-
-    def qa_enabled?
-      @qa_enabled ||= object.qa_enabled
     end
   end
 end

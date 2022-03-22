@@ -45,7 +45,7 @@ class QuestionAnswerComment < ActiveRecord::Base
   end
 
   def ensure_can_comment
-    if !post.qa_enabled
+    if !post.is_qa_topic?
       errors.add(:base, I18n.t("qa.comment.errors.qa_not_enabled"))
     elsif post.reply_to_post_number.present?
       errors.add(:base, I18n.t("qa.comment.errors.not_permitted"))

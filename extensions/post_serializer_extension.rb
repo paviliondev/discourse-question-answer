@@ -5,7 +5,6 @@ module QuestionAnswer
     def self.included(base)
       base.attributes(
         :qa_vote_count,
-        :qa_enabled,
         :qa_user_voted_direction,
         :qa_has_votes,
         :comments,
@@ -18,7 +17,7 @@ module QuestionAnswer
     end
 
     def include_qa_vote_count?
-      qa_enabled
+      object.is_qa_topic?
     end
 
     def comments
@@ -30,7 +29,7 @@ module QuestionAnswer
     end
 
     def include_comments?
-      @topic_view && qa_enabled
+      @topic_view && object.is_qa_topic?
     end
 
     def comments_count
@@ -38,7 +37,7 @@ module QuestionAnswer
     end
 
     def include_comments_count?
-      @topic_view && qa_enabled
+      @topic_view && object.is_qa_topic?
     end
 
     def qa_user_voted_direction
@@ -46,7 +45,7 @@ module QuestionAnswer
     end
 
     def include_qa_user_voted_direction?
-      @topic_view && qa_enabled && @topic_view.posts_user_voted.present?
+      @topic_view && object.is_qa_topic? && @topic_view.posts_user_voted.present?
     end
 
     def qa_has_votes
@@ -54,17 +53,7 @@ module QuestionAnswer
     end
 
     def include_qa_has_votes?
-      @topic_view && qa_enabled
-    end
-
-    def qa_disable_like
-      return true if SiteSetting.qa_disable_like_on_answers
-    end
-
-    alias_method :include_qa_disable_like?, :include_comments?
-
-    def qa_enabled
-      @topic_view ? @topic_view.qa_enabled : object.qa_enabled
+      @topic_view && object.is_qa_topic?
     end
 
     private

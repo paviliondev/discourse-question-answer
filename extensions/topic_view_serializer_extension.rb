@@ -4,7 +4,7 @@ module QuestionAnswer
   module TopicViewSerializerExtension
     def self.included(base)
       base.attributes(
-        :qa_enabled,
+        :is_qa,
         :last_answered_at,
         :last_commented_on,
         :answer_count,
@@ -13,12 +13,12 @@ module QuestionAnswer
       )
     end
 
-    def qa_enabled
-      object.qa_enabled
+    def is_qa
+      true
     end
 
-    def include_qa_enabled?
-      object.qa_enabled
+    def include_is_qa?
+      object.topic.is_qa?
     end
 
     def last_answered_at
@@ -26,7 +26,7 @@ module QuestionAnswer
     end
 
     def include_last_answered_at?
-      qa_enabled
+      object.topic.is_qa?
     end
 
     def last_commented_on
@@ -34,7 +34,7 @@ module QuestionAnswer
     end
 
     def include_last_commented_on?
-      qa_enabled
+      object.topic.is_qa?
     end
 
     def answer_count
@@ -42,7 +42,7 @@ module QuestionAnswer
     end
 
     def include_answer_count?
-      qa_enabled
+      object.topic.is_qa?
     end
 
     def last_answer_post_number
@@ -50,7 +50,7 @@ module QuestionAnswer
     end
 
     def include_last_answer_post_number?
-      qa_enabled
+      object.topic.is_qa?
     end
 
     def last_answerer
@@ -62,7 +62,7 @@ module QuestionAnswer
     end
 
     def include_last_answerer?
-      qa_enabled
+      object.topic.is_qa?
     end
   end
 end

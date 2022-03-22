@@ -1,8 +1,4 @@
 plugins:
-  qa_tags:
-    client: true
-    type: list
-    default: 'question'
   qa_enabled:
     client: true
     default: true

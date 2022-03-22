@@ -6,15 +6,14 @@ describe QuestionAnswer::VoteManager do
   fab!(:user)  { Fabricate(:user) }
   fab!(:user_2)  { Fabricate(:user) }
   fab!(:user_3)  { Fabricate(:user) }
-  fab!(:post)  { Fabricate(:post, post_number: 2) }
-  fab!(:tag)  { Fabricate(:tag) }
+  fab!(:topic) { Fabricate(:topic, subtype: Topic::QA_SUBTYPE) }
+  fab!(:topic_post) { Fabricate(:post, topic: topic) }
+  fab!(:post)  { Fabricate(:post, topic: topic) }
   fab!(:up) { QuestionAnswerVote.directions[:up] }
   fab!(:down) { QuestionAnswerVote.directions[:down] }
 
   before do
     SiteSetting.qa_enabled = true
-    SiteSetting.qa_tags = tag.name
-    post.topic.tags << tag
   end
 
   describe '.vote' do

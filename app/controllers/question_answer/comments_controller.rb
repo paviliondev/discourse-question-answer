@@ -88,7 +88,7 @@ module QuestionAnswer
     end
 
     def ensure_qa_enabled
-      raise Discourse::InvalidAccess if !@post.qa_enabled
+      raise Discourse::InvalidAccess if !@post.is_qa_topic?
     end
   end
 end

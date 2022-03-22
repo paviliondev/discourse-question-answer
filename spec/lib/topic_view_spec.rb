@@ -3,9 +3,8 @@
 require 'rails_helper'
 
 describe TopicView do
-  fab!(:tag) { Fabricate(:tag) }
   fab!(:user) { Fabricate(:user) }
-  fab!(:topic) { Fabricate(:topic).tap { |t| t.tags << tag } }
+  fab!(:topic) { Fabricate(:topic, subtype: Topic::QA_SUBTYPE) }
   fab!(:post) { create_post(topic: topic) }
 
   fab!(:answer) { create_post(topic: topic) }
@@ -25,7 +24,6 @@ describe TopicView do
 
   before do
     SiteSetting.qa_enabled = true
-    SiteSetting.qa_tags = tag.name
     vote
     vote_2
     comment

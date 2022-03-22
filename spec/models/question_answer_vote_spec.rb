@@ -3,14 +3,14 @@
 require 'rails_helper'
 
 describe QuestionAnswerVote do
-  fab!(:post) { Fabricate(:post, reply_to_post_number: nil, post_number: 2) }
+  fab!(:topic) { Fabricate(:topic, subtype: Topic::QA_SUBTYPE) }
+  fab!(:topic_post) { Fabricate(:post, topic: topic) }
+  fab!(:post) { Fabricate(:post, topic: topic) }
   fab!(:user) { Fabricate(:user) }
   fab!(:tag) { Fabricate(:tag) }
 
   before do
     SiteSetting.qa_enabled = true
-    SiteSetting.qa_tags = tag.name
-    post.topic.tags << tag
   end
 
   context 'validations' do
@@ -48,10 +48,11 @@ describe QuestionAnswerVote do
     end
 
     context 'comments' do
-      let!(:qa_comment) { Fabricate(:qa_comment, post: post) }
+      fab!(:qa_comment) { Fabricate(:qa_comment, post: post) }
 
       it 'ensures vote cannot be created on a comment when QnA is disabled' do
         SiteSetting.qa_enabled = false
+        qa_comment.reload
 
         qa_vote = QuestionAnswerVote.new(votable: qa_comment, user: user, direction: QuestionAnswerVote.directions[:up])
 

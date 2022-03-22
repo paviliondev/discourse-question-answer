@@ -14,7 +14,6 @@ import { cloneJSON } from "discourse-common/lib/object";
 const topicResponse = cloneJSON(topicFixtures["/t/280/1.json"]);
 
 function qaEnabledTopicResponse() {
-  topicResponse.post_stream.posts[0]["qa_enabled"] = true;
   topicResponse.post_stream.posts[0]["qa_vote_count"] = 0;
   topicResponse.post_stream.posts[0]["comments_count"] = 1;
 
@@ -29,7 +28,6 @@ function qaEnabledTopicResponse() {
     },
   ];
 
-  topicResponse.post_stream.posts[1]["qa_enabled"] = true;
   topicResponse.post_stream.posts[1]["qa_vote_count"] = 2;
   topicResponse.post_stream.posts[1]["qa_has_votes"] = true;
   topicResponse.post_stream.posts[1]["comments_count"] = 6;
@@ -88,7 +86,7 @@ function qaEnabledTopicResponse() {
     },
   ];
 
-  topicResponse.post_stream["qa_enabled"] = true;
+  topicResponse["is_qa"] = true;
 
   return topicResponse;
 }

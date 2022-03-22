@@ -3,32 +3,26 @@
 require 'rails_helper'
 
 describe QuestionAnswerComment do
-  fab!(:post) { Fabricate(:post) }
+  fab!(:topic) { Fabricate(:topic, subtype: Topic::QA_SUBTYPE) }
+  fab!(:post) { Fabricate(:post, topic: topic) }
   fab!(:user) { Fabricate(:user) }
   fab!(:tag) { Fabricate(:tag) }
 
   before do
     SiteSetting.qa_enabled = true
-    SiteSetting.qa_tags = tag.name
-    post.topic.tags << tag
   end
 
   context 'validations' do
-    it 'does not allow comments to be created when qa is disabled' do
-      SiteSetting.qa_enabled = false
-
-      qa_comment = QuestionAnswerComment.new(raw: 'this is a **post**', post: post, user: user)
-
-      expect(qa_comment.valid?).to eq(false)
-      expect(qa_comment.errors.full_messages).to contain_exactly(I18n.t("qa.comment.errors.qa_not_enabled"))
-    end
-
     it 'does not allow comments to be created when post is in reply to another post' do
+      post_2 = Fabricate(:post, topic: topic)
+
       SiteSetting.qa_enabled = false
-      post.update!(reply_to_post_number: 2)
+
+      post_3 = Fabricate(:post, topic: topic, reply_to_post_number: post_2.post_number)
+
       SiteSetting.qa_enabled = true
 
-      qa_comment = QuestionAnswerComment.new(raw: 'this is a **post**', post: post, user: user)
+      qa_comment = QuestionAnswerComment.new(raw: 'this is a **post**', post: post_3, user: user)
 
       expect(qa_comment.valid?).to eq(false)
       expect(qa_comment.errors.full_messages).to contain_exactly(I18n.t("qa.comment.errors.not_permitted"))

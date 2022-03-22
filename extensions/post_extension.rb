@@ -10,8 +10,8 @@ module QuestionAnswer
       base.validate :ensure_only_answer
     end
 
-    def qa_enabled
-      ::Topic.qa_enabled(topic)
+    def is_qa_topic?
+      topic.is_qa?
     end
 
     def qa_last_voted(user_id)
@@ -39,7 +39,7 @@ module QuestionAnswer
       if will_save_change_to_reply_to_post_number? &&
           reply_to_post_number &&
           reply_to_post_number != 1 &&
-          qa_enabled
+          is_qa_topic?
 
         errors.add(:base, I18n.t("post.qa.errors.replying_to_post_not_permited"))
       end

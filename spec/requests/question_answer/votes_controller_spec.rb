@@ -3,43 +3,25 @@
 require 'rails_helper'
 
 RSpec.describe QuestionAnswer::VotesController do
-  fab!(:tag) { Fabricate(:tag) }
-  fab!(:topic) { Fabricate(:topic, tags: [tag]) }
+  fab!(:topic) { Fabricate(:topic, subtype: Topic::QA_SUBTYPE) }
   fab!(:topic_post) { Fabricate(:post, topic: topic) }
   fab!(:answer) { Fabricate(:post, topic: topic) }
   fab!(:answer_2) { Fabricate(:post, topic: topic) }
-  fab!(:qa_user) { Fabricate(:user) }
-
-  fab!(:qa_answer) do
-    create_post(
-      raw: "some raw here",
-      topic_id: topic.id,
-      reply_to_post_number: answer.post_number
-    )
-  end
+  fab!(:user) { Fabricate(:user) }
 
   fab!(:admin) { Fabricate(:admin) }
   fab!(:category) { Fabricate(:category) }
 
   before do
     SiteSetting.qa_enabled = true
-    SiteSetting.qa_tags = tag.name
   end
 
   describe '#create' do
-    before { sign_in(qa_user) }
+    before { sign_in(user) }
 
     it 'returns the right response when user does not have access to post' do
       topic.update!(category: category)
       category.update!(read_restricted: true)
-
-      post '/qa/vote.json', params: { post_id: answer.id }
-
-      expect(response.status).to eq(403)
-    end
-
-    it 'should return the right response if plugin is disabled' do
-      SiteSetting.qa_enabled = false
 
       post '/qa/vote.json', params: { post_id: answer.id }
 
@@ -55,7 +37,7 @@ RSpec.describe QuestionAnswer::VotesController do
 
       expect(vote.votable_type).to eq('Post')
       expect(vote.votable_id).to eq(answer.id)
-      expect(vote.user_id).to eq(qa_user.id)
+      expect(vote.user_id).to eq(user.id)
     end
 
     it 'should error if already voted' do
@@ -70,7 +52,7 @@ RSpec.describe QuestionAnswer::VotesController do
   end
 
   describe '#destroy' do
-    before { sign_in(qa_user) }
+    before { sign_in(user) }
 
     it 'should success if has voted' do
       post '/qa/vote.json', params: { post_id: answer.id }
@@ -80,7 +62,7 @@ RSpec.describe QuestionAnswer::VotesController do
       vote = answer.question_answer_votes.first
 
       expect(vote.votable).to eq(answer)
-      expect(vote.user_id).to eq(qa_user.id)
+      expect(vote.user_id).to eq(user.id)
 
       delete '/qa/vote.json', params: { post_id: answer.id }
 
@@ -123,7 +105,7 @@ RSpec.describe QuestionAnswer::VotesController do
     end
 
     it 'should return the right response if post does not exist' do
-      sign_in(qa_user)
+      sign_in(user)
 
       get '/qa/voters.json', params: { post_id: -1 }
 
@@ -131,22 +113,11 @@ RSpec.describe QuestionAnswer::VotesController do
     end
 
     it 'should return correct users respecting limits' do
-      sign_in(qa_user)
+      sign_in(user)
 
-      Fabricate(:qa_vote,
-        votable: answer,
-        user: Fabricate(:user),
-        direction: QuestionAnswerVote.directions[:down]
-      )
-
+      user_2 = Fabricate(:user)
+      Fabricate(:qa_vote, votable: answer, user: user_2, direction: QuestionAnswerVote.directions[:down])
       Fabricate(:qa_vote, votable: answer, user: user)
-
-      Fabricate(:qa_vote,
-        votable: answer,
-        user: qa_user,
-        direction: QuestionAnswerVote.directions[:down]
-      )
-
       Fabricate(:qa_vote, votable: answer_2, user: user)
 
       stub_const(QuestionAnswer::VotesController, "VOTERS_LIMIT", 2) do
@@ -158,16 +129,16 @@ RSpec.describe QuestionAnswer::VotesController do
       parsed = JSON.parse(response.body)
       voters = parsed['voters']
 
-      expect(voters.map { |v| v['id'] }).to contain_exactly(qa_user.id, user.id)
+      expect(voters.map { |v| v['id'] }).to contain_exactly(user_2.id, user.id)
 
-      expect(voters[0]['id']).to eq(qa_user.id)
-      expect(voters[0]['username']).to eq(qa_user.username)
-      expect(voters[0]['name']).to eq(qa_user.name)
-      expect(voters[0]['avatar_template']).to eq(qa_user.avatar_template)
-      expect(voters[0]['direction']).to eq(QuestionAnswerVote.directions[:down])
+      expect(voters[0]['id']).to eq(user.id)
+      expect(voters[0]['username']).to eq(user.username)
+      expect(voters[0]['name']).to eq(user.name)
+      expect(voters[0]['avatar_template']).to eq(user.avatar_template)
+      expect(voters[0]['direction']).to eq(QuestionAnswerVote.directions[:up])
 
-      expect(voters[1]['id']).to eq(user.id)
-      expect(voters[1]['direction']).to eq(QuestionAnswerVote.directions[:up])
+      expect(voters[1]['id']).to eq(user_2.id)
+      expect(voters[1]['direction']).to eq(QuestionAnswerVote.directions[:down])
     end
   end
 
@@ -181,7 +152,7 @@ RSpec.describe QuestionAnswer::VotesController do
     end
 
     it 'should return 404 if comment_id param is not valid' do
-      sign_in(qa_user)
+      sign_in(user)
 
       post '/qa/vote/comment.json', params: { comment_id: -999 }
 
@@ -189,7 +160,7 @@ RSpec.describe QuestionAnswer::VotesController do
     end
 
     it 'should return 403 if user is not allowed to see comment' do
-      sign_in(qa_user)
+      sign_in(user)
 
       topic.update!(category: category)
       category.update!(read_restricted: true)
@@ -200,7 +171,7 @@ RSpec.describe QuestionAnswer::VotesController do
     end
 
     it 'allows user to vote on a comment' do
-      sign_in(qa_user)
+      sign_in(user)
 
       expect do
         post '/qa/vote/comment.json', params: { comment_id: qa_comment.id }
@@ -222,7 +193,7 @@ RSpec.describe QuestionAnswer::VotesController do
     end
 
     it 'should return 404 if comment_id param is not valid' do
-      sign_in(qa_user)
+      sign_in(user)
 
       delete '/qa/vote/comment.json', params: { comment_id: -999 }
 
@@ -230,7 +201,7 @@ RSpec.describe QuestionAnswer::VotesController do
     end
 
     it 'should return 403 if user has not voted on comment' do
-      sign_in(qa_user)
+      sign_in(user)
 
       delete '/qa/vote/comment.json', params: { comment_id: qa_comment.id }
 
@@ -238,9 +209,9 @@ RSpec.describe QuestionAnswer::VotesController do
     end
 
     it "should be able to remove a user's vote from a comment" do
-      QuestionAnswer::VoteManager.vote(qa_comment, qa_user, direction: QuestionAnswerVote.directions[:up])
+      QuestionAnswer::VoteManager.vote(qa_comment, user, direction: QuestionAnswerVote.directions[:up])
 
-      sign_in(qa_user)
+      sign_in(user)
 
       expect do
         delete '/qa/vote/comment.json', params: { comment_id: qa_comment.id }

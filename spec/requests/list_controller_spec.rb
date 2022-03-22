@@ -5,21 +5,13 @@ require 'rails_helper'
 describe ListController do
   fab!(:user) { Fabricate(:user) }
   fab!(:category) { Fabricate(:category) }
-  fab!(:tag) { Fabricate(:tag) }
-
-  fab!(:qa_topic) do
-    Fabricate(:topic, category: category).tap do |t|
-      t.tags << tag
-    end
-  end
-
+  fab!(:qa_topic) { Fabricate(:topic, category: category, subtype: Topic::QA_SUBTYPE) }
   fab!(:qa_topic_post) { Fabricate(:post, topic: qa_topic) }
   fab!(:qa_topic_answer) { create_post(topic: qa_topic, reply_to_post: nil) }
   fab!(:topic) { Fabricate(:topic) }
 
   before do
     SiteSetting.qa_enabled = true
-    SiteSetting.qa_tags = tag.name
     sign_in(user)
   end
 

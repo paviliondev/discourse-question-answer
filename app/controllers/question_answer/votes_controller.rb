@@ -126,7 +126,7 @@ module QuestionAnswer
     end
 
     def ensure_qa_enabled
-      raise Discourse::InvalidAccess.new unless Topic.qa_enabled(@post.topic)
+      raise Discourse::InvalidAccess.new unless @post.is_qa_topic?
     end
 
     def find_comment

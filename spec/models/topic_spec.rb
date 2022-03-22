@@ -5,14 +5,14 @@ require 'rails_helper'
 describe Topic do
   fab!(:user) { Fabricate(:user) }
   fab!(:category) { Fabricate(:category) }
-  fab!(:topic) { Fabricate(:topic, category: category) }
+  fab!(:topic) { Fabricate(:topic, category: category, subtype: Topic::QA_SUBTYPE) }
   fab!(:topic_post) { Fabricate(:post, topic: topic) }
 
   fab!(:answers) do
     5.times.map { Fabricate(:post, topic: topic) }.sort_by(&:created_at)
   end
 
-  let(:comments) do
+  fab!(:comments) do
     answer = answers.first
 
     5.times.map do
@@ -20,15 +20,39 @@ describe Topic do
     end.sort_by(&:created_at)
   end
 
-  fab!(:tag) { Fabricate(:tag) }
-
-  before do
-    SiteSetting.qa_tags = tag.name
-    topic.tags << tag
-    comments
-  end
-
   let(:up) { QuestionAnswerVote.directions[:up] }
+
+  context "validations" do
+    describe '#subtype' do
+      it "should not allow Q&A formatted topics to be created when qa_enabled site setting is not enabled" do
+        SiteSetting.qa_enabled = false
+
+        topic = Fabricate.build(:topic, archetype: Archetype.default, subtype: Topic::QA_SUBTYPE)
+
+        expect(topic.valid?).to eq(false)
+        expect(topic.errors.full_messages).to eq([I18n.t("topic.qa.errors.qa_not_enabled")])
+      end
+
+      it "should not allow topic to change to Q&A subtype once it has been created" do
+        topic_2 = Fabricate(:topic)
+        topic_2.subtype = Topic::QA_SUBTYPE
+
+        expect(topic_2.valid?).to eq(false)
+        expect(topic_2.errors.full_messages).to eq([I18n.t("topic.qa.errors.cannot_change_to_qa_subtype")])
+      end
+
+      it "should only allow Q&A subtype to be set on regular topics" do
+        topic = Fabricate.build(:topic, archetype: Archetype.default, subtype: Topic::QA_SUBTYPE)
+
+        expect(topic.valid?).to eq(true)
+
+        topic.archetype = Archetype.private_message
+
+        expect(topic.valid?).to eq(false)
+        expect(topic.errors.full_messages).to eq([I18n.t("topic.qa.errors.subtype_not_allowed")])
+      end
+    end
+  end
 
   it 'should return correct comments' do
     comment_ids = comments.map(&:id)
@@ -92,28 +116,6 @@ describe Topic do
 
       expect(Topic.qa_votes(topic, user).pluck(:votable_id))
         .to contain_exactly(*expected)
-    end
-  end
-
-  describe '.qa_enabled' do
-    it 'should return false if topic is blank' do
-      expect(Topic.qa_enabled(nil)).to eq(false)
-    end
-
-    it 'should return false for a PM' do
-      expect(Topic.qa_enabled(Fabricate(:private_message_topic))).to eq(false)
-    end
-
-    it 'should return false if disabled' do
-      SiteSetting.qa_enabled = false
-
-      expect(Topic.qa_enabled(topic)).to eq(false)
-    end
-
-    it 'should return false if category topic' do
-      category.update!(topic_id: topic.id)
-
-      expect(Topic.qa_enabled(topic)).to eq(false)
     end
   end
 end

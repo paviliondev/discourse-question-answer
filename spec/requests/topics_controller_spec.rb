@@ -1,28 +1,24 @@
 # frozen_string_literal: true
 
 describe TopicsController do
-  fab!(:tag) { Fabricate(:tag) }
   fab!(:user) { Fabricate(:user) }
-  fab!(:topic) { Fabricate(:topic).tap { |t| t.tags << tag } }
+  fab!(:topic) { Fabricate(:topic, subtype: Topic::QA_SUBTYPE) }
   fab!(:post) { create_post(topic: topic) }
 
   fab!(:answer) { create_post(topic: topic) }
   fab!(:answer_2) { create_post(topic: topic) }
   fab!(:answer_3) { create_post(topic: topic) }
 
-  let(:vote) do
+  fab!(:vote) do
     QuestionAnswer::VoteManager.vote(answer_2, user, direction: QuestionAnswerVote.directions[:up])
   end
 
-  let(:vote_2) do
+  fab!(:vote_2) do
     QuestionAnswer::VoteManager.vote(answer, user, direction: QuestionAnswerVote.directions[:down])
   end
 
   before do
     SiteSetting.qa_enabled = true
-    SiteSetting.qa_tags = tag.name
-    vote
-    vote_2
   end
 
   describe '#show' do

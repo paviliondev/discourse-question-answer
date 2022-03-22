@@ -3,16 +3,13 @@
 require 'rails_helper'
 
 describe QuestionAnswerCommentSerializer do
-  fab!(:tag) { Fabricate(:tag) }
-  fab!(:topic) { Fabricate(:topic, tags: [tag]) }
+  fab!(:topic) { Fabricate(:topic, subtype: Topic::QA_SUBTYPE) }
   fab!(:post) { Fabricate(:post, topic: topic) }
   fab!(:user) { Fabricate(:user) }
-  let(:qa_comment) { Fabricate(:qa_comment, post: post) }
+  fab!(:qa_comment) { Fabricate(:qa_comment, post: post) }
 
   before do
     SiteSetting.qa_enabled = true
-    SiteSetting.qa_tags = tag.name
-
     QuestionAnswer::VoteManager.vote(qa_comment, post.user)
   end
 

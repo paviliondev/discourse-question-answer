@@ -1,5 +1,6 @@
 import I18n from "I18n";
 import { withPluginApi } from "discourse/lib/plugin-api";
+import { readOnly } from "@ember/object/computed";
 
 export const ORDER_BY_ACTIVITY_FILTER = "activity";
 const pluginId = "discourse-question-answer";
@@ -31,11 +32,11 @@ function initPlugin(api) {
   );
 
   api.removePostMenuButton("reply", (attrs) => {
-    return attrs.qa_enabled && attrs.post_number !== 1;
+    return attrs.isQA && attrs.post_number !== 1;
   });
 
-  api.removePostMenuButton("like", (attrs) => {
-    return attrs.qa_disable_like;
+  api.removePostMenuButton("like", (_attrs, _state, siteSetting) => {
+    return siteSetting.qa_disable_like_on_answers;
   });
 
   api.modifyClass("model:post-stream", {
@@ -84,7 +85,7 @@ function initPlugin(api) {
     const result = [];
     const post = helper.getModel();
 
-    if (!post.qa_enabled) {
+    if (!post.isQA) {
       return result;
     }
 
@@ -149,7 +150,7 @@ function initPlugin(api) {
     const attrs = helper.widget.attrs;
 
     if (
-      attrs.qa_enabled &&
+      attrs.isQA &&
       !attrs.reply_to_post_number &&
       !helper.widget.state.filteredRepliesShown
     ) {
@@ -163,11 +164,7 @@ function initPlugin(api) {
     const result = [];
     const model = helper.getModel();
 
-    if (
-      model &&
-      model.get("qa_enabled") &&
-      !model.get("reply_to_post_number")
-    ) {
+    if (model.topic.is_qa) {
       const qaPost = helper.attach("qa-post", {
         count: model.get("qa_vote_count"),
         post: model,
@@ -179,21 +176,20 @@ function initPlugin(api) {
     return result;
   });
 
+  api.modifyClass("model:post", {
+    pluginId,
+
+    isQA: readOnly("topic.is_qa"),
+  });
+
   api.includePostAttributes(
-    "qa_enabled",
-    "topicUserId",
+    "isQA",
     "comments",
     "comments_count",
     "qa_disable_like",
     "qa_user_voted_direction",
     "qa_has_votes"
   );
-
-  api.addPostClassesCallback((attrs) => {
-    if (attrs.qa_enabled) {
-      return attrs.reply_to_post_number ? ["qa-is-comment"] : ["qa-is-answer"];
-    }
-  });
 }
 
 export default {

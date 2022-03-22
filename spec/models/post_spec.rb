@@ -6,15 +6,14 @@ describe Post do
   fab!(:user1) { Fabricate(:user) }
   fab!(:user2) { Fabricate(:user) }
   fab!(:user3) { Fabricate(:user) }
-  fab!(:post) { Fabricate(:post, post_number: 2) }
-  fab!(:tag) { Fabricate(:tag, name: 'qa') }
+  fab!(:topic) { Fabricate(:topic, subtype: Topic::QA_SUBTYPE) }
+  fab!(:topic_post) { Fabricate(:post, topic: topic) }
+  fab!(:post) { Fabricate(:post, topic: topic) }
   let(:up) { QuestionAnswerVote.directions[:up] }
   let(:users) { [user1, user2, user3] }
 
   before do
     SiteSetting.qa_enabled = true
-    SiteSetting.qa_tags = tag.name
-    post.topic.tags << tag
   end
 
   context "validation" do

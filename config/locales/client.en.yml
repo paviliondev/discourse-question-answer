@@ -1,5 +1,16 @@
 en:
   js:
+    composer:
+      create_qa:
+        label: "Create Q&A topic"
+      composer_actions:
+        create_as_qa:
+          label: "Toggle Q&A"
+          desc: "Topic will be created in the Question & Answer format"
+        remove_as_qa:
+          label: "Remove Q&A"
+          desc: "Topic will be created in the regular format"
+
     post:
       actions:
         undo:

@@ -5,16 +5,9 @@ require 'rails_helper'
 RSpec.describe QuestionAnswer::CommentsController do
   fab!(:user) { Fabricate(:user) }
   fab!(:admin) { Fabricate(:admin) }
-  fab!(:category) { Fabricate(:category) }
-  fab!(:tag) { Fabricate(:tag) }
   fab!(:group) { Fabricate(:group) }
-
-  fab!(:topic) do
-    Fabricate(:topic, category: category).tap do |t|
-      t.tags << tag
-    end
-  end
-
+  fab!(:category) { Fabricate(:category) }
+  fab!(:topic) { Fabricate(:topic, category: category, subtype: Topic::QA_SUBTYPE) }
   fab!(:topic_post) { Fabricate(:post, topic: topic) }
   fab!(:answer) { Fabricate(:post, topic: topic) }
   let(:comment) { Fabricate(:qa_comment, post: answer) }
@@ -23,23 +16,12 @@ RSpec.describe QuestionAnswer::CommentsController do
 
   before do
     SiteSetting.qa_enabled = true
-    SiteSetting.qa_tags = tag.name
     comment
     comment_2
     comment_3
   end
 
   describe '#load_comments' do
-    it 'returns the right response when QnA is not enabled' do
-      SiteSetting.qa_enabled = false
-
-      get "/qa/comments.json", params: {
-        post_id: answer.id, last_comment_id: comment.id
-      }
-
-      expect(response.status).to eq(403)
-    end
-
     it 'returns the right response when user is not allowed to view post' do
       category.update!(read_restricted: true)
 
@@ -85,17 +67,6 @@ RSpec.describe QuestionAnswer::CommentsController do
   describe '#create' do
     before do
       sign_in(user)
-    end
-
-    it 'returns the right response when Q&A is not enabled' do
-      SiteSetting.qa_enabled = false
-
-      post "/qa/comments.json", params: {
-        post_id: answer.id,
-        raw: "this is some comment"
-      }
-
-      expect(response.status).to eq(403)
     end
 
     it 'returns the right response when user is not allowed to create post' do

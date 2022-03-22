@@ -4,12 +4,16 @@ module QuestionAnswer
   module TopicExtension
     def self.included(base)
       base.extend(ClassMethods)
+      base.validate :ensure_regular_topic, on: [:create]
+      base.validate :ensure_no_qa_subtype, on: [:update]
+      base.const_set :QA_SUBTYPE, 'question_answer'
     end
 
     def reload(options = nil)
       @answers = nil
       @comments = nil
       @last_answerer = nil
+      @is_qa = nil
       super(options)
     end
 
@@ -56,8 +60,8 @@ module QuestionAnswer
       @last_answerer ||= User.find(answers.last[:user_id])
     end
 
-    def qa_enabled
-      Topic.qa_enabled(self)
+    def is_qa?
+      @is_qa ||= SiteSetting.qa_enabled && self.subtype == Topic::QA_SUBTYPE
     end
 
     # class methods
@@ -73,14 +77,23 @@ module QuestionAnswer
           .where(user: user, votable_type: 'Post')
           .where("posts.topic_id = ?", topic.id)
       end
+    end
 
-      def qa_enabled(topic)
-        return false unless SiteSetting.qa_enabled
-        return false if !topic
-        return false if topic.category && topic.category.topic_id == topic.id
+    private
 
-        tags = topic.tags.map(&:name)
-        !(tags & SiteSetting.qa_tags.split('|')).empty?
+    def ensure_no_qa_subtype
+      if will_save_change_to_subtype? && self.subtype == Topic::QA_SUBTYPE
+        self.errors.add(:base, I18n.t("topic.qa.errors.cannot_change_to_qa_subtype"))
+      end
+    end
+
+    def ensure_regular_topic
+      return if self.subtype != Topic::QA_SUBTYPE
+
+      if !SiteSetting.qa_enabled
+        self.errors.add(:base, I18n.t("topic.qa.errors.qa_not_enabled"))
+      elsif self.archetype != Archetype.default
+        self.errors.add(:base, I18n.t("topic.qa.errors.subtype_not_allowed"))
       end
     end
   end

@@ -3,25 +3,16 @@
 require 'rails_helper'
 
 describe QuestionAnswer::TopicViewSerializerExtension do
-  fab!(:tag) { Fabricate(:tag) }
-
-  fab!(:topic) do
-    Fabricate(:topic).tap do |t|
-      t.tags << tag
-    end
-  end
-
+  fab!(:topic) { Fabricate(:topic, subtype: Topic::QA_SUBTYPE) }
   fab!(:topic_post) { Fabricate(:post, topic: topic) }
   fab!(:answer) { Fabricate(:post, topic: topic, reply_to_post_number: nil) }
-  let(:comment) { Fabricate(:qa_comment, post: answer) }
+  fab!(:comment) { Fabricate(:qa_comment, post: answer) }
   fab!(:user) { Fabricate(:user) }
   fab!(:guardian) { Guardian.new(user) }
   let(:topic_view) { TopicView.new(topic, user) }
 
   before do
     SiteSetting.qa_enabled = true
-    SiteSetting.qa_tags = tag.name
-    comment
   end
 
   it 'should return correct values' do
@@ -32,7 +23,6 @@ describe QuestionAnswer::TopicViewSerializerExtension do
 
     payload = TopicViewSerializer.new(topic_view, scope: guardian, root: false).as_json
 
-    expect(payload[:qa_enabled]).to eq(true)
     expect(payload[:last_answered_at]).to eq(answer.created_at)
     expect(payload[:last_commented_on]).to eq(comment.created_at)
     expect(payload[:answer_count]).to eq(1)
