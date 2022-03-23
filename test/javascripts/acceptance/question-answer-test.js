@@ -10,6 +10,7 @@ import {
 import { skip, test } from "qunit";
 import topicFixtures from "discourse/tests/fixtures/topic";
 import { cloneJSON } from "discourse-common/lib/object";
+import I18n from "I18n";
 
 const topicResponse = cloneJSON(topicFixtures["/t/280/1.json"]);
 
@@ -94,7 +95,11 @@ function qaEnabledTopicResponse() {
 let filteredByActivity = false;
 
 function setupQA(needs) {
-  needs.settings({ qa_enabled: true });
+  needs.settings({
+    qa_enabled: true,
+    min_post_length: 5,
+    qa_comment_max_raw_length: 20,
+  });
 
   needs.hooks.afterEach(() => {
     filteredByActivity = false;
@@ -152,7 +157,7 @@ function setupQA(needs) {
         name: "Some Name",
         username: "someusername",
         created_at: "2022-01-12T08:21:54.175Z",
-        cooked: "<p>I edited this comment</p>",
+        cooked: "<p>editing this</p>",
         qa_vote_count: 0,
         user_voted: false,
       });
@@ -299,6 +304,35 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     );
   });
 
+  test("validations for comment length", async function (assert) {
+    await visit("/t/280");
+    await click("#post_1 .qa-comment-add-link");
+
+    await fillIn(".qa-comment-composer-textarea", "a".repeat(4));
+
+    assert.strictEqual(
+      query(".qa-comment-composer-flash").textContent.trim(),
+      I18n.t("qa.post.qa_comment.composer.too_short", { count: 5 }),
+      "displays the right message about raw length when it is too short"
+    );
+
+    await fillIn(".qa-comment-composer-textarea", "a".repeat(6));
+
+    assert.strictEqual(
+      query(".qa-comment-composer-flash").textContent.trim(),
+      I18n.t("qa.post.qa_comment.composer.length_ok", { count: 14 }),
+      "displays the right message about raw length when it is OK"
+    );
+
+    await fillIn(".qa-comment-composer-textarea", "a".repeat(21));
+
+    assert.strictEqual(
+      query(".qa-comment-composer-flash").textContent.trim(),
+      I18n.t("qa.post.qa_comment.composer.too_long", { count: 20 }),
+      "displays the right message about raw length when it is too long"
+    );
+  });
+
   test("adding a comment", async function (assert) {
     await visit("/t/280");
 
@@ -316,11 +350,7 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
       "loads all comments when composer is expanded"
     );
 
-    await fillIn(
-      ".qa-comments-menu-composer-textarea",
-      "this is a new test comment"
-    );
-
+    await fillIn(".qa-comment-composer-textarea", "this is some comment");
     await click(".qa-comments-menu-composer-submit");
 
     assert.strictEqual(
@@ -340,10 +370,7 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
       "loads all comments when composer is expanded"
     );
 
-    await fillIn(
-      ".qa-comments-menu-composer-textarea",
-      "this is a new test comment"
-    );
+    await fillIn(".qa-comment-composer-textarea", "this is a new test comment");
 
     await triggerEvent(".qa-comments-menu-composer-submit", "keydown", {
       key: "Enter",
@@ -369,15 +396,19 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     );
 
     await click("#post_1 .qa-comment-actions-edit-link");
-    await fillIn(
-      "#post_1 .qa-comment-editor-1 textarea",
-      "I edited this comment"
+    await fillIn("#post_1 .qa-comment-editor-1 textarea", "editing this");
+
+    assert.strictEqual(
+      query(".qa-comment-composer-flash").textContent.trim(),
+      I18n.t("qa.post.qa_comment.composer.length_ok", { count: 8 }),
+      "displays the right message when comment lenght is OK"
     );
+
     await click("#post_1 .qa-comment-editor-1 .qa-comment-editor-submit");
 
     assert.strictEqual(
       query("#post_1 .qa-comment-cooked").textContent,
-      "I edited this comment",
+      "editing this",
       "displays the right content after comment has been edited"
     );
 

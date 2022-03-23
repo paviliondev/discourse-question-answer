@@ -8,3 +8,7 @@ plugins:
     default: 10
     min: 1
     client: true
+  qa_comment_max_raw_length:
+    client: true
+    hidden: true
+    default: 600

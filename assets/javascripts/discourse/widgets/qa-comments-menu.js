@@ -25,10 +25,11 @@ export default createWidget("qa-comments-menu", {
           className: "qa-comment-add-link",
           action: this.currentUser ? "expandComposer" : "showLogin",
           actionParam: {
-            post_id: attrs.id,
-            last_comment_id: attrs.lastCommentId,
+            postId: attrs.id,
+            postNumber: attrs.postNumber,
+            lastCommentId: attrs.lastCommentId,
           },
-          contents: () => I18n.t("qa.post.add_comment"),
+          contents: () => I18n.t("qa.post.qa_comment.add"),
         })
       );
     }
@@ -48,7 +49,9 @@ export default createWidget("qa-comments-menu", {
               last_comment_id: attrs.lastCommentId,
             },
             contents: () =>
-              I18n.t("qa.post.show_comment", { count: attrs.moreCommentCount }),
+              I18n.t("qa.post.qa_comment.show", {
+                count: attrs.moreCommentCount,
+              }),
           }),
         ])
       );
@@ -60,10 +63,13 @@ export default createWidget("qa-comments-menu", {
   expandComposer(data) {
     this.state.expanded = true;
 
-    this.fetchComments(data).then(() => {
+    this.fetchComments({
+      post_id: data.postId,
+      last_comment_id: data.lastCommentId,
+    }).then(() => {
       schedule("afterRender", () => {
         const textArea = document.querySelector(
-          `.qa-comments-menu-composer-textarea-${data.post_id}`
+          `#post_${data.postNumber} .qa-comment-composer .qa-comment-composer-textarea`
         );
 
         textArea.focus();

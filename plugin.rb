@@ -25,6 +25,7 @@ after_initialize do
     ../extensions/topic_view_serializer_extension.rb
     ../extensions/topic_view_extension.rb
     ../extensions/user_extension.rb
+    ../app/validators/question_answer_comment_validator.rb
     ../app/controllers/question_answer/votes_controller.rb
     ../app/controllers/question_answer/comments_controller.rb
     ../app/models/question_answer_vote.rb

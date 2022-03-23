@@ -49,8 +49,6 @@ de:
       user_over_limit: "Du kannst nicht öfter abstimmten als es deine Vertrauensstufe erlaubt."
       one_vote_per_post: "Du kannst nur einmal für jeden Beitrag abstimmen."
 
-    user_vote_count: "<strong>{{voteCount}}</strong> Stimmen"
-
     last_answer_lowercase: letzte Antwort
     answer_lowercase:
       one: Antwort

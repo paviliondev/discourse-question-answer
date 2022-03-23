@@ -14,18 +14,13 @@ createWidget("qa-comments-menu-composer", {
   html(attrs, state) {
     const result = [];
 
-    result.push(
-      this.attach("qa-comments-menu-composer-textarea", {
-        value: state.value,
-        id: attrs.id,
-      })
-    );
+    result.push(this.attach("qa-comment-composer", attrs));
 
     result.push(
       this.attach("button", {
         action: "submitComment",
         disabled: state.creatingPost,
-        contents: I18n.t("qa.post.submit_comment"),
+        contents: I18n.t("qa.post.qa_comment.submit"),
         icon: "reply",
         className: "btn-primary qa-comments-menu-composer-submit",
       })
@@ -35,21 +30,21 @@ createWidget("qa-comments-menu-composer", {
       this.attach("link", {
         action: "closeComposer",
         className: "qa-comments-menu-composer-cancel",
-        contents: () => I18n.t("qa.post.cancel_comment"),
+        contents: () => I18n.t("qa.post.qa_comment.cancel"),
       })
     );
 
     return result;
   },
 
-  updateValue(value) {
-    this.state.value = value;
-  },
-
   keyDown(e) {
     if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
       this.submitComment();
     }
+  },
+
+  updateValue(value) {
+    this.state.value = value;
   },
 
   submitComment() {

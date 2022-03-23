@@ -154,20 +154,32 @@
   }
 }
 
+.qa-comment-composer {
+  width: 100%;
+
+  .qa-comment-composer-textarea {
+    width: 100%;
+    margin: 0.5em 0;
+  }
+
+  .qa-comment-composer-flash {
+    width: 100%;
+    color: var(--primary-med-or-secondary-med);
+
+    &.error {
+      color: var(--danger-hover);
+    }
+
+    margin-bottom: 0.5em;
+  }
+}
+
 .qa-comments-menu {
   font-size: var(--font-down-1);
   margin: 0;
 
-  .qa-comments-menu-composer {
-    width: 100%;
-    .qa-comments-menu-composer-textarea {
-      width: 100%;
-      margin-bottom: 0.5em;
-    }
-
-    .qa-comments-menu-composer-cancel {
-      margin-left: 0.5em;
-    }
+  .qa-comments-menu-composer-cancel {
+    margin-left: 0.5em;
   }
 
   .qa-comments-menu-seperator {

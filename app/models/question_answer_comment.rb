@@ -16,6 +16,9 @@ class QuestionAnswerComment < ActiveRecord::Base
   validates :cooked_version, presence: true
 
   validate :ensure_can_comment, on: [:create]
+
+  validates_with QuestionAnswerCommentValidator
+
   before_validation :cook_raw, if: :will_save_change_to_raw?
 
   has_many :votes, class_name: "QuestionAnswerVote", as: :votable, dependent: :delete_all

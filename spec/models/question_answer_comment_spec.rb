@@ -40,6 +40,29 @@ describe QuestionAnswerComment do
         I18n.t("qa.comment.errors.limit_exceeded", limit: SiteSetting.qa_comment_limit_per_post)
       )
     end
+
+    it 'does not allow comment to be created when raw does not meet min_post_length site setting' do
+      SiteSetting.min_post_length = 5
+
+      qa_comment = QuestionAnswerComment.new(raw: '1234', post: post, user: user)
+
+      expect(qa_comment.valid?).to eq(false)
+      expect(qa_comment.errors[:raw]).to eq([I18n.t('errors.messages.too_short', count: 5)])
+    end
+
+    it "does not allow comment to be created when raw length exceeds qa_comment_max_raw_length site setting" do
+      max = SiteSetting.qa_comment_max_raw_length
+      length = max + 1
+
+      qa_comment = QuestionAnswerComment.new(
+        raw: '1' * length,
+        post: post,
+        user: user
+      )
+
+      expect(qa_comment.valid?).to eq(false)
+      expect(qa_comment.errors[:raw]).to eq([I18n.t('errors.messages.too_long_validation', max: max, length: length)])
+    end
   end
 
   context 'callbacks' do
@@ -78,9 +101,9 @@ describe QuestionAnswerComment do
     end
 
     it 'supports emoji markdown engine' do
-      qa_comment = Fabricate(:qa_comment, post: post, raw: ':grin:')
+      qa_comment = Fabricate(:qa_comment, post: post, raw: ':grin: abcde')
 
-      expect(qa_comment.cooked).to eq("<p><img src=\"/images/emoji/twitter/grin.png?v=#{Emoji::EMOJI_VERSION}\" title=\":grin:\" class=\"emoji only-emoji\" alt=\":grin:\" loading=\"lazy\" width=\"20\" height=\"20\"></p>")
+      expect(qa_comment.cooked).to eq("<p><img src=\"/images/emoji/twitter/grin.png?v=#{Emoji::EMOJI_VERSION}\" title=\":grin:\" class=\"emoji\" alt=\":grin:\" loading=\"lazy\" width=\"20\" height=\"20\"> abcde</p>")
     end
 
     it 'supports censored markdown engine' do
