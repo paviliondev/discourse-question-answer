@@ -51,17 +51,33 @@ describe QuestionAnswerComment do
     end
 
     it "does not allow comment to be created when raw length exceeds qa_comment_max_raw_length site setting" do
-      max = SiteSetting.qa_comment_max_raw_length
-      length = max + 1
+      max = SiteSetting.qa_comment_max_raw_length = 5
+      raw = 'this string is too long'
 
       qa_comment = QuestionAnswerComment.new(
-        raw: '1' * length,
+        raw: raw,
         post: post,
         user: user
       )
 
       expect(qa_comment.valid?).to eq(false)
-      expect(qa_comment.errors[:raw]).to eq([I18n.t('errors.messages.too_long_validation', max: max, length: length)])
+      expect(qa_comment.errors[:raw]).to eq([I18n.t('errors.messages.too_long_validation', max: max, length: raw.length)])
+    end
+
+    it "does not allow comment to be created when raw does not pass TextSentinel check" do
+      qa_comment = QuestionAnswerComment.new(raw: 'ALL CAPS STRING', post: post, user: user)
+
+      expect(qa_comment.valid?).to eq(false)
+      expect(qa_comment.errors[:raw]).to eq([I18n.t("is_invalid")])
+    end
+
+    it 'does not allow comment to be created when raw contains a blocked watch word' do
+      watched_word = Fabricate(:watched_word, action: WatchedWord.actions[:block])
+
+      qa_comment = QuestionAnswerComment.new(raw: "contains #{watched_word.word}", post: post, user: user)
+
+      expect(qa_comment.valid?).to eq(false)
+      expect(qa_comment.errors[:base]).to eq([I18n.t('contains_blocked_word', word: watched_word.word)])
     end
   end
 
