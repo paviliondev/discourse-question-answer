@@ -9,10 +9,12 @@ import {
 } from "discourse/tests/helpers/qunit-helpers";
 import { skip, test } from "qunit";
 import topicFixtures from "discourse/tests/fixtures/topic";
+import discoveryFixtures from "discourse/tests/fixtures/discovery-fixtures";
 import { cloneJSON } from "discourse-common/lib/object";
 import I18n from "I18n";
 
 const topicResponse = cloneJSON(topicFixtures["/t/280/1.json"]);
+const topicList = cloneJSON(discoveryFixtures["/latest.json"]);
 
 function qaEnabledTopicResponse() {
   topicResponse.post_stream.posts[0]["qa_vote_count"] = 0;
@@ -92,6 +94,25 @@ function qaEnabledTopicResponse() {
   return topicResponse;
 }
 
+function qaTopicListResponse() {
+  // will link to OP
+  topicList.topic_list.topics[0].is_qa = true;
+  topicList.topic_list.topics[0].last_read_post_number =
+    topicList.topic_list.topics[0].highest_post_number;
+
+  // will sort by activity
+  topicList.topic_list.topics[1].is_qa = true;
+  topicList.topic_list.topics[1].last_read_post_number =
+    topicList.topic_list.topics[1].highest_post_number - 2;
+
+  // will link to last post
+  topicList.topic_list.topics[3].is_qa = true;
+  topicList.topic_list.topics[3].last_read_post_number =
+    topicList.topic_list.topics[3].highest_post_number - 1;
+
+  return topicList;
+}
+
 let filteredByActivity = false;
 
 function setupQA(needs) {
@@ -169,6 +190,10 @@ function setupQA(needs) {
 
     server.delete("/qa/vote/comment", () => {
       return helper.response({});
+    });
+
+    server.get("/latest.json", () => {
+      return helper.response(qaTopicListResponse());
     });
   });
 }
@@ -507,6 +532,25 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
       !exists("#post_2 .qa-comment-2 .qa-comment-actions-vote-count"),
       "updates the comment vote count correctly"
     );
+  });
+
+  test("topic list link overrides work", async function (assert) {
+    await visit("/");
+
+    const firstTopicLink = query(
+      ".topic-list-item:first-child .raw-topic-link"
+    ).getAttribute("href");
+    assert.ok(firstTopicLink.endsWith("/1"));
+
+    const secondTopicLink = query(
+      ".topic-list-item:nth-child(2) .raw-topic-link"
+    ).getAttribute("href");
+    assert.ok(secondTopicLink.endsWith("?filter=activity"));
+
+    const fourthTopicLink = query(
+      ".topic-list-item:nth-child(4) .raw-topic-link"
+    ).getAttribute("href");
+    assert.ok(fourthTopicLink.endsWith("/2"));
   });
 
   // Skip message bus tests but keep it around for development use. We currently do not have a reliable way to wait for

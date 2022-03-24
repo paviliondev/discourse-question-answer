@@ -28,8 +28,8 @@ describe ListController do
     qa = topics.find { |t| t["id"] == qa_topic.id }
     non_qa = topics.find { |t| t["id"] == topic.id }
 
-    expect(qa["last_read_post_number"]).to eq(nil)
-    expect(non_qa["last_read_post_number"]).to eq(2)
+    expect(qa["is_qa"]).to eq(true)
+    expect(non_qa["is_qa"]).to eq(nil)
   end
 
   it 'should return the right attributes when Q&A is disabled' do
@@ -47,7 +47,7 @@ describe ListController do
     qa = topics.find { |t| t["id"] == qa_topic.id }
     non_qa = topics.find { |t| t["id"] == topic.id }
 
-    expect(qa["last_read_post_number"]).to eq(2)
-    expect(non_qa["qa_enabled"]).to eq(nil)
+    expect(qa["is_qa"]).to eq(nil)
+    expect(non_qa["is_qa"]).to eq(nil)
   end
 end

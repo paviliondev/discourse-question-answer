@@ -54,6 +54,26 @@ function initPlugin(api) {
     },
   });
 
+  function customLastUnreadUrl(context) {
+    if (context.is_qa && context.last_read_post_number) {
+      if (context.highest_post_number <= context.last_read_post_number) {
+        // link to OP if no unread
+        return context.urlForPostNumber(1);
+      } else if (
+        context.last_read_post_number ===
+        context.highest_post_number - 1
+      ) {
+        return context.urlForPostNumber(context.last_read_post_number + 1);
+      } else {
+        // sort by activity if user has 2+ unread posts
+        return `${context.urlForPostNumber(
+          context.last_read_post_number + 1
+        )}?filter=activity`;
+      }
+    }
+  }
+  api.registerCustomLastUnreadUrlCallback(customLastUnreadUrl);
+
   api.reopenWidget("post", {
     orderByVotes() {
       this._topicController()
@@ -201,6 +221,6 @@ export default {
       return;
     }
 
-    withPluginApi("0.13.0", initPlugin);
+    withPluginApi("1.2.0", initPlugin);
   },
 };
