@@ -234,7 +234,7 @@ acceptance("Discourse Question Answer - anon user", function (needs) {
 
   test("voting a comment", async function (assert) {
     await visit("/t/280");
-    await click("#post_2 .qa-comment-2 .qa-button-upvote");
+    await click("#post_2 #qa-comment-2 .qa-button-upvote");
 
     assert.ok(exists(".login-modal"), "displays the login modal");
   });
@@ -504,12 +504,12 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     await visit("/t/280");
 
     assert.ok(
-      !exists("#post_2 .qa-comment-2 .qa-comment-actions-vote-count"),
+      !exists("#post_2 #qa-comment-2 .qa-comment-actions-vote-count"),
       "does not display element if vote count is zero"
     );
 
     assert.strictEqual(
-      query("#post_2 .qa-comment-3 .qa-comment-actions-vote-count").textContent,
+      query("#post_2 #qa-comment-3 .qa-comment-actions-vote-count").textContent,
       "3",
       "displays the right vote count"
     );
@@ -518,18 +518,18 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
   test("voting on a comment and removing vote", async function (assert) {
     await visit("/t/280");
 
-    await click("#post_2 .qa-comment-2 .qa-button-upvote");
+    await click("#post_2 #qa-comment-2 .qa-button-upvote");
 
     assert.strictEqual(
-      query("#post_2 .qa-comment-2 .qa-comment-actions-vote-count").textContent,
+      query("#post_2 #qa-comment-2 .qa-comment-actions-vote-count").textContent,
       "1",
       "updates the comment vote count correctly"
     );
 
-    await click("#post_2 .qa-comment-2 .qa-button-upvote");
+    await click("#post_2 #qa-comment-2 .qa-button-upvote");
 
     assert.ok(
-      !exists("#post_2 .qa-comment-2 .qa-comment-actions-vote-count"),
+      !exists("#post_2 #qa-comment-2 .qa-comment-actions-vote-count"),
       "updates the comment vote count correctly"
     );
   });

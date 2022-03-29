@@ -1,5 +1,11 @@
 en:
   js:
+    notifications:
+      question_answer_user_commented: "<span>%{username}</span> %{description}"
+      titles:
+        question_answer_user_commented: "new comment"
+      popup:
+        question_answer_user_commented: '%{username} commented in "%{topic}" - %{site_title}'
     composer:
       create_qa:
         label: "Create Q&A topic"

@@ -28,16 +28,16 @@ module QuestionAnswer
         raise Discourse::InvalidAccess
       end
 
-      comment = QuestionAnswerComment.new(
+      comment = QuestionAnswer::CommentCreator.create(
         user: current_user,
         post_id: @post.id,
         raw: comments_params[:raw]
       )
 
-      if comment.save
-        render_serialized(comment, QuestionAnswerCommentSerializer, root: false)
-      else
+      if comment.errors.present?
         render_json_error(comment.errors.full_messages, status: 403)
+      else
+        render_serialized(comment, QuestionAnswerCommentSerializer, root: false)
       end
     end
 

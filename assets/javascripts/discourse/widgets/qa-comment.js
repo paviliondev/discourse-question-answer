@@ -6,12 +6,16 @@ import { formatUsername } from "discourse/lib/utilities";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 
+export function buildAnchorId(qaCommentId) {
+  return `qa-comment-${qaCommentId}`;
+}
+
 export default createWidget("qa-comment", {
   tagName: "div.qa-comment",
   buildKey: (attrs) => `qa-comment-${attrs.id}`,
 
-  buildClasses(attrs) {
-    return [`qa-comment-${attrs.id}`];
+  buildId(attrs) {
+    return buildAnchorId(attrs.id);
   },
 
   sendShowLogin() {

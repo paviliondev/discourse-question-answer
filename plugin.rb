@@ -18,6 +18,7 @@ after_initialize do
     ../lib/question_answer/engine.rb
     ../lib/question_answer/vote_manager.rb
     ../lib/question_answer/guardian.rb
+    ../lib/question_answer/comment_creator.rb
     ../extensions/post_extension.rb
     ../extensions/post_serializer_extension.rb
     ../extensions/topic_extension.rb
