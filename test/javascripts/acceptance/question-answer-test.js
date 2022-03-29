@@ -19,6 +19,7 @@ const topicList = cloneJSON(discoveryFixtures["/latest.json"]);
 function qaEnabledTopicResponse() {
   topicResponse.post_stream.posts[0]["qa_vote_count"] = 0;
   topicResponse.post_stream.posts[0]["comments_count"] = 1;
+  topicResponse.post_stream.posts[0]["qa_has_votes"] = false;
 
   topicResponse.post_stream.posts[0]["comments"] = [
     {
@@ -243,6 +244,17 @@ acceptance("Discourse Question Answer - anon user", function (needs) {
 acceptance("Discourse Question Answer - logged in user", function (needs) {
   setupQA(needs);
   needs.user();
+
+  test("Q&A features do not leak into non-Q&A topics", async function (assert) {
+    await visit("/t/130");
+
+    assert.ok(exists("#post_1 button.reply"), "displays the reply button");
+
+    assert.notOk(
+      exists(".qa-answers-header"),
+      "does not display the Q&A answers header"
+    );
+  });
 
   test("non Q&A topics do not have Q&A specific class on body tag", async function (assert) {
     await visit("/t/130");

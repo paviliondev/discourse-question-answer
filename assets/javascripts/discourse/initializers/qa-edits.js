@@ -1,6 +1,5 @@
 import I18n from "I18n";
 import { withPluginApi } from "discourse/lib/plugin-api";
-import { readOnly } from "@ember/object/computed";
 
 export const ORDER_BY_ACTIVITY_FILTER = "activity";
 const pluginId = "discourse-question-answer";
@@ -32,7 +31,7 @@ function initPlugin(api) {
   );
 
   api.removePostMenuButton("reply", (attrs) => {
-    return attrs.isQA && attrs.post_number !== 1;
+    return attrs.qa_has_votes !== undefined && attrs.post_number !== 1;
   });
 
   api.removePostMenuButton("like", (_attrs, _state, siteSetting) => {
@@ -105,7 +104,7 @@ function initPlugin(api) {
     const result = [];
     const post = helper.getModel();
 
-    if (!post.isQA) {
+    if (!post.topic.is_qa) {
       return result;
     }
 
@@ -170,7 +169,7 @@ function initPlugin(api) {
     const attrs = helper.widget.attrs;
 
     if (
-      attrs.isQA &&
+      attrs.qa_has_votes !== undefined &&
       !attrs.reply_to_post_number &&
       !helper.widget.state.filteredRepliesShown
     ) {
@@ -196,17 +195,9 @@ function initPlugin(api) {
     return result;
   });
 
-  api.modifyClass("model:post", {
-    pluginId,
-
-    isQA: readOnly("topic.is_qa"),
-  });
-
   api.includePostAttributes(
-    "isQA",
     "comments",
     "comments_count",
-    "qa_disable_like",
     "qa_user_voted_direction",
     "qa_has_votes"
   );
