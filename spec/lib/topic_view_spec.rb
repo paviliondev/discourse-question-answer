@@ -85,4 +85,93 @@ describe TopicView do
       expect(topic_view.comments_counts[answer.id]).to eq(2)
     end
   end
+
+  describe '#filter_posts_near' do
+    fab!(:topic) { Fabricate(:topic, subtype: Topic::QA_SUBTYPE) }
+    fab!(:post) { create_post(topic: topic) }
+
+    fab!(:answer_plus_2_votes) do
+      create_post(topic: topic).tap do |p|
+        QuestionAnswer::VoteManager.vote(p, Fabricate(:user), direction: QuestionAnswerVote.directions[:up])
+        QuestionAnswer::VoteManager.vote(p, Fabricate(:user), direction: QuestionAnswerVote.directions[:up])
+      end
+    end
+
+    fab!(:answer_minus_2_votes) do
+      create_post(topic: topic).tap do |p|
+        QuestionAnswer::VoteManager.vote(p, Fabricate(:user), direction: QuestionAnswerVote.directions[:down])
+        QuestionAnswer::VoteManager.vote(p, Fabricate(:user), direction: QuestionAnswerVote.directions[:down])
+      end
+    end
+
+    fab!(:answer_minus_1_vote) do
+      create_post(topic: topic).tap do |p|
+        QuestionAnswer::VoteManager.vote(p, Fabricate(:user), direction: QuestionAnswerVote.directions[:down])
+      end
+    end
+
+    fab!(:answer_0_votes) { create_post(topic: topic) }
+
+    fab!(:answer_plus_1_vote_deleted) do
+      create_post(topic: topic).tap do |p|
+        QuestionAnswer::VoteManager.vote(p, Fabricate(:user), direction: QuestionAnswerVote.directions[:up])
+        p.trash!
+      end
+    end
+
+    fab!(:answer_plus_1_vote) do
+      create_post(topic: topic).tap do |p|
+        QuestionAnswer::VoteManager.vote(p, Fabricate(:user), direction: QuestionAnswerVote.directions[:up])
+      end
+    end
+
+    def topic_view_near(post)
+      TopicView.new(topic.id, user, post_number: post.post_number)
+    end
+
+    before do
+      Topic.reset_highest(topic.id)
+      TopicView.stubs(:chunk_size).returns(3)
+    end
+
+    it "snaps to the lower boundary" do
+      near_view = topic_view_near(post)
+      expect(near_view.desired_post.id).to eq(post.id)
+      expect(near_view.posts.map(&:id)).to eq([post.id, answer_plus_2_votes.id, answer_plus_1_vote.id])
+    end
+
+    it "snaps to the upper boundary" do
+      near_view = topic_view_near(answer_minus_2_votes)
+
+      expect(near_view.desired_post.id).to eq(answer_minus_2_votes.id)
+      expect(near_view.posts.map(&:id)).to eq([answer_0_votes.id, answer_minus_1_vote.id, answer_minus_2_votes.id])
+    end
+
+    it "returns the posts in the middle" do
+      near_view = topic_view_near(answer_0_votes)
+      expect(near_view.desired_post.id).to eq(answer_0_votes.id)
+      expect(near_view.posts.map(&:id)).to eq([answer_plus_1_vote.id, answer_0_votes.id, answer_minus_1_vote.id])
+    end
+
+    it "snaps to the lower boundary when deleted post_number is provided" do
+      near_view = TopicView.new(topic.id, user, post_number: topic.posts.where("deleted_at IS NOT NULL").pluck_first(:post_number))
+
+      expect(near_view.desired_post.id).to eq(post.id)
+      expect(near_view.posts.map(&:id)).to eq([post.id, answer_plus_2_votes.id, answer_plus_1_vote.id])
+    end
+
+    it "snaps to the lower boundary when post_number is too large" do
+      near_view = TopicView.new(topic.id, user, post_number: 99999999)
+
+      expect(near_view.desired_post.id).to eq(post.id)
+      expect(near_view.posts.map(&:id)).to eq([post.id, answer_plus_2_votes.id, answer_plus_1_vote.id])
+    end
+
+    it "returns the posts in the middle when sorted by activity" do
+      near_view = TopicView.new(topic.id, user, post_number: answer_minus_1_vote.post_number, filter: TopicView::ACTIVITY_FILTER)
+
+      expect(near_view.desired_post.id).to eq(answer_minus_1_vote.id)
+      expect(near_view.posts.map(&:id)).to eq([answer_minus_2_votes.id, answer_minus_1_vote.id, answer_0_votes.id])
+    end
+  end
 end

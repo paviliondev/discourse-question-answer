@@ -58,8 +58,8 @@ after_initialize do
     include QuestionAnswer::TopicExtension
   end
 
-  class ::TopicView
-    include QuestionAnswer::TopicViewExtension
+  reloadable_patch do
+    TopicView.prepend(QuestionAnswer::TopicViewExtension)
   end
 
   class ::TopicViewSerializer
