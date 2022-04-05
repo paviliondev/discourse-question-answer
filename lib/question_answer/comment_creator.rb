@@ -8,10 +8,24 @@ module QuestionAnswer
       ActiveRecord::Base.transaction do
         if qa_comment.save
           create_commented_notification(qa_comment)
+
+          DB.after_commit do
+            publish_changes(qa_comment)
+          end
         end
       end
 
       qa_comment
+    end
+
+    def self.publish_changes(qa_comment)
+      Scheduler::Defer.later "Publish new Q&A comment" do
+        qa_comment.post.publish_change_to_clients!(
+          :qa_post_commented,
+          comment: QuestionAnswerCommentSerializer.new(qa_comment, root: false).as_json,
+          comments_count: QuestionAnswerComment.where(post_id: qa_comment.post_id).count
+        )
+      end
     end
 
     def self.create_commented_notification(qa_comment)

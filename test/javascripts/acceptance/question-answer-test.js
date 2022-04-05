@@ -1,4 +1,10 @@
-import { click, fillIn, triggerEvent, visit } from "@ember/test-helpers";
+import {
+  click,
+  fillIn,
+  settled,
+  triggerEvent,
+  visit,
+} from "@ember/test-helpers";
 import {
   acceptance,
   exists,
@@ -7,7 +13,7 @@ import {
   queryAll,
   updateCurrentUser,
 } from "discourse/tests/helpers/qunit-helpers";
-import { skip, test } from "qunit";
+import { test } from "qunit";
 import topicFixtures from "discourse/tests/fixtures/topic";
 import discoveryFixtures from "discourse/tests/fixtures/discovery-fixtures";
 import { cloneJSON } from "discourse-common/lib/object";
@@ -565,10 +571,7 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     assert.ok(fourthTopicLink.endsWith("/2"));
   });
 
-  // Skip message bus tests but keep it around for development use. We currently do not have a reliable way to wait for
-  // widgets to re-render and this results in all kinds of timing issues. For example, this test passes in the browser
-  // but fails when ran in headless mode.
-  skip("receiving user post voted message where current user removed their vote", async function (assert) {
+  test("receiving user post voted message where current user removed their vote", async function (assert) {
     await visit("/t/280");
 
     publishToMessageBus("/topic/280", {
@@ -579,6 +582,8 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
       qa_user_voted_id: 19,
       qa_user_voted_direction: null,
     });
+
+    await settled();
 
     assert.strictEqual(
       query("#post_2 span.qa-post-toggle-voters").textContent,
@@ -592,7 +597,7 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     );
   });
 
-  skip("receiving user post voted message where post no longer has votes", async function (assert) {
+  test("receiving user post voted message where post no longer has votes", async function (assert) {
     await visit("/t/280");
 
     publishToMessageBus("/topic/280", {
@@ -604,6 +609,8 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
       qa_user_voted_direction: "down",
     });
 
+    await settled();
+
     assert.strictEqual(
       query("#post_2 span.qa-post-toggle-voters").textContent,
       "0",
@@ -611,7 +618,7 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     );
   });
 
-  skip("receiving user post voted message where current user is not the one that voted", async function (assert) {
+  test("receiving user post voted message where current user is not the one that voted", async function (assert) {
     await visit("/t/280");
 
     publishToMessageBus("/topic/280", {
@@ -622,6 +629,8 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
       qa_user_voted_id: 123456,
       qa_user_voted_direction: "down",
     });
+
+    await settled();
 
     assert.strictEqual(
       query("#post_2 .qa-post-toggle-voters").textContent,
@@ -640,7 +649,7 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     );
   });
 
-  skip("receiving user post voted message where current user is the one that voted", async function (assert) {
+  test("receiving user post voted message where current user is the one that voted", async function (assert) {
     await visit("/t/280");
 
     publishToMessageBus("/topic/280", {
@@ -652,6 +661,8 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
       qa_user_voted_direction: "up",
     });
 
+    await settled();
+
     assert.strictEqual(
       query("#post_2 .qa-post-toggle-voters").textContent,
       "5",
@@ -661,6 +672,81 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     assert.ok(
       exists("#post_2 .qa-button-upvote.qa-button-voted"),
       "highlights the upvote button for the current user"
+    );
+  });
+
+  test("receving post commented message when comment has already been loaded", async function (assert) {
+    await visit("/t/280");
+
+    publishToMessageBus("/topic/280", {
+      type: "qa_post_commented",
+      id: topicResponse.post_stream.posts[0].id,
+      comments_count: 1,
+      comment: topicResponse.post_stream.posts[0]["comments"][0],
+    });
+
+    await settled();
+
+    assert.ok(
+      !exists("#post_1 #qa-comment-5678"),
+      "it does not append comment when comment has already been loaded"
+    );
+  });
+
+  test("receving post commented message when there are no more comments to load ", async function (assert) {
+    await visit("/t/280");
+
+    publishToMessageBus("/topic/280", {
+      type: "qa_post_commented",
+      id: topicResponse.post_stream.posts[0].id,
+      comments_count: 2,
+      comment: {
+        id: 5678,
+        user_id: 12345,
+        name: "Some Commenter",
+        username: "somecommenter",
+        created_at: "2022-01-12T08:21:54.175Z",
+        cooked: "<p>Test comment ABC</p>",
+      },
+    });
+
+    await settled();
+
+    assert.ok(
+      query("#post_1 #qa-comment-5678").textContent.includes(
+        "Test comment ABC"
+      ),
+      "it appends comment to comments stream"
+    );
+  });
+
+  test("receiving post commented message when there are more comments to load", async function (assert) {
+    await visit("/t/280");
+
+    publishToMessageBus("/topic/280", {
+      type: "qa_post_commented",
+      id: topicResponse.post_stream.posts[1].id,
+      comments_count: 7,
+      comment: {
+        id: 5678,
+        user_id: 12345,
+        name: "Some Commenter",
+        username: "somecommenter",
+        created_at: "2022-01-12T08:21:54.175Z",
+        cooked: "<p>Test comment ABC</p>",
+      },
+    });
+
+    await settled();
+
+    assert.ok(
+      !exists("#post_2 #qa-comment-5678"),
+      "it does not append comment when there are more comments to load"
+    );
+
+    assert.ok(
+      exists("#post_2 .qa-comments-menu-show-more-link"),
+      "updates the comments count to reflect the new comment"
     );
   });
 });

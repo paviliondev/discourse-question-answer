@@ -25,7 +25,7 @@ class QuestionAnswerCommentSerializer < ApplicationSerializer
     if @comments_user_voted
       @comments_user_voted[object.id]
     else
-      object.votes.exists?(user: scope.user)
+      scope.present? && object.votes.exists?(user: scope.user)
     end
   end
 end

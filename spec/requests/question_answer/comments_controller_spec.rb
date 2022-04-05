@@ -90,7 +90,33 @@ RSpec.describe QuestionAnswer::CommentsController do
       expect(response.status).to eq(404)
     end
 
-    it 'returns the right response after creating a new comment' do
+    it 'publishes a comment created MessageBus message when a new comment is created' do
+      message = MessageBus.track_publish("/topic/#{answer.topic_id}") do
+        expect do
+          post "/qa/comments.json", params: {
+            post_id: answer.id,
+            raw: "this is some content",
+          }
+
+          expect(response.status).to eq(200)
+        end.to change { answer.reload.question_answer_comments.count }.by(1)
+      end.first
+
+      comment = answer.question_answer_comments.last
+      payload = message[:data]
+
+      expect(payload[:comment][:id]).to eq(comment.id)
+      expect(payload[:comment][:user_id]).to eq(user.id)
+      expect(payload[:comment][:name]).to eq(user.name)
+      expect(payload[:comment][:username]).to eq(user.username)
+      expect(payload[:comment][:created_at]).to be_present
+      expect(payload[:comment][:raw]).to eq("this is some content")
+      expect(payload[:comment][:cooked]).to eq("<p>this is some content</p>")
+      expect(payload[:comment][:qa_vote_count]).to eq(0)
+      expect(payload[:comment][:user_voted]).to eq(false)
+    end
+
+    it 'publishes a notification when a new comment is created' do
       answer.user.update!(last_seen_at: Time.zone.now) # User has to be seen recently to trigger notification alert message
 
       message = MessageBus.track_publish("/notification-alert/#{answer.user_id}") do
@@ -101,32 +127,42 @@ RSpec.describe QuestionAnswer::CommentsController do
           }
 
           expect(response.status).to eq(200)
-        end.to change { QuestionAnswerComment.count }.by(1)
-          .and change { answer.user.notifications.count }.by(1)
+        end.to change { answer.user.notifications.count }.by(1)
       end.first
 
-      payload = response.parsed_body
+      notification = answer.user.notifications.last
       comment = QuestionAnswerComment.last
+
+      expect(notification.notification_type).to eq(Notification.types[:question_answer_user_commented])
+      expect(notification.user_id).to eq(answer.user_id)
+      expect(notification.post_number).to eq(answer.post_number)
+      expect(notification.topic_id).to eq(answer.topic_id)
+
+      expect(notification.data).to eq({
+        qa_comment_id: comment.id,
+        display_username: user.username
+      }.to_json)
+
+      expect(message.data[:notification_type]).to eq(Notification.types[:question_answer_user_commented])
+    end
+
+    it 'returns the right response after creating a new comment' do
+      expect do
+        post "/qa/comments.json", params: {
+          post_id: answer.id,
+          raw: "this is some content",
+        }
+
+        expect(response.status).to eq(200)
+      end.to change { answer.reload.question_answer_comments.count }.by(1)
+
+      payload = response.parsed_body
+      comment = answer.question_answer_comments.last
 
       expect(payload["id"]).to eq(comment.id)
       expect(payload["name"]).to eq(user.name)
       expect(payload["username"]).to eq(user.username)
       expect(payload["cooked"]).to eq(comment.cooked)
-
-      notification = answer.user.notifications.last
-
-      expect(Notification.exists?(
-        notification_type: Notification.types[:question_answer_user_commented],
-        user_id: answer.user_id,
-        post_number: answer.post_number,
-        topic_id: answer.topic_id,
-        data: {
-          qa_comment_id: comment.id,
-          display_username: user.username
-        }.to_json
-      )).to eq(true)
-
-      expect(message.data[:notification_type]).to eq(Notification.types[:question_answer_user_commented])
     end
   end
 

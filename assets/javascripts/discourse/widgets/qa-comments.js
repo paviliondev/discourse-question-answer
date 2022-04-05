@@ -4,20 +4,13 @@ export default createWidget("qa-comments", {
   tagName: "div.qa-comments",
   buildKey: (attrs) => `qa-comments-${attrs.id}`,
 
-  defaultState(attrs) {
-    return {
-      comments: attrs.comments || [],
-      commentCount: attrs.comments_count || 0,
-    };
-  },
-
-  html(attrs, state) {
+  html(attrs) {
     const result = [];
-    const postCommentsLength = state.comments.length;
+    const postCommentsLength = attrs.comments.length;
 
     if (postCommentsLength > 0) {
       for (let i = 0; i < postCommentsLength; i++) {
-        result.push(this.attach("qa-comment", state.comments[i]));
+        result.push(this.attach("qa-comment", attrs.comments[i]));
       }
     }
 
@@ -26,9 +19,9 @@ export default createWidget("qa-comments", {
         this.attach("qa-comments-menu", {
           id: attrs.id,
           postNumber: attrs.post_number,
-          moreCommentCount: state.commentCount - postCommentsLength,
-          lastCommentId: state.comments
-            ? state.comments[state.comments.length - 1]?.id || 0
+          moreCommentCount: attrs.comments_count - postCommentsLength,
+          lastCommentId: attrs.comments
+            ? attrs.comments[attrs.comments.length - 1]?.id || 0
             : 0,
         })
       );
@@ -38,31 +31,33 @@ export default createWidget("qa-comments", {
   },
 
   appendComments(comments) {
-    this.state.comments = this.state.comments.concat(comments);
+    const post = this.findAncestorModel();
+
+    comments.forEach((comment) => {
+      post.comments.pushObject(comment);
+    });
   },
 
   removeComment(commentId) {
-    let removed = false;
+    const post = this.findAncestorModel();
 
-    this.state.comments = this.state.comments.filter((comment) => {
-      if (comment.id === commentId) {
-        removed = true;
-        return false;
-      } else {
-        return true;
-      }
+    const commentToRemove = post.comments.find((comment) => {
+      return comment.id === commentId;
     });
 
-    if (removed) {
-      this.state.commentCount--;
+    if (commentToRemove) {
+      post.comments.removeObject(commentToRemove);
+      post.comments_count--;
     }
   },
 
   updateComment(comment) {
-    const index = this.state.comments.findIndex(
+    const post = this.findAncestorModel();
+
+    const index = post.comments.findIndex(
       (oldComment) => oldComment.id === comment.id
     );
-    this.state.comments[index] = comment;
+    post.comments[index] = comment;
     this.scheduleRerender();
   },
 });

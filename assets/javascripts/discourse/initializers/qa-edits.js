@@ -6,6 +6,31 @@ const pluginId = "discourse-question-answer";
 
 function initPlugin(api) {
   api.registerCustomPostMessageCallback(
+    "qa_post_commented",
+    (topicController, message) => {
+      const postStream = topicController.get("model.postStream");
+      const post = postStream.findLoadedPost(message.id);
+
+      if (
+        post &&
+        !post.comments.some((comment) => comment.id === message.comment.id)
+      ) {
+        post.setProperties({
+          comments_count: message.comments_count,
+        });
+
+        if (post.comments_count - post.comments.length <= 1) {
+          post.comments.pushObject(message.comment);
+        }
+
+        topicController.appEvents.trigger("post-stream:refresh", {
+          id: post.id,
+        });
+      }
+    }
+  );
+
+  api.registerCustomPostMessageCallback(
     "qa_post_voted",
     (topicController, message) => {
       const postStream = topicController.get("model.postStream");
