@@ -228,20 +228,27 @@ RSpec.describe QuestionAnswer::CommentsController do
       expect(body["cooked"]).to eq("<p>this is some new raw</p>")
     end
 
-    it 'should allow users to update their own comment' do
+    it 'should allow users to update their own comment and publishes a MessageBus message' do
       sign_in(comment.user)
 
-      put "/qa/comments.json", params: {
-        comment_id: comment.id,
-        raw: 'this is some new raw'
-      }
+      message = MessageBus.track_publish("/topic/#{comment.post.topic_id}") do
+        put "/qa/comments.json", params: {
+          comment_id: comment.id,
+          raw: 'this is some new raw'
+        }
 
-      expect(response.status).to eq(200)
+        expect(response.status).to eq(200)
+      end.first
 
       body = response.parsed_body
 
       expect(body["raw"]).to eq("this is some new raw")
       expect(body["cooked"]).to eq("<p>this is some new raw</p>")
+
+      expect(message.data[:id]).to eq(comment.post_id)
+      expect(message.data[:comment_id]).to eq(comment.id)
+      expect(message.data[:comment_raw]).to eq("this is some new raw")
+      expect(message.data[:comment_cooked]).to eq("<p>this is some new raw</p>")
     end
   end
 

@@ -783,4 +783,34 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
       "adds the right class to the comment"
     );
   });
+
+  test("receiving post comment edited message for a comment that has been loaded", async function (assert) {
+    await visit("/t/280");
+
+    publishToMessageBus("/topic/280", {
+      type: "qa_post_comment_edited",
+      id: topicResponse.post_stream.posts[0].id,
+      comment_id: topicResponse.post_stream.posts[0].comments[0].id,
+      comment_raw: "this is a new comment raw",
+      comment_cooked: "<p>this is a new comment cooked</p>",
+    });
+
+    await settled();
+
+    assert.strictEqual(
+      query("#post_1 #qa-comment-1 .qa-comment-cooked").textContent.trim(),
+      "this is a new comment cooked",
+      "it updates the content of the comment"
+    );
+
+    await click("#post_1 #qa-comment-1 .qa-comment-actions-edit-link");
+
+    assert.strictEqual(
+      query(
+        "#post_1 #qa-comment-1 .qa-comment-composer textarea"
+      ).textContent.trim(),
+      "this is a new comment raw",
+      "it updates the content of the comment editor"
+    );
+  });
 });

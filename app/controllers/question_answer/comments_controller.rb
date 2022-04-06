@@ -51,6 +51,15 @@ module QuestionAnswer
       raise Discourse::InvalidAccess if !@guardian.can_edit_comment?(comment)
 
       if comment.update(raw: params[:raw])
+        Scheduler::Defer.later("Publish Q&A comment edited") do
+          comment.post.publish_change_to_clients!(
+            :qa_post_comment_edited,
+            comment_id: comment.id,
+            comment_raw: comment.raw,
+            comment_cooked: comment.cooked
+          )
+        end
+
         render_serialized(comment, QuestionAnswerCommentSerializer, root: false)
       else
         render_json_error(comment.errors.full_messages, status: 403)

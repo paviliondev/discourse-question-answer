@@ -11,6 +11,35 @@ export default {
 
     withPluginApi("1.2.0", (api) => {
       api.registerCustomPostMessageCallback(
+        "qa_post_comment_edited",
+        (topicController, message) => {
+          const postStream = topicController.get("model.postStream");
+          const post = postStream.findLoadedPost(message.id);
+
+          if (post) {
+            let refresh = false;
+
+            post.comments.forEach((comment) => {
+              if (
+                comment.id === message.comment_id &&
+                comment.raw !== message.comment_raw
+              ) {
+                comment.raw = message.comment_raw;
+                comment.cooked = message.comment_cooked;
+                refresh = true;
+              }
+            });
+
+            if (refresh) {
+              topicController.appEvents.trigger("post-stream:refresh", {
+                id: post.id,
+              });
+            }
+          }
+        }
+      );
+
+      api.registerCustomPostMessageCallback(
         "qa_post_comment_trashed",
         (topicController, message) => {
           const postStream = topicController.get("model.postStream");
