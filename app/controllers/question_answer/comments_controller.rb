@@ -66,6 +66,14 @@ module QuestionAnswer
 
       comment.trash!
 
+      Scheduler::Defer.later("Publish trash Q&A comment") do
+        comment.post.publish_change_to_clients!(
+          :qa_post_comment_trashed,
+          comment_id: comment.id,
+          comments_count: QuestionAnswerComment.where(post_id: comment.post_id).count
+        )
+      end
+
       render json: success_json
     end
 

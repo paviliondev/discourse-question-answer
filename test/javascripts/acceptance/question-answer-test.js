@@ -475,10 +475,9 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     await click("#post_1 .qa-comment-actions-delete-link");
     await click("a.btn-primary");
 
-    assert.strictEqual(
-      queryAll("#post_1 .qa-comment").length,
-      0,
-      "comment is removed after being deleted"
+    assert.ok(
+      exists("#post_1 #qa-comment-1.qa-comment-deleted"),
+      "adds the right class to deleted comment"
     );
   });
 
@@ -511,10 +510,9 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
       "updates the comment count such that show more link is not displayed"
     );
 
-    assert.strictEqual(
-      queryAll("#post_2 .qa-comment").length,
-      5,
-      "removes deleted comment"
+    assert.ok(
+      exists("#post_2 #qa-comment-7.qa-comment-deleted"),
+      "adds the right class to deleted comment"
     );
   });
 
@@ -747,6 +745,42 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     assert.ok(
       exists("#post_2 .qa-comments-menu-show-more-link"),
       "updates the comments count to reflect the new comment"
+    );
+  });
+
+  test("receiving post comment trashed message for a comment that has not been loaded ", async function (assert) {
+    await visit("/t/280");
+
+    publishToMessageBus("/topic/280", {
+      type: "qa_post_comment_trashed",
+      id: topicResponse.post_stream.posts[1].id,
+      comments_count: 5,
+      comment_id: 12345,
+    });
+
+    await settled();
+
+    assert.notOk(
+      exists("#post_2 .qa-comments-menu-show-more-link"),
+      "removes the show more comments link"
+    );
+  });
+
+  test("receving post comment trashed message for a comment that has been loaded", async function (assert) {
+    await visit("/t/280");
+
+    publishToMessageBus("/topic/280", {
+      type: "qa_post_comment_trashed",
+      id: topicResponse.post_stream.posts[1].id,
+      comments_count: 5,
+      comment_id: topicResponse.post_stream.posts[1].comments[0].id,
+    });
+
+    await settled();
+
+    assert.ok(
+      exists("#post_2 #qa-comment-2.qa-comment-deleted"),
+      "adds the right class to the comment"
     );
   });
 });

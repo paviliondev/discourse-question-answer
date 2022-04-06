@@ -67,6 +67,10 @@
   align-items: flex-start;
   padding: 0.7em 0;
 
+  &.qa-comment-deleted {
+    background-color: var(--danger-low-mid);
+  }
+
   .qa-comment-actions-vote {
     margin-right: 0.5em;
     display: inline-grid;

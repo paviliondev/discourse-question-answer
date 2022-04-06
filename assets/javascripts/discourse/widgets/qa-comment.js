@@ -11,11 +11,21 @@ export function buildAnchorId(qaCommentId) {
 }
 
 export default createWidget("qa-comment", {
-  tagName: "div.qa-comment",
+  tagName: "div",
   buildKey: (attrs) => `qa-comment-${attrs.id}`,
 
   buildId(attrs) {
     return buildAnchorId(attrs.id);
+  },
+
+  buildClasses(attrs) {
+    const result = ["qa-comment"];
+
+    if (attrs.deleted) {
+      result.push("qa-comment-deleted");
+    }
+
+    return result;
   },
 
   sendShowLogin() {

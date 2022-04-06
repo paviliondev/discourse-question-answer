@@ -42,11 +42,15 @@ export default createWidget("qa-comments", {
     const post = this.findAncestorModel();
 
     const commentToRemove = post.comments.find((comment) => {
-      return comment.id === commentId;
+      if (comment.id === commentId) {
+        comment.deleted = true;
+        return true;
+      } else {
+        false;
+      }
     });
 
     if (commentToRemove) {
-      post.comments.removeObject(commentToRemove);
       post.comments_count--;
     }
   },

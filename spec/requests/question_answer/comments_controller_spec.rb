@@ -285,16 +285,23 @@ RSpec.describe QuestionAnswer::CommentsController do
       delete "/qa/comments.json", params: { comment_id: comment.id }
 
       expect(response.status).to eq(200)
-      expect(QuestionAnswerComment.exists?(id: comment.id)).to eq(false)
+      expect(QuestionAnswerComment.with_deleted.where("deleted_at IS NOT NULL AND id = ?", comment.id).exists?).to eq(true)
     end
 
-    it "should allow users to delete their own comment" do
+    it "should allow users to delete their own comment and publishes a message bus message" do
       sign_in(comment.user)
 
-      delete "/qa/comments.json", params: { comment_id: comment.id }
+      message = MessageBus.track_publish("/topic/#{comment.post.topic_id}") do
+        delete "/qa/comments.json", params: { comment_id: comment.id }
 
-      expect(response.status).to eq(200)
-      expect(QuestionAnswerComment.exists?(id: comment.id)).to eq(false)
+        expect(response.status).to eq(200)
+      end.first
+
+      expect(message.data[:id]).to eq(comment.post_id)
+      expect(message.data[:comment_id]).to eq(comment.id)
+      expect(message.data[:comments_count]).to eq(2)
+
+      expect(QuestionAnswerComment.with_deleted.where("deleted_at IS NOT NULL AND id = ?", comment.id).exists?).to eq(true)
     end
   end
 end
