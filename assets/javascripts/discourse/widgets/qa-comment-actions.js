@@ -26,7 +26,7 @@ createWidget("qa-comment-actions", {
 
   deleteComment(data) {
     return bootbox.confirm(
-      I18n.t("qa.post.qa_comment.delete_confirm"),
+      I18n.t("qa.post.qa_comment.delete.confirm"),
       I18n.t("no_value"),
       I18n.t("yes_value"),
       (result) => {
