@@ -43,39 +43,18 @@ after_initialize do
     register_svg_icon 'info'
   end
 
-  class ::PostSerializer
-    include QuestionAnswer::PostSerializerExtension
-  end
-
   register_post_custom_field_type('vote_history', :json)
   register_post_custom_field_type('vote_count', :integer)
 
-  class ::Post
-    include QuestionAnswer::PostExtension
-  end
-
-  class ::Topic
-    include QuestionAnswer::TopicExtension
-  end
-
   reloadable_patch do
+    Post.include(QuestionAnswer::PostExtension)
+    Topic.include(QuestionAnswer::TopicExtension)
+    PostSerializer.include(QuestionAnswer::PostSerializerExtension)
     TopicView.prepend(QuestionAnswer::TopicViewExtension)
-  end
-
-  class ::TopicViewSerializer
-    include QuestionAnswer::TopicViewSerializerExtension
-  end
-
-  class ::TopicListItemSerializer
-    include QuestionAnswer::TopicListItemSerializerExtension
-  end
-
-  class ::User
-    include QuestionAnswer::UserExtension
-  end
-
-  class ::Guardian
-    include QuestionAnswer::Guardian
+    TopicViewSerializer.include(QuestionAnswer::TopicViewSerializerExtension)
+    TopicListItemSerializer.include(QuestionAnswer::TopicListItemSerializerExtension)
+    User.include(QuestionAnswer::UserExtension)
+    Guardian.include(QuestionAnswer::Guardian)
   end
 
   # TODO: Performance of the query degrades as the number of posts a user has voted
