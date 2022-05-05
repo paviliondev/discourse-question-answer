@@ -57,3 +57,26 @@ class QuestionAnswerComment < ActiveRecord::Base
     end
   end
 end
+
+# == Schema Information
+#
+# Table name: question_answer_comments
+#
+#  id             :bigint           not null, primary key
+#  post_id        :integer          not null
+#  user_id        :integer          not null
+#  raw            :text             not null
+#  cooked         :text             not null
+#  cooked_version :integer
+#  deleted_at     :datetime
+#  deleted_by_id  :integer
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  qa_vote_count  :integer          default(0)
+#
+# Indexes
+#
+#  index_question_answer_comments_on_deleted_by_id  (deleted_by_id) WHERE (deleted_by_id IS NOT NULL)
+#  index_question_answer_comments_on_post_id        (post_id)
+#  index_question_answer_comments_on_user_id        (user_id)
+#

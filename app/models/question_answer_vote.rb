@@ -54,3 +54,19 @@ class QuestionAnswerVote < ActiveRecord::Base
     end
   end
 end
+
+# == Schema Information
+#
+# Table name: question_answer_votes
+#
+#  id           :bigint           not null, primary key
+#  user_id      :integer          not null
+#  created_at   :datetime         not null
+#  direction    :string           not null
+#  votable_type :string           not null
+#  votable_id   :integer          not null
+#
+# Indexes
+#
+#  idx_votable_user_id  (votable_type,votable_id,user_id) UNIQUE
+#
