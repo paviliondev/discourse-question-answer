@@ -11,6 +11,9 @@ en:
         qa_not_enabled: "Q&A is not enabled."
         subtype_not_allowed: "Q&A formatted topics can only be created on regular topics."
         cannot_change_to_qa_subtype: "Changing a topic's subtype to Q&A is not permitted."
+      answer_count:
+        one: "%{count} Answer"
+        other: "%{count} Answers"
 
   site_settings:
     qa_tags: "Tags to enable Q&A on topic"
