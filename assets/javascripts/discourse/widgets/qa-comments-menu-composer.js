@@ -8,7 +8,7 @@ createWidget("qa-comments-menu-composer", {
   buildKey: (attrs) => `qa-comments-menu-composer-${attrs.id}`,
 
   defaultState() {
-    return { value: "", creatingPost: false };
+    return { value: "", submitDisabled: true };
   },
 
   html(attrs, state) {
@@ -19,7 +19,7 @@ createWidget("qa-comments-menu-composer", {
     result.push(
       this.attach("button", {
         action: "submitComment",
-        disabled: state.creatingPost,
+        disabled: state.submitDisabled,
         contents: I18n.t("qa.post.qa_comment.submit"),
         icon: "reply",
         className: "btn-primary qa-comments-menu-composer-submit",
@@ -45,10 +45,13 @@ createWidget("qa-comments-menu-composer", {
 
   updateValue(value) {
     this.state.value = value;
+    this.state.submitDisabled =
+      value.length < this.siteSettings.min_post_length ||
+      value.length > this.siteSettings.qa_comment_max_raw_length;
   },
 
   submitComment() {
-    this.state.creatingPost = true;
+    this.state.submitDisabled = true;
 
     return ajax("/qa/comments", {
       type: "POST",
@@ -61,7 +64,7 @@ createWidget("qa-comments-menu-composer", {
       })
       .catch(popupAjaxError)
       .finally(() => {
-        this.state.creatingPost = false;
+        this.state.submitDisabled = false;
       });
   },
 });

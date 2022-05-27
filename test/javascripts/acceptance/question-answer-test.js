@@ -126,7 +126,7 @@ function setupQA(needs) {
   needs.settings({
     qa_enabled: true,
     min_post_length: 5,
-    qa_comment_max_raw_length: 20,
+    qa_comment_max_raw_length: 50,
   });
 
   needs.hooks.afterEach(() => {
@@ -359,20 +359,35 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
       "displays the right message about raw length when it is too short"
     );
 
+    assert.ok(
+      exists(".qa-comments-menu-composer-submit[disabled=true]"),
+      "submit comment button is disabled"
+    );
+
     await fillIn(".qa-comment-composer-textarea", "a".repeat(6));
 
     assert.strictEqual(
       query(".qa-comment-composer-flash").textContent.trim(),
-      I18n.t("qa.post.qa_comment.composer.length_ok", { count: 14 }),
+      I18n.t("qa.post.qa_comment.composer.length_ok", { count: 44 }),
       "displays the right message about raw length when it is OK"
     );
 
-    await fillIn(".qa-comment-composer-textarea", "a".repeat(21));
+    assert.notOk(
+      exists(".qa-comments-menu-composer-submit[disabled=true]"),
+      "submit comment button is enabled"
+    );
+
+    await fillIn(".qa-comment-composer-textarea", "a".repeat(51));
 
     assert.strictEqual(
       query(".qa-comment-composer-flash").textContent.trim(),
-      I18n.t("qa.post.qa_comment.composer.too_long", { count: 20 }),
+      I18n.t("qa.post.qa_comment.composer.too_long", { count: 50 }),
       "displays the right message about raw length when it is too long"
+    );
+
+    assert.ok(
+      exists(".qa-comments-menu-composer-submit[disabled=true]"),
+      "submit comment button is disabled"
     );
   });
 
@@ -439,12 +454,31 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     );
 
     await click("#post_1 .qa-comment-actions-edit-link");
+
+    await fillIn(".qa-comment-composer-textarea", "a".repeat(4));
+
+    assert.strictEqual(
+      query(".qa-comment-composer-flash").textContent.trim(),
+      I18n.t("qa.post.qa_comment.composer.too_short", { count: 5 }),
+      "displays the right message about raw length when it is too short"
+    );
+
+    assert.ok(
+      exists(".qa-comment-editor-submit[disabled=true]"),
+      "submit comment button is disabled"
+    );
+
     await fillIn("#post_1 .qa-comment-editor-1 textarea", "editing this");
 
     assert.strictEqual(
       query(".qa-comment-composer-flash").textContent.trim(),
-      I18n.t("qa.post.qa_comment.composer.length_ok", { count: 8 }),
+      I18n.t("qa.post.qa_comment.composer.length_ok", { count: 38 }),
       "displays the right message when comment lenght is OK"
+    );
+
+    assert.notOk(
+      exists(".qa-comment-editor-submit[disabled=true]"),
+      "submit comment button is enabled"
     );
 
     await click("#post_1 .qa-comment-editor-1 .qa-comment-editor-submit");

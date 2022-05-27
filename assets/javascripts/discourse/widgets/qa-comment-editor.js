@@ -12,7 +12,7 @@ createWidget("qa-comment-editor", {
   },
 
   defaultState(attrs) {
-    return { updatingComment: false, value: attrs.raw };
+    return { value: attrs.raw, submitDisabled: true };
   },
 
   html(attrs, state) {
@@ -20,7 +20,7 @@ createWidget("qa-comment-editor", {
       this.attach("qa-comment-composer", attrs),
       this.attach("button", {
         action: "editComment",
-        disabled: state.updatingComment,
+        disabled: state.submitDisabled,
         contents: I18n.t("qa.post.qa_comment.edit"),
         icon: "pencil-alt",
         className: "btn-primary qa-comment-editor-submit",
@@ -35,6 +35,9 @@ createWidget("qa-comment-editor", {
 
   updateValue(value) {
     this.state.value = value;
+    this.state.submitDisabled =
+      value.length < this.siteSettings.min_post_length ||
+      value.length > this.siteSettings.qa_comment_max_raw_length;
   },
 
   keyDown(e) {
@@ -44,7 +47,7 @@ createWidget("qa-comment-editor", {
   },
 
   editComment() {
-    this.state.updatingComment = true;
+    this.state.submitDisabled = true;
 
     return ajax("/qa/comments", {
       type: "PUT",
@@ -59,7 +62,7 @@ createWidget("qa-comment-editor", {
       })
       .catch(popupAjaxError)
       .finally(() => {
-        this.state.updatingComment = false;
+        this.state.submitDisabled = false;
       });
   },
 });
