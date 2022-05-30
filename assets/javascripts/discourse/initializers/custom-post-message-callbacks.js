@@ -77,7 +77,10 @@ export default {
               comments_count: message.comments_count,
             });
 
-            if (post.comments_count - post.comments.length <= 1) {
+            if (
+              post.comments_count - post.comments.length <= 1 &&
+              topicController.currentUser.id !== message.comment.user_id
+            ) {
               post.comments.pushObject(message.comment);
             }
 

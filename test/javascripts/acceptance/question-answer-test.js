@@ -725,6 +725,33 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     );
   });
 
+  test("receving post commented message for a comment created by the current user", async function (assert) {
+    updateCurrentUser({ id: 12345 });
+
+    await visit("/t/280");
+
+    publishToMessageBus("/topic/280", {
+      type: "qa_post_commented",
+      id: topicResponse.post_stream.posts[0].id,
+      comments_count: 2,
+      comment: {
+        id: 5678,
+        user_id: 12345,
+        name: "Some Commenter",
+        username: "somecommenter",
+        created_at: "2022-01-12T08:21:54.175Z",
+        cooked: "<p>Test comment ABC</p>",
+      },
+    });
+
+    await settled();
+
+    assert.ok(
+      !exists("#post_1 #qa-comment-5678"),
+      "it does not append comment"
+    );
+  });
+
   test("receving post commented message when there are no more comments to load ", async function (assert) {
     await visit("/t/280");
 
