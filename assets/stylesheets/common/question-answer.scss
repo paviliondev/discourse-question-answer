@@ -68,6 +68,7 @@
   flex-direction: row;
   align-items: flex-start;
   padding: 0.7em 0;
+  word-break: break-word;
 
   &.qa-comment-deleted {
     background-color: var(--danger-low-mid);
