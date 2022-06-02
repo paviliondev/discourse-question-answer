@@ -7,6 +7,7 @@ describe QuestionAnswerVote do
   fab!(:topic_post) { Fabricate(:post, topic: topic) }
   fab!(:post) { Fabricate(:post, topic: topic) }
   fab!(:user) { Fabricate(:user) }
+  fab!(:post_1) { Fabricate(:post, topic: topic, user: user) }
   fab!(:tag) { Fabricate(:tag) }
 
   before do
@@ -44,6 +45,15 @@ describe QuestionAnswerVote do
 
         expect(qa_vote.valid?).to eq(false)
         expect(qa_vote.errors[:votable_type].present?).to eq(true)
+      end
+
+      it 'ensures that self voting is not allowed' do
+        qa_vote = QuestionAnswerVote.new(votable: post_1, user: user, direction: QuestionAnswerVote.directions[:up])
+
+        expect(qa_vote.valid?).to eq(false)
+        expect(qa_vote.errors.full_messages).to contain_exactly(
+          I18n.t("post.qa.errors.self_voting_not_permitted")
+        )
       end
     end
 

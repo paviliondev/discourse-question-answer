@@ -8,6 +8,8 @@ module QuestionAnswer
     before_action :ensure_qa_enabled, only: [:create, :destroy]
 
     def create
+      ensure_can_vote(@post.user_id)
+
       unless @post.qa_can_vote(current_user.id, vote_params[:direction])
         raise Discourse::InvalidAccess.new(
           nil,
@@ -26,6 +28,7 @@ module QuestionAnswer
     def create_comment_vote
       comment = find_comment
       ensure_can_see_comment!(comment)
+      ensure_can_vote(comment.user_id)
 
       if QuestionAnswerVote.exists?(votable: comment, user: current_user)
         raise Discourse::InvalidAccess.new(
@@ -137,6 +140,16 @@ module QuestionAnswer
 
     def ensure_can_see_comment!(comment)
       @guardian.ensure_can_see!(comment.post)
+    end
+
+    def ensure_can_vote(author_id)
+      if author_id == current_user.id
+        raise Discourse::InvalidAccess.new(
+          nil,
+          nil,
+          custom_message: 'post.qa.errors.self_voting_not_permitted'
+        )
+      end
     end
   end
 end

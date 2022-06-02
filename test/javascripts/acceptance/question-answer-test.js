@@ -707,7 +707,7 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     );
   });
 
-  test("receving post commented message when comment has already been loaded", async function (assert) {
+  test("receiving post commented message when comment has already been loaded", async function (assert) {
     await visit("/t/280");
 
     publishToMessageBus("/topic/280", {
@@ -725,7 +725,7 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     );
   });
 
-  test("receving post commented message for a comment created by the current user", async function (assert) {
+  test("receiving post commented message for a comment created by the current user", async function (assert) {
     updateCurrentUser({ id: 12345 });
 
     await visit("/t/280");
@@ -752,7 +752,7 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     );
   });
 
-  test("receving post commented message when there are no more comments to load ", async function (assert) {
+  test("receiving post commented message when there are no more comments to load ", async function (assert) {
     await visit("/t/280");
 
     publishToMessageBus("/topic/280", {
@@ -827,7 +827,7 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     );
   });
 
-  test("receving post comment trashed message for a comment that has been loaded", async function (assert) {
+  test("receiving post comment trashed message for a comment that has been loaded", async function (assert) {
     await visit("/t/280");
 
     publishToMessageBus("/topic/280", {

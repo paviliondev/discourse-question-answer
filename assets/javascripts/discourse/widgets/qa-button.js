@@ -37,6 +37,10 @@ export default createWidget("qa-button", {
   },
 
   click() {
+    if (this.attrs.loading) {
+      return false;
+    }
+
     this.sendWidgetAction(
       this.attrs.voted ? "removeVote" : "vote",
       this.attrs.direction

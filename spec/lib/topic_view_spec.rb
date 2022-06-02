@@ -45,7 +45,7 @@ describe TopicView do
 
   it "should preload comments, comments count, user voted status for a given topic" do
     QuestionAnswer::VoteManager.vote(comment, user)
-    QuestionAnswer::VoteManager.vote(comment_2, comment_2.user)
+    QuestionAnswer::VoteManager.vote(comment_2, comment_3.user)
 
     topic_view = TopicView.new(topic, user)
 

@@ -10,6 +10,7 @@ class QuestionAnswerVote < ActiveRecord::Base
   validates :votable_type, presence: true, inclusion: { in: VOTABLE_TYPES }
   validates :votable_id, presence: true
   validates :user_id, presence: true
+  validate :ensure_valid_vote
   validate :ensure_valid_post, if: -> { votable_type == 'Post' }
   validate :ensure_valid_comment, if: -> { votable_type == 'QuestionAnswerComment' }
 
@@ -51,6 +52,12 @@ class QuestionAnswerVote < ActiveRecord::Base
       errors.add(:base, I18n.t("post.qa.errors.qa_not_enabled"))
     elsif post.reply_to_post_number.present?
       errors.add(:base, I18n.t("post.qa.errors.voting_not_permitted"))
+    end
+  end
+
+  def ensure_valid_vote
+    if votable.user_id == user_id
+      errors.add(:base, I18n.t("post.qa.errors.self_voting_not_permitted"))
     end
   end
 end

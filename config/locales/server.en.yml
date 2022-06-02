@@ -5,6 +5,7 @@ en:
         replying_to_post_not_permited: "You are not allowed to create a post in reply to another post."
         voting_not_permitted: "You are not allowed to vote on this post."
         comment_cannot_be_downvoted: "You can only upvote comments."
+        self_voting_not_permitted: "You are not allowed to vote on your own post or comment."
   topic:
     qa:
       errors:

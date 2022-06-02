@@ -3,11 +3,12 @@
 require 'rails_helper'
 
 RSpec.describe QuestionAnswer::VotesController do
+  fab!(:user) { Fabricate(:user) }
   fab!(:topic) { Fabricate(:topic, subtype: Topic::QA_SUBTYPE) }
   fab!(:topic_post) { Fabricate(:post, topic: topic) }
   fab!(:answer) { Fabricate(:post, topic: topic) }
   fab!(:answer_2) { Fabricate(:post, topic: topic) }
-  fab!(:user) { Fabricate(:user) }
+  fab!(:answer_3) { Fabricate(:post, topic: topic, user: user) }
 
   fab!(:admin) { Fabricate(:admin) }
   fab!(:category) { Fabricate(:category) }
@@ -46,6 +47,12 @@ RSpec.describe QuestionAnswer::VotesController do
       expect(response.status).to eq(200)
 
       post '/qa/vote.json', params: { post_id: answer.id }
+
+      expect(response.status).to eq(403)
+    end
+
+    it 'should return 403 if user votes on a post by self' do
+      post '/qa/vote.json', params: { post_id: answer_3.id }
 
       expect(response.status).to eq(403)
     end
@@ -144,6 +151,7 @@ RSpec.describe QuestionAnswer::VotesController do
 
   describe '#create_comment_vote' do
     let(:qa_comment) { Fabricate(:qa_comment, post: answer) }
+    let(:qa_comment_2) { Fabricate(:qa_comment, post: answer, user: user) }
 
     it 'should return 403 for an anon user' do
       post '/qa/vote/comment.json', params: { comment_id: qa_comment.id }
@@ -166,6 +174,14 @@ RSpec.describe QuestionAnswer::VotesController do
       category.update!(read_restricted: true)
 
       post '/qa/vote/comment.json', params: { comment_id: qa_comment.id }
+
+      expect(response.status).to eq(403)
+    end
+
+    it 'should return 403 if user votes on a comment by self' do
+      sign_in(user)
+
+      post '/qa/vote/comment.json', params: { comment_id: qa_comment_2.id }
 
       expect(response.status).to eq(403)
     end
