@@ -16,11 +16,23 @@ export default {
 
       api.customizeComposerText({
         actionTitle(model) {
-          return model.createAsQA ? I18n.t("composer.create_qa.label") : null;
+          if (model.createAsQA) {
+            return I18n.t("composer.create_qa.label");
+          } else if (model.topic?.is_qa) {
+            return I18n.t("qa.topic.answer.label");
+          } else {
+            return null;
+          }
         },
 
         saveLabel(model) {
-          return model.createAsQA ? "composer.create_qa.label" : null;
+          if (model.createAsQA) {
+            return "composer.create_qa.label";
+          } else if (model.topic?.is_qa) {
+            return "qa.topic.answer.label";
+          } else {
+            return null;
+          }
         },
       });
 

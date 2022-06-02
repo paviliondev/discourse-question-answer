@@ -285,6 +285,16 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     );
   });
 
+  test("Q&A topics has relevant copy on reply button", async function (assert) {
+    await visit("/t/280");
+
+    assert.strictEqual(
+      query(".reply.create .d-button-label").textContent.trim(),
+      I18n.t("qa.topic.answer.label"),
+      "displays the correct reply label"
+    );
+  });
+
   test("sorting post stream by activity and votes", async function (assert) {
     await visit("/t/280");
 

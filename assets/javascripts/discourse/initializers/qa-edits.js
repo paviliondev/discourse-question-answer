@@ -6,11 +6,35 @@ const pluginId = "discourse-question-answer";
 
 function initPlugin(api) {
   api.removePostMenuButton("reply", (attrs) => {
-    return attrs.qa_has_votes !== undefined && attrs.post_number !== 1;
+    return attrs.qa_has_votes !== undefined;
   });
 
   api.removePostMenuButton("like", (_attrs, _state, siteSetting) => {
     return siteSetting.qa_disable_like_on_answers;
+  });
+
+  api.addPostMenuButton("answer", (attrs) => {
+    if (
+      attrs.qa_has_votes === undefined ||
+      attrs.post_number !== 1 ||
+      !attrs.canCreatePost
+    ) {
+      return;
+    }
+
+    const args = {
+      action: "replyToPost",
+      title: "qa.topic.answer.help",
+      icon: "reply",
+      className: "reply create fade-out",
+      position: "last",
+    };
+
+    if (!attrs.mobileView) {
+      args.label = "qa.topic.answer.label";
+    }
+
+    return args;
   });
 
   api.modifyClass("model:post-stream", {
