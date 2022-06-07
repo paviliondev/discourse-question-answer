@@ -55,6 +55,7 @@ module QuestionAnswer
     end
 
     def self.can_undo(post, user)
+      return true if post.qa_last_voted(user.id).blank?
       window = SiteSetting.qa_undo_vote_action_window.to_i
       window.zero? || post.qa_last_voted(user.id).to_i > window.minutes.ago.to_i
     end

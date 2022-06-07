@@ -8,15 +8,7 @@ module QuestionAnswer
     before_action :ensure_qa_enabled, only: [:create, :destroy]
 
     def create
-      ensure_can_vote(@post.user_id)
-
-      unless @post.qa_can_vote(current_user.id, vote_params[:direction])
-        raise Discourse::InvalidAccess.new(
-          nil,
-          nil,
-          custom_message: 'vote.error.one_vote_per_post'
-        )
-      end
+      ensure_can_vote(@post)
 
       if QuestionAnswer::VoteManager.vote(@post, current_user, direction: vote_params[:direction])
         render json: success_json
@@ -28,15 +20,7 @@ module QuestionAnswer
     def create_comment_vote
       comment = find_comment
       ensure_can_see_comment!(comment)
-      ensure_can_vote(comment.user_id)
-
-      if QuestionAnswerVote.exists?(votable: comment, user: current_user)
-        raise Discourse::InvalidAccess.new(
-          nil,
-          nil,
-          custom_message: 'vote.error.one_vote_per_comment'
-        )
-      end
+      ensure_can_vote(comment)
 
       if QuestionAnswer::VoteManager.vote(comment, current_user, direction: QuestionAnswerVote.directions[:up])
         render json: success_json
@@ -142,12 +126,32 @@ module QuestionAnswer
       @guardian.ensure_can_see!(comment.post)
     end
 
-    def ensure_can_vote(author_id)
-      if author_id == current_user.id
+    def ensure_can_vote(votable)
+      error_message = nil
+      error_message_params = {}
+
+      if votable.user_id == current_user.id
+        error_message = "post.qa.errors.self_voting_not_permitted"
+      elsif votable.class.name == "Post"
+        direction = vote_params[:direction] || QuestionAnswerVote.directions[:up]
+        if QuestionAnswerVote.exists?(votable: votable, user_id: current_user.id, direction: direction)
+          error_message = "vote.error.one_vote_per_post"
+        elsif !QuestionAnswer::VoteManager.can_undo(votable, current_user)
+          error_message = "vote.error.undo_vote_action_window"
+          error_message_params = { minutes: SiteSetting.qa_undo_vote_action_window }
+        end
+      elsif votable.class.name == "QuestionAnswerComment"
+        if QuestionAnswerVote.exists?(votable: votable, user: current_user)
+          error_message = "vote.error.one_vote_per_comment"
+        end
+      end
+
+      if error_message.present?
         raise Discourse::InvalidAccess.new(
           nil,
           nil,
-          custom_message: 'post.qa.errors.self_voting_not_permitted'
+          custom_message: error_message,
+          custom_message_params: error_message_params
         )
       end
     end

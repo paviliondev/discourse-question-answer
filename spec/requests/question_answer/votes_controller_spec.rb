@@ -56,6 +56,21 @@ RSpec.describe QuestionAnswer::VotesController do
 
       expect(response.status).to eq(403)
     end
+
+    it 'should return 403 after qa_undo_vote_action_window' do
+      SiteSetting.qa_undo_vote_action_window = 1
+
+      post "/qa/vote.json", params: { post_id: answer.id }
+
+      expect(response.status).to eq(200)
+
+      freeze_time 2.minutes.from_now do
+        post '/qa/vote.json', params: { post_id: answer.id, direction: QuestionAnswerVote.directions[:down] }
+
+        expect(response.status).to eq(403)
+        expect(JSON.parse(response.body)['errors'][0]).to eq(I18n.t('vote.error.undo_vote_action_window', minutes: 1))
+      end
+    end
   end
 
   describe '#destroy' do
