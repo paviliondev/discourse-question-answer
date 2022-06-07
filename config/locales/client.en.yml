@@ -48,7 +48,7 @@ en:
             too_long:
               one: "Comment cannot be longer than %{count} character"
               other: "Comment cannot be longer than %{count} characters"
-          submit: "comment"
+          submit: "Add a comment"
           edit: "edit"
           cancel: "cancel"
           add: "Add a comment"
