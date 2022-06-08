@@ -12,3 +12,6 @@ plugins:
     client: true
     hidden: true
     default: 600
+  qa_enable_likes_on_answers:
+    client: true
+    default: false

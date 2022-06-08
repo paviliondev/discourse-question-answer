@@ -10,7 +10,11 @@ function initPlugin(api) {
   });
 
   api.removePostMenuButton("like", (_attrs, _state, siteSetting) => {
-    return siteSetting.qa_disable_like_on_answers;
+    return (
+      _attrs.qa_has_votes !== undefined &&
+      _attrs.post_number !== 1 &&
+      !siteSetting.qa_enable_likes_on_answers
+    );
   });
 
   api.addPostMenuButton("answer", (attrs) => {

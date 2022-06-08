@@ -127,6 +127,7 @@ function setupQA(needs) {
     qa_enabled: true,
     min_post_length: 5,
     qa_comment_max_raw_length: 50,
+    qa_enable_likes_on_answers: false,
   });
 
   needs.hooks.afterEach(() => {
@@ -354,6 +355,20 @@ acceptance("Discourse Question Answer - logged in user", function (needs) {
     assert.notOk(
       exists("#post_2 .reply"),
       "reply button is only shown for the first post"
+    );
+  });
+
+  test("like buttons are hidden in post stream except for the first post", async function (assert) {
+    await visit("/t/280");
+
+    assert.ok(
+      exists("#post_1 .like"),
+      "like button is shown for the first post"
+    );
+
+    assert.notOk(
+      exists("#post_2 .like"),
+      "like button is only shown for the first post"
     );
   });
 
