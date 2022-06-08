@@ -27,6 +27,7 @@ after_initialize do
     ../extensions/topic_view_serializer_extension.rb
     ../extensions/topic_view_extension.rb
     ../extensions/user_extension.rb
+    ../extensions/composer_messages_finder_extension.rb
     ../app/validators/question_answer_comment_validator.rb
     ../app/controllers/question_answer/votes_controller.rb
     ../app/controllers/question_answer/comments_controller.rb
@@ -56,6 +57,7 @@ after_initialize do
     TopicListItemSerializer.include(QuestionAnswer::TopicListItemSerializerExtension)
     User.include(QuestionAnswer::UserExtension)
     Guardian.include(QuestionAnswer::Guardian)
+    ComposerMessagesFinder.prepend(QuestionAnswer::ComposerMessagesFinderExtension)
   end
 
   # TODO: Performance of the query degrades as the number of posts a user has voted
