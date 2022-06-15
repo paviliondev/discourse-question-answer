@@ -15,6 +15,11 @@
       border-top: 1px solid var(--primary-low);
     }
   }
+
+  // disable reactions by default
+  .discourse-reactions-actions {
+    display: none;
+  }
 }
 
 .qa-answers-header {
