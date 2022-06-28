@@ -186,7 +186,7 @@ function initPlugin(api) {
     const result = [];
     const model = helper.getModel();
 
-    if (model.topic.is_qa) {
+    if (model.topic?.is_qa) {
       const qaPost = helper.attach("qa-post", {
         count: model.get("qa_vote_count"),
         post: model,
