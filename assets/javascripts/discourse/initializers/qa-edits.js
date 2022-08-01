@@ -47,12 +47,12 @@ function initPlugin(api) {
     orderStreamByActivity() {
       this.cancelFilter();
       this.set("filter", ORDER_BY_ACTIVITY_FILTER);
-      return this.refreshAndJumptoSecondVisible();
+      return this.refreshAndJumpToSecondVisible();
     },
 
     orderStreamByVotes() {
       this.cancelFilter();
-      return this.refreshAndJumptoSecondVisible();
+      return this.refreshAndJumpToSecondVisible();
     },
   });
 
