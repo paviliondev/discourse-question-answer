@@ -44,7 +44,8 @@ describe TopicsController do
     end
 
     it "includes QA comments for crawler view" do
-      pending "temporarily disable crawler view test while the perf issues are being worked on"
+      skip "temporarily disable crawler view test while the perf issues are being worked on"
+
       get "/t/#{topic.slug}/#{topic.id}.html"
 
       expect(response.status).to eq(200)
