@@ -1,3 +1,5 @@
+> This plugin is no longer maintained. Please use https://github.com/discourse/discourse-question-answer
+
 # Question Answer Plugin
 
 This is a [Discourse](https://meta.discourse.org) plugin built by [Pavilion](https://thepavilion.io).
