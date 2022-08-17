@@ -38,7 +38,10 @@ module QuestionAnswer
 
     def comments
       @comments ||= begin
-        QuestionAnswerComment.joins(:post).where("posts.topic_id = ?", self.id)
+        QuestionAnswerComment
+          .joins(:post)
+          .where("posts.topic_id = ?", self.id)
+          .order(created_at: :asc)
       end
     end
 

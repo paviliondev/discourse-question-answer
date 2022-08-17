@@ -9,7 +9,7 @@ describe Topic do
   fab!(:topic_post) { Fabricate(:post, topic: topic) }
 
   fab!(:answers) do
-    5.times.map { Fabricate(:post, topic: topic) }.sort_by(&:created_at)
+    5.times.map { Fabricate(:post, topic: topic) }.sort_by(&:post_number)
   end
 
   fab!(:comments) do
