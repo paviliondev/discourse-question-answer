@@ -33,9 +33,9 @@ acceptance("Discourse Question Answer - composer", function (needs) {
     await visit("/");
     await click("#create-topic");
 
-    const composerActionTitle = selectKit(".composer-action-title");
-    await composerActionTitle.expand();
-    await composerActionTitle.selectKitSelectRowByName(
+    const composerActions = selectKit(".composer-actions");
+    await composerActions.expand();
+    await composerActions.selectKitSelectRowByName(
       I18n.t("composer.composer_actions.create_as_qa.label")
     );
 
@@ -51,8 +51,8 @@ acceptance("Discourse Question Answer - composer", function (needs) {
       "displays the right label for composer create button"
     );
 
-    await composerActionTitle.expand();
-    await composerActionTitle.selectKitSelectRowByName(
+    await composerActions.expand();
+    await composerActions.selectKitSelectRowByName(
       I18n.t("composer.composer_actions.remove_as_qa.label")
     );
 
@@ -62,8 +62,8 @@ acceptance("Discourse Question Answer - composer", function (needs) {
       "reverts to original composer title when Q&A format is disabled"
     );
 
-    await composerActionTitle.expand();
-    await composerActionTitle.selectKitSelectRowByName(
+    await composerActions.expand();
+    await composerActions.selectKitSelectRowByName(
       I18n.t("composer.composer_actions.create_as_qa.label")
     );
 
