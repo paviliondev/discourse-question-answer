@@ -33,6 +33,7 @@ en:
           vote: "You upvoted this post."
 
     topic:
+      set_as_qa: "Enable QnA for this topic"
       one_to_many:
         title: "New Entry"
         help: "begin composing a new entry"

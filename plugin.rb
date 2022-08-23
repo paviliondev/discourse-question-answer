@@ -134,4 +134,20 @@ after_initialize do
   add_to_serializer(:user_card, :vote_count) do
     object.vote_count
   end
+
+  NewPostManager.add_handler do |manager|
+    is_regular = manager.args[:archetype].nil? || manager.args[:archetype] == Archetype.default
+    not_warning = !manager.args[:is_warning]
+    is_question = manager.args[:is_question] == 'true'
+
+    if is_regular && not_warning && is_question
+      manager.args[:subtype] = 'question'
+    end
+
+    false
+  end
+
+  add_permitted_post_create_param(:is_question)
+  NewPostManager.add_plugin_payload_attribute(:subtype)
+  TopicSubtype.register('question')
 end
