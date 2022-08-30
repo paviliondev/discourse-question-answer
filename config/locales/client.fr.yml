@@ -1,14 +1,11 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
 fr:
   js:
-    composer:
-      composer_actions:
-        reply_to_question:
-          label: Répondre à la question
-          desc: Répondez à la question dans le premier post
-        comment_on_answer:
-          label: "Commentaire sur la réponse de%{postUsername}"
-          desc: Commenter une réponse
-
     post:
       actions:
         undo:
@@ -17,38 +14,6 @@ fr:
           vote: "voté pour cela"
         by_you:
           vote: "Vous avez voté pour ce post"
-        by_you_and_others:
-          vote:
-            one: "Vous et 1 autre avez voté pour ce post"
-            other: "Vous et {{count}} autres personnes avez voté pour ce message"
-
-        by_others:
-          vote:
-            one: "1 personne a voté pour ce post"
-            other: "{{count}} les gens ont voté pour ce post"
-
-
-    topic:
-      answer:
-        title: 'Réponse'
-        help: 'commencer à composer une réponse à la question'
-      comment:
-        title: 'Commentaire'
-        help: 'commencer à rédiger un commentaire sur cette réponse'
-        show_comments:
-          all: 'afficher {{count}} commentaires'
-          more: 'show {{count}} plus de commentaires'
-
-      tip:
-        qa:
-          title: "Question"
-          details: "Les utilisateurs peuvent voter pour la réponse qui répond le mieux au message initial. <ul><li>Chaque utilisateur a droit à un vote.</li><li> Les réponses sont classées par nombre de votes.</li></ul>"
-
     vote:
       already_voted: "Vous ne pouvez voter qu'une fois par question."
-
     last_answer_lowercase: dernière réponse
-    answers_lowercase:
-      one: réponse
-      other: réponses
-

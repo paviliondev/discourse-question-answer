@@ -1,3 +1,9 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
 fi:
   post_action_types:
     vote:
@@ -5,7 +11,6 @@ fi:
       description: 'Äänestä tätä parhaaksi vastaukseksi'
       short_description: 'Äänestä tätä parhaaksi vastaukseksi'
       long_form: 'äänesti tätä parhaaksi vastauseksi'
-
   vote:
     error:
       user_has_not_voted: "Käyttäjä ei ole äänestänyt."

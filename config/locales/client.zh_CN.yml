@@ -1,16 +1,11 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
 zh_CN:
   js:
-    composer:
-      composer_actions:
-        reply_to_question:
-          label: 回答这个问题
-          desc: 在第一个帖子中回答这个问题
-        comment_on_answer:
-          label: 评论 %{postUsername} 的答案
-          desc: 评论答案
-        comment_on_entry:
-          label: 评论 ${postUsername} 的条目
-          desc: 评论一个条目
     post:
       actions:
         undo:
@@ -19,37 +14,6 @@ zh_CN:
           vote: "投票"
         by_you:
           vote: "你为这个答案投票了"
-        by_you_and_others:
-          vote:
-            one: "你和另外一个人投票给了这个答案"
-            other: "你和 {{count}} 个人投票给了这个答案"
-
-        by_others:
-          vote:
-            one: "1 个人投票给了这个答案"
-            other: "{{count}} 个人投票给了这个答案"
-
-    topic:
-      answer:
-        title: '答案'
-        help: '为这个问题添加答案'
-      comment:
-        title: '评论'
-        help: '为这个答案添加评论'
-        show_comments:
-          all: '显示 {{count}} 条评论'
-          more: '显示 {{count}} 条更多评论'
-      tip:
-        qa:
-          title: "问题"
-          details: "用户可以给最佳回答投票。
-                    <ul><li>每人只有一票。</li>
-                    <li>回答以得票数排序。</li></ul>"
-
     vote:
       already_voted: "每个问题您只能投票一次。"
-
     last_answer_lowercase: 最后答案
-    answer_lowercase:
-      one: 答案
-      other: 答案

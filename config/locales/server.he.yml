@@ -1,17 +1,20 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
 he:
   site_settings:
     qa_tags: "תגיות כדי לאפשר Q&A בפוסט"
     qa_enabled: "אפשר תוסף Q&A"
-    qa_disable_like_on_answers: "השבת את כפתור הלייק בפוסטים של Q&A"
     qa_undo_vote_action_window: "מספר הדקות שמשתמשים רשאים לבטל הצבעות בנושאי QnA (הזן 0 ללא הגבלה)"
-
   post_action_types:
     vote:
       title: 'הצבעה'
       description: 'הצבעה עבור פוסט'
       short_description: 'הצבעה עבור פוסט'
       long_form: 'הצבעת עבור הפוסט'
-
   vote:
     error:
       user_has_not_voted: "משתמש לא הצביע."

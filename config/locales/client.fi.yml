@@ -1,14 +1,11 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
 fi:
   js:
-    composer:
-      composer_actions:
-        reply_to_question:
-          label: Vastaa kysymykseen
-          desc: Vastaa alkuperäiseen kysymykseen
-        comment_on_answer:
-          label: "Kommentoi käyttäjän %{postUsername} vastausta"
-          desc: Kommentoi tätä vastausta
-
     post:
       actions:
         undo:
@@ -17,38 +14,9 @@ fi:
           vote: "Äänestivät tätä parhaaksi vastaukseksi"
         by_you:
           vote: "Annoit äänen tälle vastaukselle"
-        by_you_and_others:
-          vote:
-            one: "Sinä ja 1 toinen äänestitte tätä parhaaksi vastaukseksi"
-            other: "Sinä ja {{count}} muuta äänestitte tätä parhaaksi vastaukseksi"
-
-        by_others:
-          vote:
-            one: "1 henkilö äänesti tätä parhaaksi vastaukseksi"
-            other: "{{count}} henkilöä äänestivät tätä parhaaksi vastaukseksi"
-
-
-    topic:
-      answer:
-        title: 'Vastaa'
-        help: 'Kirjoita vastaus kysymykseen'
-      comment:
-        title: 'Kommentoi'
-        help: 'Kommentoi tätä vastausta'
-        show_comments:
-          all: 'näytä {{count}} kommenttia'
-          more: 'näytä {{count}} kommenttia lisää'
-
-      tip:
-        qa:
-          title: "Äänestysohjeet"
-          details: "Äänestä parasta vastausta alkuperäiseen kysymykseen klikkaamalla sinistä peukkua.\n<ul><li>Sinulla on yksi ääni käytössä keskusteluketjua kohden.</li> <li>Vastaukset järjestäytyvät äänien lukumäärän mukaan.</li><li>Jos muutat mieltäsi, voit perua annetun äänen.</li></ul>"
-
     vote:
       already_voted: "Voit äänestää vain yhtä vastausta tähän kysymykseen"
-
     last_answer_lowercase: viimeisin vastaus
     answer_lowercase:
       one: vastaus
       other: vastaukset
-

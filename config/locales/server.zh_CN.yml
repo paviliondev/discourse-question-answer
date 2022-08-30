@@ -1,17 +1,20 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
 zh_CN:
   site_settings:
     qa_tags: "可以启用问答功能的标签"
     qa_enabled: "启用问答插件"
-    qa_disable_like_on_answers: "在问答贴中禁用“喜欢”按钮"
     qa_undo_vote_action_window: "允许用户撤销投票的分钟数（0 为不限制）"
-
   post_action_types:
     vote:
       title: '投票'
       description: '为这个帖子投票'
       short_description: '为这个帖子投票'
       long_form: '为这个帖子投了票'
-
   vote:
     error:
       user_has_not_voted: "用户没有投票"

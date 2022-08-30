@@ -1,54 +1,10 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
 it:
   js:
-    composer:
-      composer_actions:
-        reply_to_question:
-          label: ""
-          desc: ""
-        comment_on_answer:
-          label: ""
-          desc: ""
-
-    post:
-      actions:
-        undo:
-          vote: ""
-        people:
-          vote: ""
-        by_you:
-          vote: ""
-        by_you_and_others:
-          vote:
-            one: ""
-            other: ""
-
-        by_others:
-          vote:
-            one: ""
-            other: ""
-
-
-    topic:
-      answer:
-        title: ''
-        help: ''
-      comment:
-        title: ''
-        help: ''
-        show_comments:
-          all: ''
-          more: ''
-
-      tip:
-        qa:
-          title: "Argomento Q&A"
-          details: "Gli utenti possono votare il messaggio che meglio risponde al messaggio iniziale. <ul><li>Ad ogni utente è consentito un voto.</li> <li>Le risposte vengono ordinate per numero di voti.</li></ul>"
-
     vote:
       already_voted: "Puoi votare una sola volta per domanda."
-
-    last_answer_lowercase: ""
-    answer_lowercase:
-      one: ''
-      other: ''
-

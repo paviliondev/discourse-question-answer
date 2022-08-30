@@ -1,17 +1,20 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
 de:
   site_settings:
     qa_tags: "Schlagwörter, die QnA für ein Thema aktivieren"
     qa_enabled: "Aktiviere das QA Plugin"
-    qa_disable_like_on_answers: "Deaktiviert die Like Schaltfläche für Antworten in QnA Themen"
     qa_undo_vote_action_window: "Anzahl an Minuten, in denen Nutzer Stimmen in QnA Themen zurücknehmen können (0 bedeutet kein Limit)"
-
   post_action_types:
     vote:
       title: 'Abstimmen'
       description: 'Stimme für diesen Beitrag'
       short_description: 'Stimme für diesen Beitrag'
       long_form: 'hat für diesen Beitrag gestimmt'
-
   vote:
     error:
       user_has_not_voted: "Nutzer hat nicht abgestimmt."

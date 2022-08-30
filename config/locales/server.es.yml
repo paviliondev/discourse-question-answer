@@ -1,17 +1,20 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
 es:
   site_settings:
     qa_tags: "Etiquetas para activar PyR en un tema"
     qa_enabled: "Activar el plugin de Preguntas y Respuestas (Q&A - PyR)"
-    qa_disable_like_on_answers: "Desactiva el botón de me gusta en las respuestas de temas PyR"
     qa_undo_vote_action_window: "Número de minutos en los cuales los usuarios tienen permitido deshacer sus votos en temas PyR (introducir 0 para no poner límite)"
-
   post_action_types:
     vote:
       title: 'Votar'
       description: 'Votar este mensaje'
       short_description: 'Votar este mensaje'
       long_form: 'ha votado este mensaje'
-
   vote:
     error:
       user_has_not_voted: "El usuario no ha votado."

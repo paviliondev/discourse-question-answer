@@ -1,17 +1,11 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
 he:
   js:
-    composer:
-      composer_actions:
-        reply_to_question:
-          label: ענה על השאלה
-          desc: ענה על השאלה בפוסט הראשון
-        comment_on_answer:
-          label: "תגובה לתשובה של %{postUsername}"
-          desc: תגובה לתשובה
-        comment_on_entry:
-          label: "הגב על הפוסט של ${postUsername}"
-          desc: הגב על הפוסט
-
     post:
       actions:
         undo:
@@ -20,36 +14,8 @@ he:
           vote: "הצביעו לפוסט."
         by_you:
           vote: "הצבעת לפוסט זה."
-
-    topic:
-      answer:
-        title: 'תשובה'
-        help: 'הוסף תשובה לשאלה'
-      comment:
-        title: 'תגובה'
-        help: 'הוסף תגובה חדשה'
-        show_comments:
-          all: 'הראה {{count}} תגובות'
-          more: 'הראה {{count}} תגובות נוספות'
-
-      tip:
-        qa:
-          title: "שאלה"
-          details: "משתמשים יכולים להצביע בעד התגובה שעונה הכי טוב על הפוסט.
-                    <ul>
-                    <li>משתמש בעל רמת אמון 1 יכול לבצע {{tl1Limit}} הצבעות.</li>
-                    <li>משתמש בעל רמת אמון 2 יכול לבצע {{tl1Limit}} הצבעות.</li>
-                    <li>משתמש בעל רמת אמון 3 יכול לבצע {{tl1Limit}} הצבעות.</li>
-                    <li>משתמש בעל רמת אמון 4 יכול לבצע {{tl1Limit}} הצבעות.</li>
-                    <li>סדר התגובות נקבע לפי כמות ההצבעות</li>
-                    </ul>"
-
     vote:
       already_voted: "ניתן להצביע רק פעם אחת לשאלה."
       user_over_limit: "הגעת לכמות המקסימלית של ההצבעות."
       one_vote_per_post: "ניתן להצביע רק פעם אחת לפוסט."
-
     last_answer_lowercase: תשובה אחרונה
-    answer_lowercase:
-      one: תשובה
-      other: תשובות

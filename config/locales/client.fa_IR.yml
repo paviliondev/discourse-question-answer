@@ -1,0 +1,37 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
+fa_IR:
+  js:
+    notifications:
+      question_answer_user_commented: "<span>%{username}</span> %{description}"
+    composer:
+      create_qa:
+        label: "ایجاد موضوع پرسش و پاسخ"
+      composer_actions:
+        create_as_qa:
+          label: "تغییر پرسش و پاسخ"
+        remove_as_qa:
+          label: "حذف پرسش و پاسخ"
+          desc: "موضوع در ساختار عادی ایجاد خواهد شد"
+    last_answer_lowercase: آخرین پاسخ
+    answer_lowercase:
+      one: پاسخ
+      other: پاسخ
+    qa:
+      post:
+        qa_comment:
+          edit: "ویرایش"
+          cancel: "لغو"
+      topic:
+        answer:
+          label: "پاسخ"
+        sort_by: "مرتب‌سازی بر اساس"
+        votes: "رای‌ها"
+        activity: "فعالیت"
+        answer_count:
+          one: "%{count} پاسخ"
+          other: "%{count} پاسخ"

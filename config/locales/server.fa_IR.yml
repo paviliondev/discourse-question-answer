@@ -1,0 +1,20 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
+fa_IR:
+  topic:
+    qa:
+      errors:
+        qa_not_enabled: "پرسش و پاسخ فعال نیست."
+      answer_count:
+        one: "%{count} پاسخ"
+        other: "%{count} پاسخ"
+  site_settings:
+    qa_enabled: "فعال کردن افزونه پرسش و پاسخ"
+    qa_enable_likes_on_answers: "فعال کردن دکمه پسندیدن روی پاسخ‌ها در موضوعات پرسش و پاسخ"
+  post_action_types:
+    vote:
+      title: 'رای'

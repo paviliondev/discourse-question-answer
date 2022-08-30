@@ -1,17 +1,20 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
 fr:
   site_settings:
     qa_tags: "Tags pour activer QnA sur le sujet"
     qa_enabled: "Activer le plugin QA"
-    qa_disable_like_on_answers: "Désactiver le bouton de type de réponse sur les sujets de questions et réponses"
     qa_undo_vote_action_window: "Nombre de minutes où les utilisateurs sont autorisés à annuler les votes dans les sujets QnA (entrez 0 pour aucune limite)"
-
   post_action_types:
     vote:
       title: 'Vote'
       description: 'Votez pour ce post'
       short_description: 'Votez pour ce post'
       long_form: 'voté pour ce post'
-
   vote:
     error:
       user_has_not_voted: "L'utilisateur n'a pas voté."

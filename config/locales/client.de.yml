@@ -1,17 +1,11 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
 de:
   js:
-    composer:
-      composer_actions:
-        reply_to_question:
-          label: Beantworte die Frage
-          desc: Beantworte die Frage im ersten Beitrag
-        comment_on_answer:
-          label: Kommentiere die Antwort von %{postUsername}
-          desc: Kommentiere eine Antwort
-        comment_on_entry:
-          label: Kommentiere den Beitrag von ${postUsername}
-          desc: Kommentiere einen Beitrag
-
     post:
       actions:
         undo:
@@ -20,38 +14,11 @@ de:
           vote: "Stimme(n) für diesen Beitrag"
         by_you:
           vote: "Du hast für diesen Beitrag gestimmt."
-
-    topic:
-      answer:
-        title: 'Antworten'
-        help: 'beginne damit eine Antwort auf diese Frage zu verfassen'
-      comment:
-        title: 'Kommentieren'
-        help: 'beginne damit einen Kommentar zu verfassen'
-        show_comments:
-          all: 'zeige {{count}} Kommentare'
-          more: 'zeige {{count}} Kommentare mehr'
-
-      tip:
-        qa:
-          title: "Frage"
-          details: "Nutzer können für die Antwort stimmen, die die Frage im ersten Beitrag am besten beantwortet.
-                    <ul>
-                    <li>Vertrauensstufe 1 hat {{tl1Limit}} Stimme.</li>
-                    <li>Vertrauensstufe 2 hat {{tl2Limit}} Stimmen.</li>
-                    <li>Vertrauensstufe 3 hat {{tl3Limit}} Stimmen.</li>
-                    <li>Vertrauensstufe 4 hat {{tl4Limit}} Stimmen.</li>
-                    <li>Antworten werden nach der Anzahl der Stimmen sortiert.</li>
-                    </ul>"
-
     vote:
       already_voted: "Du kannst nur einmal pro Frage abstimmen."
       user_over_limit: "Du kannst nicht öfter abstimmten als es deine Vertrauensstufe erlaubt."
       one_vote_per_post: "Du kannst nur einmal für jeden Beitrag abstimmen."
-
     last_answer_lowercase: letzte Antwort
     answer_lowercase:
       one: Antwort
       other: Antworten
-    qa:
-      answer_count: "{{answerCount}} Antwort(en)"

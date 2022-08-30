@@ -1,14 +1,11 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
 es:
   js:
-    composer:
-      composer_actions:
-        reply_to_question:
-          label: Responder a la pregunta
-          desc: Responder a la pregunta en el primer mensaje
-        comment_on_answer:
-          label: "Comentar la respuesta de %{postUsername}"
-          desc: Comentar una respuesta
-
     post:
       actions:
         undo:
@@ -17,38 +14,9 @@ es:
           vote: "han votado esto"
         by_you:
           vote: "Has votado este mensaje"
-        by_you_and_others:
-          vote:
-            one: "Tú y otra persona habéis votado este mensaje"
-            other: "Tú y otras {{count}} personas habéis votado este mensaje"
-
-        by_others:
-          vote:
-            one: "1 persona ha votado este mensaje"
-            other: "{{count}} personas han votado este mensaje"
-
-
-    topic:
-      answer:
-        title: 'Respuesta'
-        help: 'empezar a redactar una respuesta a la pregunta'
-      comment:
-        title: 'Comentar'
-        help: 'empezar a redactar un comentario sobre una pregunta'
-        show_comments:
-          all: 'mostrar {{count}} comentarios'
-          more: 'mostrar {{count}} más comentarios'
-
-      tip:
-        qa:
-          title: "Pregunta"
-          details: "Los usuarios pueden votar la respuesta que mejor responda a la pregunta del mensaje inicial. <ul><li>Cada usuario solo tiene permitido un voto.</li> <li>Las respuestas están ordenadas según el número de votos recibidos.</li></ul>"
-
     vote:
       already_voted: "Solo puedes votar una vez por pregunta."
-
     last_answer_lowercase: última respuesta
     answer_lowercase:
       one: respuesta
       other: respuestas
-
