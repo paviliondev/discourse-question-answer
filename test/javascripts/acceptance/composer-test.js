@@ -4,6 +4,7 @@ import selectKit from "discourse/tests/helpers/select-kit-helper";
 import { test } from "qunit";
 import I18n from "I18n";
 import { parsePostData } from "discourse/tests/helpers/create-pretender";
+import Category from "discourse/models/category";
 
 let createAsQASetInRequest = false;
 
@@ -74,6 +75,27 @@ acceptance("Discourse Question Answer - composer", function (needs) {
     assert.ok(
       createAsQASetInRequest,
       "submits the right request to create topic as Q&A formatted"
+    );
+  });
+
+  test("Creating new topic in category with Q&A create default", async function (assert) {
+    Category.findById(2).set("create_as_qa_default", true);
+
+    await visit("/");
+    await click("#create-topic");
+
+    assert.strictEqual(
+      query(".action-title").innerText.trim(),
+      I18n.t("topic.create_long")
+    );
+
+    const categoryChooser = selectKit(".category-chooser");
+    await categoryChooser.expand();
+    await categoryChooser.selectRowByValue(2);
+
+    assert.strictEqual(
+      query(".action-title").innerText.trim(),
+      I18n.t("composer.create_qa.label")
     );
   });
 });

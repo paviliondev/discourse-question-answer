@@ -6,6 +6,11 @@ en:
         question_answer_user_commented: "new comment"
       popup:
         question_answer_user_commented: '%{username} commented in "%{topic}" - %{site_title}'
+
+    category:
+      qa_settings_heading: Question Answer
+      create_as_qa_default: New topics default to Q&A in this category.
+
     composer:
       create_qa:
         label: "Create Q&A topic"

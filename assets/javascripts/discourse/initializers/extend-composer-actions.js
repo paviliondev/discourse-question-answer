@@ -1,6 +1,7 @@
 import I18n from "I18n";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { CREATE_TOPIC } from "discourse/models/composer";
+import { observes } from "discourse-common/utils/decorators";
 
 export default {
   name: "extend-composer-actions",
@@ -74,6 +75,21 @@ export default {
         } else {
           return [];
         }
+      });
+
+      api.modifyClass("model:composer", {
+        pluginId: "discourse-question-answer",
+
+        @observes("categoryId")
+        categoryCreateAsQADefault() {
+          const createAsQA = this.category?.create_as_qa_default;
+
+          if (this.creatingTopic && createAsQA !== this.createAsQA) {
+            this.set("createAsQA", createAsQA);
+            this.notifyPropertyChange("replyOptions");
+            this.notifyPropertyChange("action");
+          }
+        },
       });
     });
   },
